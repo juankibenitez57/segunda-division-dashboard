@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
 
@@ -39,6 +39,12 @@
     <li><a href="#" class="nav-link" data-tab="tab-jugadores"><span class="nav-icon">👤</span><span class="nav-text">Jugadores</span></a></li>
     <li><a href="#" class="nav-link" data-tab="tab-revalorizacion"><span class="nav-icon">📈</span><span class="nav-text">Revalorización</span></a></li>
     <li><a href="#" class="nav-link" data-tab="tab-temporadas"><span class="nav-icon">📅</span><span class="nav-text">Temporadas</span></a></li>
+    <li>
+      <a href="#" class="nav-link" data-tab="tab-sub23">
+        <span class="nav-icon">🌟</span>
+        <span class="nav-text">Sub-23</span>
+      </a>
+    </li>
     <li><a href="#" class="nav-link" data-tab="tab-bbdd"><span class="nav-icon">🗄️</span><span class="nav-text">Base de Datos</span></a></li>
   </ul>
 </nav>
@@ -177,7 +183,7 @@
         <div id="chart-evolucion-ops" class="chart-container"></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Dinero total movido por club (Treemap)</div>
+        <div class="chart-title">Ranking Clubes — Dinero Total Movido</div>
         <div id="chart-treemap" class="chart-container"></div>
       </div>
     </div>
@@ -281,7 +287,7 @@
       <div id="chart-pos-tipo" class="chart-container"></div>
     </div>
     <div class="chart-card full-width">
-      <div class="chart-title">Posición → Tipo de operación (Sunburst)</div>
+      <div class="chart-title">Posiciones: Valor Medio vs Volumen</div>
       <div id="chart-sunburst" class="chart-container chart-tall"></div>
     </div>
   </div>
@@ -487,6 +493,65 @@
     </div>
   </div>
 
+  <!-- ═══════════════ SUB-23 TAB ═══════════════ -->
+  <div id="tab-sub23" class="tab-content">
+    <div class="section-header">
+      <h2 class="section-title">🌟 Análisis Sub-23</h2>
+      <p class="section-subtitle">Talento joven — jugadores menores de 23 años</p>
+    </div>
+
+    <!-- KPIs Sub-23 -->
+    <div class="kpi-grid" id="kpis-sub23" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px"></div>
+
+    <!-- Row 1 -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Top Fichajes Sub-23 (importe)</div>
+        <div id="chart-sub23-caros"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Clubes que más fichan Sub-23</div>
+        <div id="chart-sub23-clubes"></div>
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Posiciones más frecuentes Sub-23</div>
+        <div id="chart-sub23-pos"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Nacionalidades Sub-23</div>
+        <div id="chart-sub23-nac"></div>
+      </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Valor medio por posición (Sub-23)</div>
+        <div id="chart-sub23-valor-pos"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Evolución mercado Sub-23 por temporada</div>
+        <div id="chart-sub23-evolucion"></div>
+      </div>
+    </div>
+
+    <!-- Row 4 full width -->
+    <div class="chart-card" style="margin-top:20px">
+      <div class="chart-title">Sub-23 más revalorizados (desde revalorizacion.csv)</div>
+      <div id="chart-sub23-rev"></div>
+    </div>
+
+    <!-- Top operations table -->
+    <div class="chart-card" style="margin-top:20px">
+      <div class="chart-title">Top operaciones Sub-23 — Detalle</div>
+      <div id="table-sub23" style="overflow-x:auto"></div>
+    </div>
+  </div>
+
   <!-- ===================== TAB 8: BASE DE DATOS ===================== -->
   <div id="tab-bbdd" class="tab-content">
     <div class="chart-card full-width">
@@ -525,6 +590,6 @@
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="script.js?v=5"></script>
+<script src="script.js?v=6"></script>
 </body>
 </html>

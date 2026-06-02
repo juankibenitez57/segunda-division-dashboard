@@ -25,17 +25,36 @@ const CLUB_IDS = {
 };
 
 const POS_ES = {
-  'Centre-Forward':'Delantero Centro','Centre-Back':'Central',
-  'Central Midfield':'Mediocentro','Left Winger':'Extremo Izq.',
-  'Right Winger':'Extremo Der.','Right-Back':'Lateral Der.',
-  'Left-Back':'Lateral Izq.','Goalkeeper':'Portero',
-  'Attacking Midfield':'Mediapunta','Defensive Midfield':'Pivote',
-  'Second Striker':'2º Delantero','Right Midfield':'Medio Der.',
-  'Left Midfield':'Medio Izq.','Striker':'Delantero'
+  'Centre-Forward':  'Delantero',
+  'Second Striker':  'Delantero',
+  'Striker':         'Delantero',
+  'Centre-Back':     'Central',
+  'Central Midfield':'Centrocampista',
+  'Defensive Midfield':'Centrocampista',
+  'Right Midfield':  'Centrocampista',
+  'Left Midfield':   'Centrocampista',
+  'Left Winger':     'Extremo Izq.',
+  'Right Winger':    'Extremo Der.',
+  'Right-Back':      'Lateral Der.',
+  'Left-Back':       'Lateral Izq.',
+  'Goalkeeper':      'Portero',
+  'Attacking Midfield':'Mediapunta',
 };
 
 /* ===================== UTILITY FUNCTIONS ===================== */
 function tPos(p) { return POS_ES[p] || p; }
+
+function playerAvatar(name, size = 34) {
+  const parts = (name || '?').trim().split(/\s+/);
+  const initials = (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+  const palette = ['#009a44','#1d6fa4','#c8a951','#8b5cf6','#e07b39','#0891b2','#be185d'];
+  const bg = palette[(name || '').charCodeAt(0) % palette.length];
+  const fs = Math.round(size * 0.38);
+  return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:${fs}px;font-weight:700;color:#fff;flex-shrink:0;
+    border:2px solid rgba(255,255,255,0.15)">${initials}</div>`;
+}
 
 function clubShield(name) {
   const id = CLUB_IDS[name];
@@ -244,6 +263,7 @@ function renderCurrentTab() {
     case 'tab-jugadores':    if (!chartsRendered['tab-jugadores']) { renderJugadoresTab(); chartsRendered['tab-jugadores'] = true; } break;
     case 'tab-revalorizacion': if (!chartsRendered['tab-revalorizacion']) { renderRevalorizacionTab(); chartsRendered['tab-revalorizacion'] = true; } break;
     case 'tab-temporadas':   renderTemporadasTab(); break;
+    case 'tab-sub23':        renderSub23Tab(); break;
     case 'tab-bbdd':         if (!chartsRendered['tab-bbdd']) { renderBBDDTab(); chartsRendered['tab-bbdd'] = true; } break;
   }
 }
@@ -431,26 +451,44 @@ function renderEvolucionOps(data) {
 }
 
 function renderTreemap(data) {
+  // Top-15 club ranking by total money moved
   const byClub = groupBy(data, 'club');
-  const clubTotals = Object.entries(byClub)
+  const ranking = Object.entries(byClub)
     .map(([club, rows]) => ({ club, total: sumBy(rows, 'importe_numerico') }))
-    .filter(d => d.total > 0)
     .sort((a, b) => b.total - a.total)
-    .slice(0, 30);
+    .slice(0, 15);
 
-  if (clubTotals.length === 0) return;
+  const max = ranking[0]?.total || 1;
 
-  plot('chart-treemap', [
-    {
-      type: 'treemap',
-      labels: clubTotals.map(d => d.club),
-      parents: clubTotals.map(() => ''),
-      values: clubTotals.map(d => d.total / 1e6),
-      texttemplate: '%{label}<br>€%{value:.1f}M',
-      hovertemplate: '%{label}: €%{value:.2f}M<extra></extra>',
-      marker: { colorscale: [[0,'#e8f5ee'],[1,'#009a44']], showscale: false }
-    }
-  ], { margin: { t: 10, r: 10, b: 10, l: 10 } });
+  const rows = ranking.map((r, i) => {
+    const shield = clubShield(r.club);
+    const shieldHtml = shield
+      ? `<img src="${shield}" width="24" height="24" style="border-radius:3px;object-fit:contain;vertical-align:middle;margin-right:8px" onerror="this.style.display='none'">`
+      : '';
+    const pct = (r.total / max * 100).toFixed(1);
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}`;
+    return `
+      <tr>
+        <td style="width:32px;text-align:center;font-size:0.8rem;color:var(--text-muted)">${medal}</td>
+        <td style="padding:8px 6px">${shieldHtml}<span style="font-weight:600;font-size:0.85rem">${r.club}</span></td>
+        <td style="width:45%;padding:8px 6px">
+          <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:10px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:4px"></div>
+          </div>
+        </td>
+        <td style="width:80px;text-align:right;font-weight:700;color:var(--primary);font-size:0.85rem;padding:8px 6px">${formatM(r.total)}</td>
+      </tr>`;
+  }).join('');
+
+  const container = document.getElementById('chart-treemap');
+  if (!container) return;
+  container.innerHTML = `
+    <div style="padding:8px 0">
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em">
+        TOP 15 CLUBES POR DINERO TOTAL MOVIDO
+      </div>
+      <table style="width:100%;border-collapse:collapse">${rows}</table>
+    </div>`;
 }
 
 function renderSankey(data) {
@@ -758,34 +796,39 @@ function renderPosTipo() {
 }
 
 function renderPosSunburst() {
-  const byPos = groupBy(ALL_DATA, 'posicion');
-  const topPos = topN(Object.fromEntries(Object.entries(byPos).map(([k,v])=>[k,v.length])), 8).map(d=>d[0]);
-  const tipos = [...new Set(ALL_DATA.map(d => d.tipo_operacion))].filter(Boolean);
+  // Bubble chart: position (x) vs mean importe (y) vs count (size)
+  const grouped = groupBy(ALL_DATA.filter(r => r.importe_numerico > 0), 'posicion');
+  const bubbles = Object.entries(grouped).map(([pos, rows]) => ({
+    pos: tPos(pos),
+    mean: meanBy(rows, 'importe_numerico'),
+    count: rows.length,
+    total: sumBy(rows, 'importe_numerico'),
+  })).sort((a, b) => b.mean - a.mean);
 
-  const ids = [], labels = [], parents = [], values = [];
-  ids.push('root'); labels.push('Total'); parents.push(''); values.push(ALL_DATA.length);
+  const trace = {
+    type: 'scatter',
+    mode: 'markers+text',
+    x: bubbles.map((_, i) => i),
+    y: bubbles.map(b => b.mean / 1e6),
+    text: bubbles.map(b => b.pos),
+    textposition: 'top center',
+    marker: {
+      size: bubbles.map(b => Math.sqrt(b.count) * 6 + 10),
+      color: bubbles.map(b => b.total / 1e6),
+      colorscale: [[0,'#162032'],[0.5,'#009a44'],[1,'#c8a951']],
+      showscale: true,
+      colorbar: { title: 'Total M€', thickness: 12, tickfont: { color: '#dce8dc', size: 10 } },
+      line: { color: 'rgba(255,255,255,0.2)', width: 1 }
+    },
+    hovertemplate: '<b>%{text}</b><br>Valor medio: €%{y:.2f}M<br>Operaciones: %{marker.size}<extra></extra>'
+  };
 
-  topPos.forEach(pos => {
-    const posLabel = tPos(pos);
-    const count = (byPos[pos] || []).length;
-    ids.push(posLabel); labels.push(posLabel); parents.push('root'); values.push(count);
-    tipos.forEach(tipo => {
-      const c = (byPos[pos]||[]).filter(d => d.tipo_operacion === tipo).length;
-      if (c > 0) {
-        const idStr = `${posLabel}|${tipo}`;
-        ids.push(idStr); labels.push(tipo); parents.push(posLabel); values.push(c);
-      }
-    });
-  });
-
-  plot('chart-sunburst', [
-    { type: 'sunburst', ids, labels, parents, values,
-      branchvalues: 'total',
-      marker: { colorscale: [[0,'#e8f5ee'],[0.5,'#009a44'],[1,'#00521c']] },
-      hovertemplate: '%{label}: %{value} ops (%{percentParent:.1%})<extra></extra>',
-      textfont: { size: 10 } }
-  ], {
-    margin: { t: 20, r: 20, b: 20, l: 20 }
+  plot('chart-sunburst', [trace], {
+    title: 'Posiciones: valor medio vs volumen (tamaño = nº operaciones)',
+    xaxis: { showticklabels: false, showgrid: false },
+    yaxis: { title: 'Valor medio por operación (M€)' },
+    height: 420,
+    margin: { t: 50, r: 80, b: 40, l: 70 }
   });
 }
 
@@ -803,14 +846,16 @@ function renderJugadoresTab() {
 function renderTopCaros(data) {
   const sorted = data.filter(d => d.importe_numerico > 0)
     .sort((a, b) => b.importe_numerico - a.importe_numerico).slice(0, 15);
-  const labels = sorted.map(d => `${d.jugador} — ${d.club} (${d.temporada})`).reverse();
+  const labels = sorted.map(d => `${d.jugador} — ${d.club}`).reverse();
   const vals = sorted.map(d => d.importe_numerico / 1e6).reverse();
+  const customdata = sorted.map(d => [d.club, tPos(d.posicion), d.temporada, d.edad]).reverse();
 
   plot('chart-top-caros', [
     { x: vals, y: labels, type: 'bar', orientation: 'h',
+      customdata,
       marker: { color: CHART_COLORS[0] },
       text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
-      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+      hovertemplate: '<b>%{y}</b><br>Temporada: %{customdata[2]}<br>Posición: %{customdata[1]}<br>Edad: %{customdata[3]}<br>Importe: €%{x:.2f}M<extra></extra>' }
   ], {
     xaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)', tickfont: { size: 9 } },
@@ -999,18 +1044,20 @@ function renderRevClubesMedia() {
 
 function renderRevJugadores() {
   const sorted = [...REV_DATA].sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0,15);
-  const labels = sorted.map(d => `${d.jugador} (${d.club})`).reverse();
+  const labels = sorted.map(d => `${d.jugador} (${d.club}) ${d.temporada_llegada||''}→${d.temporada_salida||''}`).reverse();
   const vals = sorted.map(d => (+d.revalorizacion_abs||0) / 1e6).reverse();
+  const customdata = sorted.map(d => [d.temporada_llegada||'—', d.temporada_salida||'—', tPos(d.posicion||'')]).reverse();
 
   plot('chart-rev-jugadores', [
     { x: vals, y: labels, type: 'bar', orientation: 'h',
+      customdata,
       marker: { color: vals.map(v => v >= 0 ? CHART_COLORS[0] : '#dc2626') },
       text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
-      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+      hovertemplate: '<b>%{y}</b><br>Temp. llegada: %{customdata[0]}<br>Temp. salida: %{customdata[1]}<br>Posición: %{customdata[2]}<br>Revalorización: €%{x:.2f}M<extra></extra>' }
   ], {
     xaxis: { title: 'Revalorización (M€)', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)', tickfont: { size: 9 } },
-    margin: { t: 30, r: 90, b: 50, l: 200 }
+    margin: { t: 30, r: 90, b: 50, l: 260 }
   });
 }
 
@@ -1295,6 +1342,227 @@ function renderBBDDTab() {
       { targets: '_all', defaultContent: '' }
     ]
   });
+}
+
+/* ═══════════════════════════════════════════════
+   SUB-23 TAB
+   ═══════════════════════════════════════════════ */
+function renderSub23Tab() {
+  const d = ALL_DATA.filter(r => r.edad <= 22);
+  const rev = REV_DATA.filter(r => (+r.edad_llegada || 99) <= 22);
+
+  // KPIs
+  const kpiEl = document.getElementById('kpis-sub23');
+  if (kpiEl) {
+    const totalMoney = sumBy(d.filter(r => r.importe_numerico > 0), 'importe_numerico');
+    const uniquePlayers = new Set(d.map(r => r.jugador)).size;
+    const uniqueClubs   = new Set(d.map(r => r.club)).size;
+    kpiEl.innerHTML = [
+      { v: d.length,          l: 'Operaciones Sub-23',  c: 'var(--primary)'  },
+      { v: uniquePlayers,     l: 'Jugadores únicos',    c: '#c8a951'         },
+      { v: uniqueClubs,       l: 'Clubes implicados',   c: '#1d6fa4'         },
+      { v: formatM(totalMoney), l: 'Dinero movido',     c: 'var(--primary)', raw: true },
+    ].map(k => `
+      <div class="kpi-card">
+        <div class="kpi-value" style="color:${k.c}">${k.raw ? k.v : k.v.toLocaleString('es-ES')}</div>
+        <div class="kpi-label">${k.l}</div>
+      </div>`).join('');
+  }
+
+  // Chart 1 — Top fichajes Sub-23 by importe
+  const topCaros = d.filter(r => r.importe_numerico > 0 && r.movimiento === 'alta')
+    .sort((a, b) => b.importe_numerico - a.importe_numerico)
+    .slice(0, 12);
+
+  if (topCaros.length > 0) {
+    plot('chart-sub23-caros', [{
+      type: 'bar', orientation: 'h',
+      x: topCaros.map(r => r.importe_numerico / 1e6).reverse(),
+      y: topCaros.map(r => `${r.jugador} (${r.temporada})`).reverse(),
+      customdata: topCaros.map(r => [r.club, tPos(r.posicion), r.temporada, r.edad]).reverse(),
+      hovertemplate: '<b>%{y}</b><br>Club: %{customdata[0]}<br>Posición: %{customdata[1]}<br>Temporada: %{customdata[2]}<br>Edad: %{customdata[3]} años<br>Importe: €%{x:.2f}M<extra></extra>',
+      marker: { color: CHART_COLORS[0] },
+      text: topCaros.map(r => formatM(r.importe_numerico)).reverse(),
+      textposition: 'outside', textfont: { color: '#dce8dc', size: 10 }
+    }], {
+      yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      xaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      height: 380, margin: { t: 30, r: 100, b: 50, l: 200 }
+    });
+  }
+
+  // Chart 2 — Clubs that sign most U23
+  const altasU23 = d.filter(r => r.movimiento === 'alta');
+  const byClub = groupBy(altasU23, 'club');
+  const clubRanks = topN(Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, v.length])), 12);
+  if (clubRanks.length > 0) {
+    plot('chart-sub23-clubes', [{
+      type: 'bar', orientation: 'h',
+      x: clubRanks.map(([,v]) => v).reverse(),
+      y: clubRanks.map(([k]) => k).reverse(),
+      marker: { color: CHART_COLORS[0] },
+      hovertemplate: '<b>%{y}</b><br>Fichajes Sub-23: %{x}<extra></extra>',
+      text: clubRanks.map(([,v]) => v).reverse(), textposition: 'outside', textfont: { color: '#dce8dc', size: 10 }
+    }], {
+      yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      xaxis: { title: 'Nº fichajes', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      height: 380, margin: { t: 30, r: 60, b: 50, l: 160 }
+    });
+  }
+
+  // Chart 3 — Positions
+  const posCnt = groupBy(d, 'posicion');
+  const posRanks = topN(Object.fromEntries(Object.entries(posCnt).map(([k,v]) => [tPos(k), v.length])), 10);
+  if (posRanks.length > 0) {
+    plot('chart-sub23-pos', [{
+      type: 'bar', orientation: 'h',
+      x: posRanks.map(([,v]) => v).reverse(),
+      y: posRanks.map(([k]) => k).reverse(),
+      marker: { color: '#c8a951' },
+      text: posRanks.map(([,v]) => v).reverse(), textposition: 'outside', textfont: { color: '#dce8dc', size: 10 }
+    }], {
+      yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      xaxis: { title: 'Operaciones', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      height: 360, margin: { t: 30, r: 60, b: 50, l: 140 }
+    });
+  }
+
+  // Chart 4 — Nationalities
+  const nacCnt = groupBy(d, 'nacionalidad');
+  const nacRanks = topN(Object.fromEntries(Object.entries(nacCnt).map(([k,v]) => [k, v.length])), 12);
+  if (nacRanks.length > 0) {
+    plot('chart-sub23-nac', [{
+      type: 'bar', orientation: 'h',
+      x: nacRanks.map(([,v]) => v).reverse(),
+      y: nacRanks.map(([k]) => k).reverse(),
+      marker: { color: '#1d6fa4' },
+      text: nacRanks.map(([,v]) => v).reverse(), textposition: 'outside', textfont: { color: '#dce8dc', size: 10 }
+    }], {
+      yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      xaxis: { title: 'Jugadores', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      height: 380, margin: { t: 30, r: 60, b: 50, l: 130 }
+    });
+  }
+
+  // Chart 5 — Mean value by position Sub-23 (using _vm field)
+  const posVal = Object.entries(groupBy(d.filter(r => r._vm > 0), 'posicion'))
+    .map(([p, rows]) => ({ pos: tPos(p), mean: meanBy(rows, '_vm') }))
+    .sort((a, b) => b.mean - a.mean);
+  if (posVal.length > 0) {
+    plot('chart-sub23-valor-pos', [{
+      type: 'bar', orientation: 'h',
+      x: posVal.map(r => r.mean / 1e6).reverse(),
+      y: posVal.map(r => r.pos).reverse(),
+      marker: { color: CHART_COLORS[4] },
+      text: posVal.map(r => formatM(r.mean)).reverse(), textposition: 'outside', textfont: { color: '#dce8dc', size: 10 },
+      hovertemplate: '<b>%{y}</b><br>Valor medio: €%{x:.2f}M<extra></extra>'
+    }], {
+      yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      xaxis: { title: 'Valor medio (M€)', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      height: 360, margin: { t: 30, r: 100, b: 50, l: 140 }
+    });
+  }
+
+  // Chart 6 — Evolution by season
+  const bySeason = groupBy(d, 'temporada');
+  const seasons  = Object.keys(bySeason).sort();
+  if (seasons.length > 0) {
+    plot('chart-sub23-evolucion', [{
+      type: 'bar',
+      x: seasons,
+      y: seasons.map(s => bySeason[s].length),
+      name: 'Operaciones',
+      marker: { color: CHART_COLORS[0] }
+    }, {
+      type: 'scatter', mode: 'lines+markers',
+      x: seasons,
+      y: seasons.map(s => sumBy(bySeason[s].filter(r => r.importe_numerico > 0), 'importe_numerico') / 1e6),
+      name: 'Dinero (M€)', yaxis: 'y2',
+      line: { color: '#c8a951', width: 2 },
+      marker: { size: 6 }
+    }], {
+      yaxis: { title: 'Operaciones', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      yaxis2: { title: 'M€', overlaying: 'y', side: 'right', showgrid: false, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+      legend: { orientation: 'h', y: 1.1, bgcolor: 'rgba(0,0,0,0)', font: { size: 10 } },
+      height: 340, margin: { t: 50, r: 80, b: 50, l: 60 }
+    });
+  }
+
+  // Chart 7 — Most revalued U23 (from REV_DATA)
+  if (rev.length > 0) {
+    const topRev = rev.filter(r => (+r.revalorizacion_abs || 0) > 0)
+      .sort((a, b) => (+b.revalorizacion_abs || 0) - (+a.revalorizacion_abs || 0))
+      .slice(0, 12);
+    if (topRev.length > 0) {
+      plot('chart-sub23-rev', [{
+        type: 'bar', orientation: 'h',
+        x: topRev.map(r => (+r.revalorizacion_abs || 0) / 1e6).reverse(),
+        y: topRev.map(r => `${r.jugador} (${r.temporada_llegada||''}→${r.temporada_salida||''})`).reverse(),
+        customdata: topRev.map(r => [r.club, tPos(r.posicion), (+r.revalorizacion_pct||0).toFixed(0), r.edad_llegada]).reverse(),
+        hovertemplate: '<b>%{y}</b><br>Club: %{customdata[0]}<br>Pos: %{customdata[1]}<br>Revalorización: +%{customdata[2]}%<br>Edad llegada: %{customdata[3]}<extra></extra>',
+        marker: { color: CHART_COLORS[0] },
+        text: topRev.map(r => `+${formatM(+r.revalorizacion_abs || 0)}`).reverse(),
+        textposition: 'outside', textfont: { color: '#dce8dc', size: 10 }
+      }], {
+        yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+        xaxis: { title: 'Revalorización (M€)', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+        height: 400, margin: { t: 30, r: 100, b: 50, l: 220 }
+      });
+    }
+  }
+
+  // Table — top Sub-23 operations
+  const topOps = d.filter(r => r.importe_numerico > 0 || r._vm > 0)
+    .sort((a, b) => (b._vm || 0) - (a._vm || 0))
+    .slice(0, 25);
+
+  const tableEl = document.getElementById('table-sub23');
+  if (tableEl) {
+    tableEl.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:0.82rem">
+        <thead>
+          <tr style="border-bottom:2px solid var(--primary)">
+            <th style="padding:10px 8px;text-align:left;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.72rem">Jugador</th>
+            <th style="padding:10px 8px;text-align:left;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.72rem">Club</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.72rem">Temporada</th>
+            <th style="padding:10px 8px;text-align:center;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.72rem">Mov.</th>
+            <th style="padding:10px 8px;text-align:right;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.72rem">Edad</th>
+            <th style="padding:10px 8px;text-align:left;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.72rem">Posición</th>
+            <th style="padding:10px 8px;text-align:right;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.72rem">Importe</th>
+            <th style="padding:10px 8px;text-align:right;color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.72rem">Valor Mdo.</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${topOps.map((r, i) => `
+            <tr style="border-bottom:1px solid var(--border);background:${i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent'}">
+              <td style="padding:9px 8px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  ${playerAvatar(r.jugador, 28)}
+                  <span style="font-weight:600">${r.jugador || '—'}</span>
+                </div>
+              </td>
+              <td style="padding:9px 8px">
+                <div style="display:flex;align-items:center;gap:6px">
+                  ${clubShield(r.club) ? `<img src="${clubShield(r.club)}" width="20" height="20" style="object-fit:contain" onerror="this.style.display='none'">` : ''}
+                  ${r.club || '—'}
+                </div>
+              </td>
+              <td style="padding:9px 8px;text-align:center;color:#c8a951;font-weight:600">${r.temporada || '—'}</td>
+              <td style="padding:9px 8px;text-align:center">
+                <span style="background:${r.movimiento==='alta'?'rgba(0,154,68,0.2)':'rgba(220,82,82,0.2)'};
+                  color:${r.movimiento==='alta'?'#009a44':'#dc2626'};
+                  padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600">
+                  ${r.movimiento === 'alta' ? '▲ Alta' : '▼ Baja'}
+                </span>
+              </td>
+              <td style="padding:9px 8px;text-align:right;font-weight:700">${r.edad || '—'}</td>
+              <td style="padding:9px 8px;color:var(--text-muted)">${tPos(r.posicion || '')}</td>
+              <td style="padding:9px 8px;text-align:right;font-weight:700;color:var(--primary)">${r.importe_original || '-'}</td>
+              <td style="padding:9px 8px;text-align:right;color:var(--text-muted)">${r.valor_mercado || '-'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
 }
 
 /* ===================== INIT ===================== */
