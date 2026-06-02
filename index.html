@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Análisis de Mercado — Segunda División 2021-2026</title>
+
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+  <!-- Dashboard styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============================================================
+     LOADING OVERLAY
+     ============================================================ -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p class="loading-text">Cargando datos del mercado…</p>
+</div>
+
+<!-- ============================================================
+     FILE UPLOAD FALLBACK
+     ============================================================ -->
+<div id="file-fallback">
+  <div class="upload-card">
+    <h2>📂 Cargar archivo CSV</h2>
+    <p>No se pudo cargar el archivo automáticamente.<br>
+       Selecciona el archivo <strong>segunda_division_fichajes_2021_2026.csv</strong> manualmente.</p>
+    <label class="btn-upload" for="csv-file-input">
+      ⬆ Seleccionar CSV
+    </label>
+    <input type="file" id="csv-file-input" accept=".csv" />
+  </div>
+</div>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside id="sidebar">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <!-- Real Betis Balompié Shield (embedded SVG) -->
+    <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" width="60" height="72">
+      <defs>
+        <clipPath id="shield">
+          <path d="M5,18 L5,78 Q5,108 50,122 Q95,108 95,78 L95,18 Z"/>
+        </clipPath>
+      </defs>
+      <path d="M5,18 L5,78 Q5,108 50,122 Q95,108 95,78 L95,18 Z" fill="white" stroke="#c8a951" stroke-width="2.5"/>
+      <rect x="5" y="18" width="30" height="104" fill="#009a44" clip-path="url(#shield)"/>
+      <rect x="65" y="18" width="30" height="104" fill="#009a44" clip-path="url(#shield)"/>
+      <path d="M15,10 L22,3 L29,10 L36,4 L43,11 L50,5 L57,11 L64,4 L71,10 L78,3 L85,10 L85,19 L15,19 Z" fill="#c8a951"/>
+      <path d="M5,18 L5,78 Q5,108 50,122 Q95,108 95,78 L95,18 Z" fill="none" stroke="#c8a951" stroke-width="2.5"/>
+      <rect x="5" y="18" width="90" height="3" fill="#c8a951" clip-path="url(#shield)"/>
+      <text x="50" y="65" text-anchor="middle" fill="#009a44" font-size="8" font-weight="bold" font-family="Arial">REAL BETIS</text>
+      <text x="50" y="76" text-anchor="middle" fill="#009a44" font-size="6.5" font-family="Arial">BALOMPIÉ</text>
+    </svg>
+    <div class="sidebar-title">Scouting &amp;<br>Análisis de Mercado</div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Resumen</div>
+    <a class="nav-item active" data-target="sec-kpis" href="#sec-kpis">
+      <span class="nav-icon">📊</span> KPIs Generales
+    </a>
+
+    <div class="nav-section-label">Economía</div>
+    <a class="nav-item" data-target="sec-bloque1" href="#sec-bloque1">
+      <span class="nav-icon">💰</span> Radiografía Económica
+    </a>
+
+    <div class="nav-section-label">Plantel</div>
+    <a class="nav-item" data-target="sec-bloque2" href="#sec-bloque2">
+      <span class="nav-icon">⚽</span> Análisis por Posiciones
+    </a>
+    <a class="nav-item" data-target="sec-bloque3" href="#sec-bloque3">
+      <span class="nav-icon">🔍</span> Análisis de Scouting
+    </a>
+
+    <div class="nav-section-label">Mercado</div>
+    <a class="nav-item" data-target="sec-bloque4" href="#sec-bloque4">
+      <span class="nav-icon">📈</span> Análisis de Mercado
+    </a>
+    <a class="nav-item" data-target="sec-bloque5" href="#sec-bloque5">
+      <span class="nav-icon">🧠</span> Análisis Avanzado
+    </a>
+    <a class="nav-item" data-target="sec-insights" href="#sec-insights">
+      <span class="nav-icon">💡</span> Insights del Mercado
+    </a>
+
+    <div class="nav-section-label">Datos</div>
+    <a class="nav-item" data-target="sec-tabla" href="#sec-tabla">
+      <span class="nav-icon">📋</span> Tabla Completa
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    Segunda División<br>
+    <span>2021-22 → 2025-26</span>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+<div id="main">
+
+  <!-- Sticky Header -->
+  <header id="header">
+    <div>
+      <div class="header-title">ANÁLISIS DE MERCADO DE SEGUNDA DIVISIÓN</div>
+      <div class="header-subtitle">Temporadas 2021-22 a 2025-26 · Herramienta de Scouting</div>
+    </div>
+    <div class="header-actions">
+      <span class="header-badge" id="header-badge">Cargando…</span>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main id="content">
+
+    <!-- --------------------------------------------------------
+         GLOBAL FILTERS
+         -------------------------------------------------------- -->
+    <div id="filter-panel">
+      <div class="filter-header" id="filter-toggle-btn">
+        <div class="filter-header-left">
+          <span>🔧</span>
+          <span class="filter-title">Filtros Globales</span>
+          <span class="filter-badge" id="filter-active-count"></span>
+        </div>
+        <span class="filter-toggle" id="filter-chevron">▼</span>
+      </div>
+      <div class="filter-body" id="filter-body">
+        <div class="filter-grid">
+
+          <!-- Temporada -->
+          <div class="filter-group">
+            <label class="filter-label">Temporada</label>
+            <div class="multi-select-wrapper" id="ms-temporada-wrap">
+              <button class="multi-select-btn" id="ms-temporada-btn">
+                <span id="ms-temporada-label">Todas</span>
+                <span class="arrow">▼</span>
+              </button>
+              <div class="multi-select-dropdown" id="ms-temporada-drop">
+                <div class="multi-select-options" id="ms-temporada-opts"></div>
+                <div class="multi-select-actions">
+                  <button data-target="ms-temporada" data-action="all">Todos</button>
+                  <button data-target="ms-temporada" data-action="none">Ninguno</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Club -->
+          <div class="filter-group">
+            <label class="filter-label">Club</label>
+            <div class="multi-select-wrapper" id="ms-club-wrap">
+              <button class="multi-select-btn" id="ms-club-btn">
+                <span id="ms-club-label">Todos</span>
+                <span class="arrow">▼</span>
+              </button>
+              <div class="multi-select-dropdown" id="ms-club-drop">
+                <div class="multi-select-search"><input type="text" placeholder="Buscar club…" id="ms-club-search" /></div>
+                <div class="multi-select-options" id="ms-club-opts"></div>
+                <div class="multi-select-actions">
+                  <button data-target="ms-club" data-action="all">Todos</button>
+                  <button data-target="ms-club" data-action="none">Ninguno</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Posición -->
+          <div class="filter-group">
+            <label class="filter-label">Posición</label>
+            <div class="multi-select-wrapper" id="ms-posicion-wrap">
+              <button class="multi-select-btn" id="ms-posicion-btn">
+                <span id="ms-posicion-label">Todas</span>
+                <span class="arrow">▼</span>
+              </button>
+              <div class="multi-select-dropdown" id="ms-posicion-drop">
+                <div class="multi-select-options" id="ms-posicion-opts"></div>
+                <div class="multi-select-actions">
+                  <button data-target="ms-posicion" data-action="all">Todas</button>
+                  <button data-target="ms-posicion" data-action="none">Ninguna</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Movimiento -->
+          <div class="filter-group">
+            <label class="filter-label">Movimiento</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item"><input type="checkbox" id="cb-alta" checked /><span>Alta</span></label>
+              <label class="checkbox-item"><input type="checkbox" id="cb-baja" checked /><span>Baja</span></label>
+            </div>
+          </div>
+
+          <!-- Tipo operación -->
+          <div class="filter-group">
+            <label class="filter-label">Tipo Operación</label>
+            <div class="multi-select-wrapper" id="ms-tipo-wrap">
+              <button class="multi-select-btn" id="ms-tipo-btn">
+                <span id="ms-tipo-label">Todos</span>
+                <span class="arrow">▼</span>
+              </button>
+              <div class="multi-select-dropdown" id="ms-tipo-drop">
+                <div class="multi-select-options" id="ms-tipo-opts"></div>
+                <div class="multi-select-actions">
+                  <button data-target="ms-tipo" data-action="all">Todos</button>
+                  <button data-target="ms-tipo" data-action="none">Ninguno</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nacionalidad -->
+          <div class="filter-group">
+            <label class="filter-label">Nacionalidad</label>
+            <div class="multi-select-wrapper" id="ms-nac-wrap">
+              <button class="multi-select-btn" id="ms-nac-btn">
+                <span id="ms-nac-label">Todas</span>
+                <span class="arrow">▼</span>
+              </button>
+              <div class="multi-select-dropdown" id="ms-nac-drop">
+                <div class="multi-select-search"><input type="text" placeholder="Buscar nac.…" id="ms-nac-search" /></div>
+                <div class="multi-select-options" id="ms-nac-opts"></div>
+                <div class="multi-select-actions">
+                  <button data-target="ms-nac" data-action="all">Todas</button>
+                  <button data-target="ms-nac" data-action="none">Ninguna</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edad -->
+          <div class="filter-group">
+            <label class="filter-label">Edad</label>
+            <div class="range-group">
+              <div class="range-inputs">
+                <input type="number" id="edad-min" value="17" min="17" max="41" />
+                <span class="range-sep">—</span>
+                <input type="number" id="edad-max" value="41" min="17" max="41" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Importe mínimo -->
+          <div class="filter-group">
+            <label class="filter-label">Importe Mín. (€)</label>
+            <input type="number" class="filter-input" id="importe-min" value="0" min="0" step="100000" placeholder="0" />
+          </div>
+
+        </div>
+
+        <div class="filter-footer">
+          <span class="filter-stats">Mostrando <strong id="filtered-count">0</strong> de <strong id="total-count">0</strong> operaciones</span>
+          <button class="btn-reset" id="btn-reset">🔄 Restablecer filtros</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION 0 — KPIs Generales
+         ============================================================ -->
+    <section class="dashboard-section" id="sec-kpis">
+      <div class="section-header">
+        <span class="section-icon">📊</span>
+        <div>
+          <div class="section-title">KPIs Generales</div>
+          <div class="section-desc">Métricas clave del período analizado</div>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card" style="--kpi-color: #00c896">
+          <div class="kpi-icon">🔄</div>
+          <div class="kpi-value" id="kpi-total-ops">—</div>
+          <div class="kpi-label">Total Operaciones</div>
+          <div class="kpi-delta" id="kpi-total-ops-d"></div>
+        </div>
+        <div class="kpi-card" style="--kpi-color: #3b82f6">
+          <div class="kpi-icon">👤</div>
+          <div class="kpi-value" id="kpi-jugadores">—</div>
+          <div class="kpi-label">Jugadores Únicos</div>
+          <div class="kpi-delta" id="kpi-jugadores-d"></div>
+        </div>
+        <div class="kpi-card" style="--kpi-color: #f59e0b">
+          <div class="kpi-icon">💶</div>
+          <div class="kpi-value" id="kpi-importe">—</div>
+          <div class="kpi-label">Importe Total Movido</div>
+          <div class="kpi-delta" id="kpi-importe-d"></div>
+        </div>
+        <div class="kpi-card" style="--kpi-color: #8b5cf6">
+          <div class="kpi-icon">📊</div>
+          <div class="kpi-value" id="kpi-medio">—</div>
+          <div class="kpi-label">Valor Medio Traspaso</div>
+          <div class="kpi-delta" id="kpi-medio-d"></div>
+        </div>
+        <div class="kpi-card" style="--kpi-color: #06b6d4">
+          <div class="kpi-icon">🎂</div>
+          <div class="kpi-value" id="kpi-edad">—</div>
+          <div class="kpi-label">Edad Media</div>
+          <div class="kpi-delta" id="kpi-edad-d"></div>
+        </div>
+        <div class="kpi-card" style="--kpi-color: #f97316">
+          <div class="kpi-icon">🏟️</div>
+          <div class="kpi-value" id="kpi-clubes">—</div>
+          <div class="kpi-label">Clubes Analizados</div>
+          <div class="kpi-delta" id="kpi-clubes-d"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 1 — Radiografía Económica
+         ============================================================ -->
+    <section class="dashboard-section" id="sec-bloque1">
+      <div class="section-header">
+        <span class="section-icon">💰</span>
+        <div>
+          <div class="section-title">Radiografía Económica</div>
+          <div class="section-desc">Gasto, ingresos y balance neto por club</div>
+        </div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-title">Top 10 Clubes Compradores</div>
+          <div class="chart-card-sub">Por gasto total en incorporaciones</div>
+          <div id="chart-compradores" style="height:360px"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Top 10 Clubes Vendedores</div>
+          <div class="chart-card-sub">Por ingresos totales en ventas</div>
+          <div id="chart-vendedores" style="height:360px"></div>
+        </div>
+      </div>
+
+      <div class="chart-full chart-card">
+        <div class="chart-card-title">Balance Neto por Club</div>
+        <div class="chart-card-sub">Diferencia entre gasto en altas e ingresos por bajas (verde = superávit)</div>
+        <div id="chart-balance" style="height:420px"></div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-title">Evolución Económica por Temporada</div>
+          <div class="chart-card-sub">Gasto en altas vs ingresos por bajas</div>
+          <div id="chart-evolucion-eco" style="height:340px"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Treemap — Movimiento Económico</div>
+          <div class="chart-card-sub">Total movido (altas + bajas) por club</div>
+          <div id="chart-treemap" style="height:340px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2 — Análisis por Posiciones
+         ============================================================ -->
+    <section class="dashboard-section" id="sec-bloque2">
+      <div class="section-header">
+        <span class="section-icon">⚽</span>
+        <div>
+          <div class="section-title">Análisis por Posiciones</div>
+          <div class="section-desc">Distribución económica y operacional por demarcación</div>
+        </div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-title">Inversión Total por Posición</div>
+          <div class="chart-card-sub">Suma de importe_numerico</div>
+          <div id="chart-pos-dinero" style="height:360px"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Número de Operaciones por Posición</div>
+          <div class="chart-card-sub">Total de movimientos</div>
+          <div id="chart-pos-ops" style="height:360px"></div>
+        </div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-title">Valor Medio por Posición</div>
+          <div class="chart-card-sub">Media importe_numerico (sólo operaciones con valor)</div>
+          <div id="chart-pos-valor-medio" style="height:360px"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Distribución Importes por Posición</div>
+          <div class="chart-card-sub">Box plot — dispersión de valores</div>
+          <div id="chart-pos-boxplot" style="height:360px"></div>
+        </div>
+      </div>
+
+      <div class="chart-full chart-card">
+        <div class="chart-card-title">Edad Media por Posición</div>
+        <div class="chart-card-sub">Media de edad en las operaciones</div>
+        <div id="chart-pos-edad-media" style="height:300px"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3 — Análisis de Scouting
+         ============================================================ -->
+    <section class="dashboard-section" id="sec-bloque3">
+      <div class="section-header">
+        <span class="section-icon">🔍</span>
+        <div>
+          <div class="section-title">Análisis de Scouting</div>
+          <div class="section-desc">Perfiles de jugadores, nacionalidades y valores de mercado</div>
+        </div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-title">Distribución por Nacionalidad</div>
+          <div class="chart-card-sub">Top 12 nacionalidades (donut)</div>
+          <div id="chart-nac-pie" style="height:360px"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Distribución de Edad</div>
+          <div class="chart-card-sub">Histograma de edades (rango 17-41)</div>
+          <div id="chart-dist-edad" style="height:360px"></div>
+        </div>
+      </div>
+
+      <div class="chart-full chart-card">
+        <div class="chart-card-title">Mapa de Procedencia</div>
+        <div class="chart-card-sub">Número de jugadores por país de origen</div>
+        <div id="chart-nac-mapa" style="height:420px"></div>
+      </div>
+
+      <div class="chart-full chart-card">
+        <div class="chart-card-title">Edad vs Importe — Scatter</div>
+        <div class="chart-card-sub">Relación edad/valor por tipo de operación</div>
+        <div id="chart-edad-scatter" style="height:420px"></div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-title">Top 15 Fichajes más Caros</div>
+          <div class="chart-card-sub">Por importe_numerico declarado</div>
+          <div id="chart-top-caros" style="height:440px"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Top 15 por Valor de Mercado</div>
+          <div class="chart-card-sub">Parseado de columna valor_mercado</div>
+          <div id="chart-top-valor" style="height:440px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 4 — Análisis de Mercado
+         ============================================================ -->
+    <section class="dashboard-section" id="sec-bloque4">
+      <div class="section-header">
+        <span class="section-icon">📈</span>
+        <div>
+          <div class="section-title">Análisis de Mercado</div>
+          <div class="section-desc">Tipos de operación, volumen y actividad por club</div>
+        </div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-title">Distribución Tipo de Operación</div>
+          <div class="chart-card-sub">Proporción de libre, cesión, traspaso, etc.</div>
+          <div id="chart-tipo-ops" style="height:360px"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Evolución del Mercado</div>
+          <div class="chart-card-sub">Operaciones por temporada (altas + bajas apiladas)</div>
+          <div id="chart-evolucion-mkt" style="height:360px"></div>
+        </div>
+      </div>
+
+      <div class="chart-full chart-card">
+        <div class="chart-card-title">Top 15 Clubes por Actividad Total</div>
+        <div class="chart-card-sub">Número total de operaciones registradas</div>
+        <div id="chart-clubes-ops" style="height:380px"></div>
+      </div>
+
+      <div class="chart-full chart-card">
+        <div class="chart-card-title">Heatmap Club × Posición</div>
+        <div class="chart-card-sub">Número de operaciones — top 20 clubes</div>
+        <div id="chart-heatmap-club" style="height:460px"></div>
+      </div>
+
+      <div class="chart-full chart-card">
+        <div class="chart-card-title">Heatmap Temporada × Posición</div>
+        <div class="chart-card-sub">Operaciones por temporada y posición</div>
+        <div id="chart-heatmap-season" style="height:340px"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 5 — Análisis Avanzado
+         ============================================================ -->
+    <section class="dashboard-section" id="sec-bloque5">
+      <div class="section-header">
+        <span class="section-icon">🧠</span>
+        <div>
+          <div class="section-title">Análisis Avanzado</div>
+          <div class="section-desc">Flujos, rankings y patrones complejos</div>
+        </div>
+      </div>
+
+      <div class="chart-full chart-card">
+        <div class="chart-card-title">Diagrama Sankey — Flujos de Transferencias</div>
+        <div class="chart-card-sub">Club origen → Club destino (top 30 flujos por valor, solo traspasos con importe)</div>
+        <div id="chart-sankey" style="height:520px"></div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-title">Sunburst — Posición × Tipo de Operación</div>
+          <div class="chart-card-sub">Descomposición de volumen por demarcación</div>
+          <div id="chart-sunburst" style="height:440px"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Ranking de Actividad por Club</div>
+          <div class="chart-card-sub">Operaciones medias por temporada</div>
+          <div id="chart-ranking-actividad" style="height:440px"></div>
+        </div>
+      </div>
+
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-title">Ranking de Eficiencia</div>
+          <div class="chart-card-sub">Balance neto por operación (top 20 clubes)</div>
+          <div id="chart-ranking-eficiencia" style="height:440px"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Heatmap Actividad Temporal</div>
+          <div class="chart-card-sub">Operaciones por temporada y club (top 20)</div>
+          <div id="chart-activos-temporada" style="height:440px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 6 — Insights del Mercado
+         ============================================================ -->
+    <section class="dashboard-section" id="sec-insights">
+      <div class="section-header">
+        <span class="section-icon">💡</span>
+        <div>
+          <div class="section-title">Insights del Mercado</div>
+          <div class="section-desc">Hallazgos clave calculados automáticamente sobre los datos filtrados</div>
+        </div>
+      </div>
+      <div class="insights-grid" id="insights-grid">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 7 — Tabla Completa
+         ============================================================ -->
+    <section class="dashboard-section" id="sec-tabla">
+      <div class="section-header">
+        <span class="section-icon">📋</span>
+        <div>
+          <div class="section-title">Tabla Completa</div>
+          <div class="section-desc">Explorar, filtrar y exportar todos los registros</div>
+        </div>
+      </div>
+      <div id="sec-tabla-inner">
+        <div class="table-toolbar">
+          <div id="dt-buttons-area"></div>
+        </div>
+        <table id="main-table" class="display" style="width:100%">
+          <thead>
+            <tr>
+              <th>Temporada</th>
+              <th>Jugador</th>
+              <th>Club</th>
+              <th>Movimiento</th>
+              <th>Club Origen</th>
+              <th>Club Destino</th>
+              <th>Posición</th>
+              <th>Edad</th>
+              <th>Nacionalidad</th>
+              <th>Importe (texto)</th>
+              <th>Importe (€)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main><!-- /#content -->
+</div><!-- /#main -->
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+data/raw/
+logs/
+src/__pycache__/
+*.pyc
+*.log
+__pycache__/
