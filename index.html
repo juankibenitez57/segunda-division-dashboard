@@ -189,8 +189,8 @@
     </div>
 
     <div class="chart-card full-width">
-      <div class="chart-title">Flujos de transferencias: Club origen → Club destino (top 25 traspasos)</div>
-      <div id="chart-sankey" class="chart-container chart-tall"></div>
+      <div class="chart-title">Top 25 traspasos por importe — Jugador · Temporada · Origen → Destino</div>
+      <div id="chart-sankey"></div>
     </div>
 
     <div class="insights-row" id="chart-mercado-insights">
@@ -351,6 +351,16 @@
 
   <!-- ===================== TAB 6: REVALORIZACIÓN ===================== -->
   <div id="tab-revalorizacion" class="tab-content">
+    <div class="filters-bar" style="margin-bottom:18px">
+      <div class="filter-group" style="flex-direction:row;align-items:center;gap:10px">
+        <label style="font-size:0.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em">Filtro origen</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.83rem;font-weight:500;color:var(--text)">
+          <input type="checkbox" id="rev-filter-primera" style="cursor:pointer;accent-color:var(--primary);width:15px;height:15px">
+          Excluir jugadores procedentes de Primera División / ligas superiores extranjeras
+        </label>
+      </div>
+      <div id="rev-filter-info" style="font-size:0.75rem;color:var(--text-muted);align-self:center"></div>
+    </div>
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-value" id="rev-kpi-pares">—</div>

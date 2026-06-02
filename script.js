@@ -24,6 +24,8 @@ const CLUB_IDS = {
   "UD Ibiza":"13241","UD Las Palmas":"472","Villarreal CF B":"11972"
 };
 
+const CLUB_IDS_SET = new Set(Object.keys(CLUB_IDS));
+
 const POS_ES = {
   'Centre-Forward':  'Delantero',
   'Second Striker':  'Delantero',
@@ -168,6 +170,58 @@ function processMain(data) {
   });
 }
 
+/* ===================== ORIGEN DETECTION ===================== */
+const LIGAS_MAYORES_EXT = new Set([
+  'England','Germany','France','Italy','Netherlands','Portugal',
+  'Brazil','Argentina','Scotland','Belgium','Turkey','Russia','Ukraine'
+]);
+
+function enrichRevData() {
+  REV_DATA.forEach(rev => {
+    const altaRecord = ALL_DATA.find(d =>
+      d.jugador === rev.jugador &&
+      d.club === rev.club &&
+      d.movimiento === 'alta' &&
+      d.temporada === rev.temporada_llegada
+    );
+
+    if (!altaRecord) { rev._origen = 'desconocido'; return; }
+
+    const origen = (altaRecord.club_origen || '').trim();
+    const pais   = (altaRecord.pais_club   || '').trim();
+    const vm     = +rev.vm_llegada || 0;
+
+    if (LIGAS_MAYORES_EXT.has(pais)) {
+      rev._origen = 'extranjero';
+    } else if (pais === 'Spain' && origen && !CLUB_IDS_SET.has(origen) && vm > 1000000) {
+      rev._origen = 'primera';
+    } else {
+      rev._origen = 'segunda';
+    }
+  });
+}
+
+function getRevData() {
+  const excluir = document.getElementById('rev-filter-primera')?.checked;
+  const data = excluir
+    ? REV_DATA.filter(d => d._origen === 'segunda' || d._origen === 'desconocido')
+    : REV_DATA;
+
+  // Update info label
+  const info = document.getElementById('rev-filter-info');
+  if (info) {
+    if (excluir) {
+      const excluidos = REV_DATA.length - data.length;
+      info.textContent = excluidos > 0
+        ? `${excluidos} jugador(es) excluido(s) por proceder de ligas superiores`
+        : 'No se encontraron jugadores de ligas superiores con los criterios actuales';
+    } else {
+      info.textContent = '';
+    }
+  }
+  return data;
+}
+
 function showFileInputFallback() {
   const overlay = document.getElementById('loading-overlay');
   overlay.innerHTML = `
@@ -180,6 +234,7 @@ function showFileInputFallback() {
 
 function onAllLoaded() {
   hideLoading();
+  enrichRevData();
   populateFilters();
   renderCurrentTab();
   setupEventListeners();
@@ -237,6 +292,12 @@ function setupEventListeners() {
   // Club filter in Clubes tab
   document.getElementById('club-filter').addEventListener('change', () => {
     renderClubesTab();
+  });
+
+  // Revalorización origin filter
+  document.getElementById('rev-filter-primera')?.addEventListener('change', () => {
+    chartsRendered['tab-revalorizacion'] = false;
+    renderRevalorizacionTab();
   });
 }
 
@@ -482,6 +543,8 @@ function renderTreemap(data) {
 
   const container = document.getElementById('chart-treemap');
   if (!container) return;
+  container.style.height = 'auto';
+  container.style.minHeight = '0';
   container.innerHTML = `
     <div style="padding:8px 0">
       <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em">
@@ -492,44 +555,82 @@ function renderTreemap(data) {
 }
 
 function renderSankey(data) {
-  const flows = data.filter(d => d.movimiento === 'alta' && d.importe_numerico > 0 && d.club_origen && d.club);
-  const flowMap = {};
-  flows.forEach(d => {
-    const key = `${d.club_origen}|||${d.club}`;
-    flowMap[key] = (flowMap[key] || 0) + d.importe_numerico;
-  });
+  const container = document.getElementById('chart-sankey');
+  if (!container) return;
 
-  const sorted = Object.entries(flowMap).sort((a, b) => b[1] - a[1]).slice(0, 25);
-  if (sorted.length === 0) return;
+  const traspasos = data
+    .filter(d => d.movimiento === 'alta' && d.importe_numerico > 0 && d.club_origen && d.club)
+    .sort((a, b) => b.importe_numerico - a.importe_numerico)
+    .slice(0, 25);
 
-  const nodeSet = new Set();
-  sorted.forEach(([key]) => { const [o, d] = key.split('|||'); nodeSet.add(o); nodeSet.add(d); });
-  const nodes = [...nodeSet];
-  const nodeIndex = Object.fromEntries(nodes.map((n, i) => [n, i]));
+  if (traspasos.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:28px">No hay traspasos con importe conocido para los filtros seleccionados.</p>';
+    return;
+  }
 
-  const sources = sorted.map(([k]) => nodeIndex[k.split('|||')[0]]);
-  const targets = sorted.map(([k]) => nodeIndex[k.split('|||')[1]]);
-  const values = sorted.map(([,v]) => v / 1e6);
+  const maxImp = traspasos[0].importe_numerico;
 
-  plot('chart-sankey', [
-    {
-      type: 'sankey',
-      orientation: 'h',
-      node: {
-        pad: 12, thickness: 20,
-        label: nodes,
-        color: nodes.map(() => '#009a44')
-      },
-      link: {
-        source: sources, target: targets, value: values,
-        color: sources.map(() => 'rgba(0,154,68,0.25)'),
-        hovertemplate: '%{source.label} → %{target.label}: €%{value:.2f}M<extra></extra>'
-      }
-    }
-  ], {
-    margin: { t: 20, r: 30, b: 20, l: 30 },
-    font: { size: 10, color: '#1a2332' }
-  });
+  const rows = traspasos.map((d, i) => {
+    const srcShield = clubShield(d.club_origen);
+    const dstShield = clubShield(d.club);
+    const pct = (d.importe_numerico / maxImp * 100).toFixed(1);
+    const pos = i + 1;
+    const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉'
+      : `<span style="font-size:0.75rem;font-weight:700;color:var(--text-muted)">${pos}</span>`;
+    return `
+      <tr style="border-bottom:1px solid var(--border)"
+          onmouseover="this.style.background='var(--primary-light)'"
+          onmouseout="this.style.background=''">
+        <td style="padding:10px 8px;text-align:center;width:36px">${medal}</td>
+        <td style="padding:10px 8px">
+          <div style="display:flex;align-items:center;gap:9px">
+            ${playerAvatar(d.jugador, 30)}
+            <div>
+              <div style="font-weight:700;font-size:0.85rem">${d.jugador}</div>
+              <div style="font-size:0.72rem;color:var(--text-muted)">${tPos(d.posicion || '')}${d.edad ? ' · ' + d.edad + ' años' : ''}</div>
+            </div>
+          </div>
+        </td>
+        <td style="padding:10px 8px;text-align:center;width:82px">
+          <span style="background:rgba(200,169,81,0.18);color:#7a5c00;padding:3px 9px;border-radius:12px;font-size:0.72rem;font-weight:700;letter-spacing:0.02em;white-space:nowrap">${d.temporada}</span>
+        </td>
+        <td style="padding:10px 12px;min-width:260px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:5px">
+              ${srcShield ? `<img src="${srcShield}" width="20" height="20" style="object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">` : ''}
+              <span style="font-size:0.82rem;color:var(--text-muted)">${d.club_origen}</span>
+            </div>
+            <span style="color:var(--primary);font-weight:800;font-size:0.95rem">→</span>
+            <div style="display:flex;align-items:center;gap:5px">
+              ${dstShield ? `<img src="${dstShield}" width="20" height="20" style="object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">` : ''}
+              <span style="font-size:0.82rem;font-weight:700;color:var(--text)">${d.club}</span>
+            </div>
+          </div>
+        </td>
+        <td style="padding:10px 14px;text-align:right;white-space:nowrap">
+          <div style="font-size:0.95rem;font-weight:800;color:var(--primary)">${formatM(d.importe_numerico)}</div>
+          <div style="margin-top:4px;background:var(--border);border-radius:4px;height:4px;width:80px;margin-left:auto">
+            <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:4px"></div>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:580px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border)">
+            <th style="padding:8px 8px 10px;text-align:center;font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">#</th>
+            <th style="padding:8px 8px 10px;font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">Jugador</th>
+            <th style="padding:8px 8px 10px;text-align:center;font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">Temporada</th>
+            <th style="padding:8px 12px 10px;font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">Origen → Destino</th>
+            <th style="padding:8px 14px 10px;text-align:right;font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">Importe</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
 }
 
 function renderInsights(data) {
@@ -979,32 +1080,33 @@ function renderNacMapa(data) {
 
 /* ===================== TAB 6: REVALORIZACIÓN ===================== */
 function renderRevalorizacionTab() {
-  if (REV_DATA.length === 0) {
+  const revData = getRevData();
+  if (revData.length === 0) {
     document.getElementById('rev-kpi-pares').textContent = 'N/D';
     return;
   }
 
-  const positives = REV_DATA.filter(d => (+d.revalorizacion_abs || 0) > 0);
+  const positives = revData.filter(d => (+d.revalorizacion_abs || 0) > 0);
 
-  document.getElementById('rev-kpi-pares').textContent = fmt(REV_DATA.length);
+  document.getElementById('rev-kpi-pares').textContent = fmt(revData.length);
   document.getElementById('rev-kpi-pos').textContent = fmt(positives.length);
   document.getElementById('rev-kpi-total').textContent = formatM(sumBy(positives, 'revalorizacion_abs'));
   const meanPct = meanBy(positives.filter(d => d.revalorizacion_pct != null), 'revalorizacion_pct');
   document.getElementById('rev-kpi-media').textContent = `+${meanPct.toFixed(0)}%`;
 
-  renderRevClubes();
-  renderRevClubesMedia();
-  renderRevJugadores();
-  renderRevPos();
-  renderRevEdad();
-  renderRevTemporada();
-  renderRevNac();
-  renderRevROI();
-  renderRevTable();
+  renderRevClubes(revData);
+  renderRevClubesMedia(revData);
+  renderRevJugadores(revData);
+  renderRevPos(revData);
+  renderRevEdad(revData);
+  renderRevTemporada(revData);
+  renderRevNac(revData);
+  renderRevROI(revData);
+  renderRevTable(revData);
 }
 
-function renderRevClubes() {
-  const byClub = groupBy(REV_DATA, 'club');
+function renderRevClubes(revData) {
+  const byClub = groupBy(revData, 'club');
   const top = topN(Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, sumBy(v,'revalorizacion_abs')])), 15);
   const labels = top.map(d => d[0]).reverse();
   const vals = top.map(d => d[1] / 1e6).reverse();
@@ -1021,8 +1123,8 @@ function renderRevClubes() {
   });
 }
 
-function renderRevClubesMedia() {
-  const byClub = groupBy(REV_DATA.filter(d => d.revalorizacion_pct != null), 'club');
+function renderRevClubesMedia(revData) {
+  const byClub = groupBy(revData.filter(d => d.revalorizacion_pct != null), 'club');
   const clubMeans = Object.entries(byClub)
     .filter(([,v]) => v.length >= 2)
     .map(([k,v]) => [k, meanBy(v,'revalorizacion_pct')]);
@@ -1042,8 +1144,8 @@ function renderRevClubesMedia() {
   });
 }
 
-function renderRevJugadores() {
-  const sorted = [...REV_DATA].sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0,15);
+function renderRevJugadores(revData) {
+  const sorted = [...revData].sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0,15);
   const labels = sorted.map(d => `${d.jugador} (${d.club}) ${d.temporada_llegada||''}→${d.temporada_salida||''}`).reverse();
   const vals = sorted.map(d => (+d.revalorizacion_abs||0) / 1e6).reverse();
   const customdata = sorted.map(d => [d.temporada_llegada||'—', d.temporada_salida||'—', tPos(d.posicion||'')]).reverse();
@@ -1061,8 +1163,8 @@ function renderRevJugadores() {
   });
 }
 
-function renderRevPos() {
-  const byPos = groupBy(REV_DATA, 'posicion');
+function renderRevPos(revData) {
+  const byPos = groupBy(revData, 'posicion');
   const top = topN(Object.fromEntries(Object.entries(byPos).map(([k,v]) => [k, sumBy(v,'revalorizacion_abs')])), 14);
   const labels = top.map(d => tPos(d[0])).reverse();
   const vals = top.map(d => d[1] / 1e6).reverse();
@@ -1079,8 +1181,8 @@ function renderRevPos() {
   });
 }
 
-function renderRevEdad() {
-  const data = REV_DATA.filter(d => d.edad_llegada && d.revalorizacion_pct != null);
+function renderRevEdad(revData) {
+  const data = revData.filter(d => d.edad_llegada && d.revalorizacion_pct != null);
   const positions = [...new Set(data.map(d => d.posicion))].filter(Boolean);
 
   const traces = positions.slice(0, 8).map((pos, i) => {
@@ -1106,8 +1208,8 @@ function renderRevEdad() {
   });
 }
 
-function renderRevTemporada() {
-  const byTemp = groupBy(REV_DATA.filter(d => d.temporada_salida), 'temporada_salida');
+function renderRevTemporada(revData) {
+  const byTemp = groupBy(revData.filter(d => d.temporada_salida), 'temporada_salida');
   const seasons = Object.keys(byTemp).sort();
   const vals = seasons.map(s => sumBy(byTemp[s],'revalorizacion_abs') / 1e6);
 
@@ -1123,8 +1225,8 @@ function renderRevTemporada() {
   });
 }
 
-function renderRevNac() {
-  const byNac = groupBy(REV_DATA.filter(d => d.revalorizacion_pct != null), 'nacionalidad');
+function renderRevNac(revData) {
+  const byNac = groupBy(revData.filter(d => d.revalorizacion_pct != null), 'nacionalidad');
   const nacMeans = Object.entries(byNac).filter(([,v]) => v.length >= 2)
     .map(([k,v]) => [k, meanBy(v,'revalorizacion_pct')]);
   const top = nacMeans.sort((a,b) => b[1]-a[1]).slice(0,10);
@@ -1143,8 +1245,8 @@ function renderRevNac() {
   });
 }
 
-function renderRevROI() {
-  const data = REV_DATA.filter(d => (+d.vm_llegada||0) > 0);
+function renderRevROI(revData) {
+  const data = revData.filter(d => (+d.vm_llegada||0) > 0);
   const byClub = groupBy(data, 'club');
   const clubROI = Object.entries(byClub)
     .filter(([,v]) => v.length >= 2)
@@ -1168,8 +1270,8 @@ function renderRevROI() {
   });
 }
 
-function renderRevTable() {
-  const sorted = [...REV_DATA].sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0,20);
+function renderRevTable(revData) {
+  const sorted = [...revData].sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0,20);
   const tbody = document.getElementById('rev-top-tbody');
   if (!tbody) return;
 
