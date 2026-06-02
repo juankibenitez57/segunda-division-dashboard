@@ -3,28 +3,31 @@
    Dashboard Styles — styles.css
    ============================================================ */
 
-/* ---------- CSS Variables ---------- */
+/* ---------- CSS Variables — Dark Professional Theme ---------- */
 :root {
-  --bg:           #f4f6f9;
-  --bg-card:      #ffffff;
-  --sidebar-bg:   #00521c;
-  --sidebar-text: #ffffff;
-  --sidebar-hover:#006e31;
-  --primary:      #009a44;
-  --primary-dark: #006e31;
-  --primary-light:#e8f5ee;
+  --bg:           #0e1621;
+  --bg-2:         #111d2b;
+  --bg-card:      #162032;
+  --bg-card-hover:#1c2a40;
+  --sidebar-bg:   #091410;
+  --sidebar-text: #e0ead8;
+  --sidebar-hover:rgba(0,154,68,0.18);
+  --primary:      #00b84a;
+  --primary-dark: #009a44;
+  --primary-light:rgba(0,154,68,0.12);
   --accent:       #c8a951;
-  --text:         #1a2332;
-  --text-muted:   #64748b;
-  --border:       #e2e8f0;
-  --success:      #059669;
-  --danger:       #dc2626;
-  --warning:      #d97706;
+  --text:         #dce8dc;
+  --text-muted:   #7a9080;
+  --border:       rgba(255,255,255,0.07);
+  --border-strong:rgba(0,154,68,0.25);
+  --success:      #00b84a;
+  --danger:       #e05252;
+  --warning:      #d4a017;
   --sidebar-width:220px;
-  --header-height:64px;
+  --header-height:60px;
   --radius:       10px;
-  --shadow:       0 2px 12px rgba(0,0,0,0.08);
-  --shadow-md:    0 4px 20px rgba(0,0,0,0.12);
+  --shadow:       0 2px 16px rgba(0,0,0,0.35);
+  --shadow-md:    0 4px 28px rgba(0,0,0,0.5);
 }
 
 /* ---------- Reset ---------- */
@@ -400,7 +403,7 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: 0.82rem;
   color: var(--text);
-  background: #fff;
+  background: var(--bg-card);
   cursor: pointer;
   outline: none;
   min-width: 130px;
@@ -567,8 +570,8 @@ body {
   letter-spacing: 0.04em;
 }
 
-.ranking-table tbody tr:nth-child(odd) { background: #f9fafb; }
-.ranking-table tbody tr:nth-child(even) { background: #fff; }
+.ranking-table tbody tr:nth-child(odd) { background: var(--bg-2); }
+.ranking-table tbody tr:nth-child(even) { background: var(--bg-card); }
 .ranking-table tbody tr:hover { background: var(--primary-light); }
 
 .ranking-table td {
@@ -689,8 +692,8 @@ body {
   text-align: center;
 }
 
-tr.row-positive { background: #f0fdf4; }
-tr.row-negative { background: #fff1f2; }
+tr.row-positive { background: rgba(0,154,68,0.12); }
+tr.row-negative { background: rgba(220,80,80,0.12); }
 
 .arrow-up { color: var(--success); font-weight: 700; }
 .arrow-down { color: var(--danger); font-weight: 700; }
@@ -723,8 +726,8 @@ tr.row-negative { background: #fff1f2; }
   border-bottom: 2px solid var(--primary);
 }
 
-#bbdd-table tbody tr:nth-child(odd) { background: #f9fafb; }
-#bbdd-table tbody tr:nth-child(even) { background: white; }
+#bbdd-table tbody tr:nth-child(odd) { background: var(--bg-2); }
+#bbdd-table tbody tr:nth-child(even) { background: var(--bg-card); }
 #bbdd-table tbody tr:hover { background: var(--primary-light) !important; }
 #bbdd-table td { padding: 7px 10px; }
 

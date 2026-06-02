@@ -74,9 +74,9 @@ function fmt(n) { return new Intl.NumberFormat('es-ES').format(Math.round(n)); }
 const BASE_LAYOUT = {
   paper_bgcolor: 'rgba(0,0,0,0)',
   plot_bgcolor: 'rgba(0,0,0,0)',
-  font: { color: '#1a2332', family: 'Inter, sans-serif', size: 11 },
-  xaxis: { gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-  yaxis: { gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+  font: { color: '#dce8dc', family: 'Inter, sans-serif', size: 11 },
+  xaxis: { gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+  yaxis: { gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
   margin: { t: 45, r: 20, b: 50, l: 60 },
   legend: { bgcolor: 'rgba(0,0,0,0)', font: { size: 10 } }
 };
@@ -392,8 +392,8 @@ function renderEvolucion(data) {
       text: bajas.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 } }
   ], {
     barmode: 'group',
-    yaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    xaxis: { gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    xaxis: { gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 45, r: 20, b: 50, l: 70 }
   });
 }
@@ -425,8 +425,8 @@ function renderEvolucionOps(data) {
       fill: 'tozeroy', fillcolor: 'rgba(224,123,57,0.15)', line: { color: CHART_COLORS[2], width: 2 },
       marker: { color: CHART_COLORS[2], size: 7 } }
   ], {
-    yaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    xaxis: { gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' }
+    yaxis: { title: 'Operaciones', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    xaxis: { gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' }
   });
 }
 
@@ -490,7 +490,7 @@ function renderSankey(data) {
     }
   ], {
     margin: { t: 20, r: 30, b: 20, l: 30 },
-    font: { size: 10, color: '#1a2332' }
+    font: { size: 10, color: '#dce8dc' }
   });
 }
 
@@ -607,8 +607,8 @@ function renderCompradores(data) {
       text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 80, b: 50, l: 150 }
   });
 }
@@ -626,8 +626,8 @@ function renderVendedores(data) {
       text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 80, b: 50, l: 150 }
   });
 }
@@ -648,8 +648,8 @@ function renderBalance(data) {
       text: vals.map(v => `${v >= 0 ? '+' : ''}€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 9 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 100, b: 50, l: 160 }
   });
 }
@@ -676,8 +676,8 @@ function renderPosOps() {
       text: vals.map(v => fmt(v)), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: %{x} ops<extra></extra>' }
   ], {
-    xaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Operaciones', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 60, b: 50, l: 140 }
   });
 }
@@ -694,8 +694,8 @@ function renderPosDinero() {
       text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 80, b: 50, l: 140 }
   });
 }
@@ -712,8 +712,8 @@ function renderPosValorMedio() {
       text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'VM Medio (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'VM Medio (M€)', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 90, b: 50, l: 140 }
   });
 }
@@ -730,8 +730,8 @@ function renderPosEdadMedia() {
       text: vals.map(v => `${v} años`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: %{x} años<extra></extra>' }
   ], {
-    xaxis: { title: 'Edad media', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Edad media', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 80, b: 50, l: 140 }
   });
 }
@@ -751,8 +751,8 @@ function renderPosTipo() {
 
   plot('chart-pos-tipo', traces, {
     barmode: 'stack',
-    xaxis: { title: 'Posición', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Posición', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { title: 'Operaciones', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 40, r: 20, b: 80, l: 60 }
   });
 }
@@ -812,8 +812,8 @@ function renderTopCaros(data) {
       text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0', tickfont: { size: 9 } },
+    xaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)', tickfont: { size: 9 } },
     margin: { t: 30, r: 90, b: 50, l: 220 }
   });
 }
@@ -830,8 +830,8 @@ function renderTopValorMercado(data) {
       text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
       hovertemplate: '%{y}: €%{x:.2f}M VM<extra></extra>' }
   ], {
-    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0', tickfont: { size: 9 } },
+    xaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)', tickfont: { size: 9 } },
     margin: { t: 30, r: 90, b: 50, l: 200 }
   });
 }
@@ -860,8 +860,8 @@ function renderEdadImporte(data) {
   });
 
   plot('chart-edad-importe', traces, {
-    xaxis: { title: 'Edad', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { title: 'Importe (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Edad', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { title: 'Importe (M€)', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     showlegend: true,
     legend: { bgcolor: 'rgba(0,0,0,0)', font: { size: 9 } },
     margin: { t: 40, r: 20, b: 50, l: 70 }
@@ -881,8 +881,8 @@ function renderDistEdad(data) {
       opacity: 0.8 }
   ], {
     barmode: 'overlay',
-    xaxis: { title: 'Edad', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { title: 'Frecuencia', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Edad', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { title: 'Frecuencia', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 40, r: 20, b: 50, l: 60 }
   });
 }
@@ -899,8 +899,8 @@ function renderNacBar(data) {
       text: vals.map(v => fmt(v)), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: %{x} jugadores<extra></extra>' }
   ], {
-    xaxis: { title: 'Jugadores', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Jugadores', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 60, b: 50, l: 120 }
   });
 }
@@ -924,7 +924,7 @@ function renderNacMapa(data) {
       showframe: false, showcoastlines: true,
       projection: { type: 'natural earth' },
       bgcolor: 'rgba(0,0,0,0)',
-      coastlinecolor: '#e2e8f0',
+      coastlinecolor: 'rgba(255,255,255,0.07)',
       landcolor: '#f4f6f9',
       countrycolor: '#e2e8f0'
     },
@@ -970,8 +970,8 @@ function renderRevClubes() {
       text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Revalorización (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Revalorización (M€)', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 90, b: 50, l: 160 }
   });
 }
@@ -991,8 +991,8 @@ function renderRevClubesMedia() {
       text: vals.map(v => `${v}%`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: %{x:.1f}%<extra></extra>' }
   ], {
-    xaxis: { title: '% Medio', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: '% Medio', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 70, b: 50, l: 160 }
   });
 }
@@ -1008,8 +1008,8 @@ function renderRevJugadores() {
       text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Revalorización (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0', tickfont: { size: 9 } },
+    xaxis: { title: 'Revalorización (M€)', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)', tickfont: { size: 9 } },
     margin: { t: 30, r: 90, b: 50, l: 200 }
   });
 }
@@ -1026,8 +1026,8 @@ function renderRevPos() {
       text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Revalorización (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Revalorización (M€)', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 90, b: 50, l: 140 }
   });
 }
@@ -1051,8 +1051,8 @@ function renderRevEdad() {
   });
 
   plot('chart-rev-edad', traces, {
-    xaxis: { title: 'Edad de llegada', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { title: 'Revalorización %', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Edad de llegada', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { title: 'Revalorización %', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     showlegend: true,
     legend: { bgcolor: 'rgba(0,0,0,0)', font: { size: 9 } },
     margin: { t: 40, r: 20, b: 50, l: 70 }
@@ -1070,8 +1070,8 @@ function renderRevTemporada() {
       text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{x}: €%{y:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Temporada salida', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { title: 'Revalorización (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Temporada salida', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { title: 'Revalorización (M€)', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 40, r: 20, b: 60, l: 70 }
   });
 }
@@ -1090,8 +1090,8 @@ function renderRevNac() {
       text: vals.map(v => `${v}%`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: %{x:.1f}%<extra></extra>' }
   ], {
-    xaxis: { title: '% Medio', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: '% Medio', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 70, b: 50, l: 130 }
   });
 }
@@ -1115,8 +1115,8 @@ function renderRevROI() {
       text: vals.map(v => `${v}%`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: ROI %{x:.1f}%<extra></extra>' }
   ], {
-    xaxis: { title: 'ROI %', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'ROI %', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 80, b: 50, l: 160 }
   });
 }
@@ -1177,8 +1177,8 @@ function renderTempClubesOps(data) {
       text: vals.map(v => fmt(v)), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: %{x} ops<extra></extra>' }
   ], {
-    xaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Operaciones', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 60, b: 50, l: 160 }
   });
 }
@@ -1210,8 +1210,8 @@ function renderTempTopFichajes(data) {
       text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
       hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0', tickfont: { size: 9 } },
+    xaxis: { title: 'Millones €', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)', tickfont: { size: 9 } },
     margin: { t: 30, r: 90, b: 50, l: 200 }
   });
 }
@@ -1228,8 +1228,8 @@ function renderTempPosiciones(data) {
       text: vals.map(v => fmt(v)), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{y}: %{x} ops<extra></extra>' }
   ], {
-    xaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
-    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { title: 'Operaciones', gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
+    yaxis: { automargin: true, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.07)', zerolinecolor: 'rgba(255,255,255,0.07)' },
     margin: { t: 30, r: 60, b: 50, l: 140 }
   });
 }
