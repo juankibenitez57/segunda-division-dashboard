@@ -176,6 +176,41 @@ const LIGAS_MAYORES_EXT = new Set([
   'Brazil','Argentina','Scotland','Belgium','Turkey','Russia','Ukraine'
 ]);
 
+// Clubes de Segunda División que tuvieron temporadas en Primera dentro del período 2021-2026.
+// Un jugador cuyo club pasó por Primera durante su estancia tiene valor inflado por esa etapa.
+const CLUBS_PRIMERA_SEASONS = {
+  'Cádiz CF':               new Set(['2021-22','2022-23','2023-24','2024-25']),
+  'Levante UD':             new Set(['2021-22']),
+  'Granada CF':             new Set(['2021-22']),
+  'Elche CF':               new Set(['2021-22','2022-23']),
+  'UD Almería':             new Set(['2022-23','2023-24']),
+  'Girona FC':              new Set(['2022-23','2023-24','2024-25','2025-26']),
+  'Real Valladolid CF':     new Set(['2022-23']),
+  'RCD Espanyol Barcelona': new Set(['2022-23']),
+  'Deportivo Alavés':       new Set(['2023-24','2024-25','2025-26']),
+  'UD Las Palmas':          new Set(['2023-24','2024-25']),
+  'CD Leganés':             new Set(['2024-25','2025-26']),
+};
+
+const ALL_SEASONS_ORD = ['2021-22','2022-23','2023-24','2024-25','2025-26'];
+
+function seasonsBetween(from, to) {
+  const fi = ALL_SEASONS_ORD.indexOf(from);
+  const ti = ALL_SEASONS_ORD.indexOf(to);
+  if (fi === -1 || ti === -1) return [from, to].filter(Boolean);
+  return ALL_SEASONS_ORD.slice(Math.min(fi,ti), Math.max(fi,ti) + 1);
+}
+
+function isExternoMain(d) {
+  const pais   = (d.pais_club   || '').trim();
+  const origen = (d.club_origen || '').trim();
+  if (LIGAS_MAYORES_EXT.has(pais)) return true;
+  if (pais === 'Spain' && origen && !CLUB_IDS_SET.has(origen) && (d._vm || 0) > 1000000) return true;
+  const clubPrim = CLUBS_PRIMERA_SEASONS[d.club];
+  if (clubPrim && clubPrim.has(d.temporada)) return true;
+  return false;
+}
+
 function enrichRevData() {
   REV_DATA.forEach(rev => {
     const altaRecord = ALL_DATA.find(d =>
@@ -185,18 +220,31 @@ function enrichRevData() {
       d.temporada === rev.temporada_llegada
     );
 
-    if (!altaRecord) { rev._origen = 'desconocido'; return; }
+    // Detectar origen desde el fichaje de alta
+    if (altaRecord) {
+      const origen = (altaRecord.club_origen || '').trim();
+      const pais   = (altaRecord.pais_club   || '').trim();
+      const vm     = +rev.vm_llegada || 0;
 
-    const origen = (altaRecord.club_origen || '').trim();
-    const pais   = (altaRecord.pais_club   || '').trim();
-    const vm     = +rev.vm_llegada || 0;
-
-    if (LIGAS_MAYORES_EXT.has(pais)) {
-      rev._origen = 'extranjero';
-    } else if (pais === 'Spain' && origen && !CLUB_IDS_SET.has(origen) && vm > 1000000) {
-      rev._origen = 'primera';
+      if (LIGAS_MAYORES_EXT.has(pais)) {
+        rev._origen = 'extranjero';
+      } else if (pais === 'Spain' && origen && !CLUB_IDS_SET.has(origen) && vm > 1000000) {
+        rev._origen = 'primera';
+      } else {
+        rev._origen = 'segunda';
+      }
     } else {
-      rev._origen = 'segunda';
+      rev._origen = 'desconocido';
+    }
+
+    // Si el club tuvo temporadas en Primera durante la estancia del jugador,
+    // su revalorización no es atribuible exclusivamente a Segunda División.
+    if (rev._origen === 'segunda' || rev._origen === 'desconocido') {
+      const clubPrim = CLUBS_PRIMERA_SEASONS[rev.club];
+      if (clubPrim) {
+        const seasons = seasonsBetween(rev.temporada_llegada, rev.temporada_salida);
+        if (seasons.some(s => clubPrim.has(s))) rev._origen = 'primera';
+      }
     }
   });
 }
@@ -299,6 +347,12 @@ function setupEventListeners() {
     chartsRendered['tab-revalorizacion'] = false;
     renderRevalorizacionTab();
   });
+
+  // Jugadores origin filter
+  document.getElementById('jug-filter-primera')?.addEventListener('change', () => {
+    chartsRendered['tab-jugadores'] = false;
+    renderJugadoresTab();
+  });
 }
 
 /* ===================== TAB SWITCHING ===================== */
@@ -370,14 +424,17 @@ function getMktData() {
 }
 
 function getJugData() {
-  const season = document.getElementById('jug-season').value;
-  const club = document.getElementById('jug-club').value;
-  const pos = document.getElementById('jug-pos').value;
-  return ALL_DATA.filter(d =>
-    (season === 'all' || d.temporada === season) &&
-    (club === 'all' || d.club === club) &&
-    (pos === 'all' || d.posicion === pos)
-  );
+  const season  = document.getElementById('jug-season').value;
+  const club    = document.getElementById('jug-club').value;
+  const pos     = document.getElementById('jug-pos').value;
+  const excluir = document.getElementById('jug-filter-primera')?.checked;
+  return ALL_DATA.filter(d => {
+    if (season !== 'all' && d.temporada !== season) return false;
+    if (club   !== 'all' && d.club      !== club)   return false;
+    if (pos    !== 'all' && d.posicion  !== pos)     return false;
+    if (excluir && isExternoMain(d)) return false;
+    return true;
+  });
 }
 
 /* ===================== TAB 1: INICIO ===================== */
