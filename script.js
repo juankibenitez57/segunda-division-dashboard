@@ -5,1631 +5,1299 @@
 
 'use strict';
 
-/* ============================================================
-   CONSTANTS & CONFIGURATION
-   ============================================================ */
+/* ===================== CONSTANTS ===================== */
+const CHART_COLORS = ['#009a44','#1d6fa4','#e07b39','#8b5cf6','#d4a017','#0891b2','#be185d','#059669','#7c3aed','#b45309'];
 
-const CSV_PATH = 'data/final/segunda_division_fichajes_2021_2026.csv';
+const CLUB_IDS = {
+  "AD Alcorcón":"11596","AD Ceuta FC":"8568","Albacete Balompié":"1532",
+  "Burgos CF":"1536","CD Castellón":"2502","CD Eldense":"12567",
+  "CD Leganés":"1244","CD Lugo":"11000","CD Mirandés":"13222",
+  "CD Tenerife":"648","CF Fuenlabrada":"16486","Cultural Leonesa":"4542",
+  "Cádiz CF":"2687","Córdoba CF":"993","Deportivo Alavés":"1108",
+  "Deportivo de La Coruña":"897","Elche CF":"1531","FC Andorra":"10718",
+  "FC Cartagena":"7077","Girona FC":"12321","Granada CF":"16795",
+  "Levante UD":"3368","Málaga CF":"1084","RCD Espanyol Barcelona":"714",
+  "Racing Ferrol":"1176","Racing Santander":"630","Real Oviedo":"2497",
+  "Real Sociedad B":"9899","Real Valladolid CF":"366","Real Zaragoza":"142",
+  "SD Amorebieta":"16575","SD Eibar":"1533","SD Huesca":"5358",
+  "SD Ponferradina":"4032","Sporting Gijón":"2448","UD Almería":"3302",
+  "UD Ibiza":"13241","UD Las Palmas":"472","Villarreal CF B":"11972"
+};
 
-/** Chart color palette */
-const PALETTE = [
-  '#00c896','#3b82f6','#f59e0b','#ef4444','#8b5cf6',
-  '#06b6d4','#f97316','#ec4899','#84cc16','#a78bfa',
-  '#34d399','#60a5fa','#fbbf24','#f87171','#c084fc'
-];
-
-/** Position translations EN → ES */
 const POS_ES = {
-  'Centre-Forward':   'Delantero Cen.',
-  'Centre-Back':      'Central',
-  'Central Midfield': 'Mediocentro',
-  'Left Winger':      'Extremo Izq.',
-  'Right Winger':     'Extremo Der.',
-  'Right-Back':       'Lateral Der.',
-  'Left-Back':        'Lateral Izq.',
-  'Goalkeeper':       'Portero',
-  'Attacking Midfield':'Mediapunta',
-  'Defensive Midfield':'Pivote',
-  'Second Striker':   '2º Delantero',
-  'Right Midfield':   'Medio Der.',
-  'Left Midfield':    'Medio Izq.',
-  'Striker':          'Delantero'
+  'Centre-Forward':'Delantero Centro','Centre-Back':'Central',
+  'Central Midfield':'Mediocentro','Left Winger':'Extremo Izq.',
+  'Right Winger':'Extremo Der.','Right-Back':'Lateral Der.',
+  'Left-Back':'Lateral Izq.','Goalkeeper':'Portero',
+  'Attacking Midfield':'Mediapunta','Defensive Midfield':'Pivote',
+  'Second Striker':'2º Delantero','Right Midfield':'Medio Der.',
+  'Left Midfield':'Medio Izq.','Striker':'Delantero'
 };
 
-/** Nationality → Plotly country name mappings for choropleth */
-const NAC_COUNTRY_MAP = {
-  'Spain': 'Spain', 'Argentina': 'Argentina', 'France': 'France',
-  'Portugal': 'Portugal', 'Brazil': 'Brazil', 'Uruguay': 'Uruguay',
-  'Serbia': 'Serbia', 'Colombia': 'Colombia', 'Ghana': 'Ghana',
-  'Morocco': 'Morocco', 'Senegal': 'Senegal', 'Germany': 'Germany',
-  'Italy': 'Italy', 'Netherlands': 'Netherlands', 'Belgium': 'Belgium',
-  'Croatia': 'Croatia', 'Ecuador': 'Ecuador', 'Paraguay': 'Paraguay',
-  'Chile': 'Chile', 'Mexico': 'Mexico', 'Nigeria': 'Nigeria',
-  'Ivory Coast': "Cote d'Ivoire", 'Mali': 'Mali', 'Guinea': 'Guinea',
-  'Cameroon': 'Cameroon', 'Romania': 'Romania', 'Hungary': 'Hungary',
-  'Sweden': 'Sweden', 'Norway': 'Norway', 'Denmark': 'Denmark',
-  'Poland': 'Poland', 'Slovakia': 'Slovakia', 'Czech Republic': 'Czechia',
-  'Austria': 'Austria', 'Switzerland': 'Switzerland', 'Turkey': 'Turkey',
-  'United States': 'United States', 'Canada': 'Canada', 'Venezuela': 'Venezuela',
-  'Peru': 'Peru', 'Bolivia': 'Bolivia', 'Costa Rica': 'Costa Rica',
-  'Honduras': 'Honduras', 'Jamaica': 'Jamaica', 'Zimbabwe': 'Zimbabwe',
-  'Zambia': 'Zambia', 'DR Congo': 'Democratic Republic of the Congo',
-  'Cape Verde': 'Cabo Verde', 'Guinea-Bissau': 'Guinea-Bissau',
-  'Equatorial Guinea': 'Equatorial Guinea', 'Gabon': 'Gabon',
-  'Egypt': 'Egypt', 'Algeria': 'Algeria', 'Tunisia': 'Tunisia',
-  'South Africa': 'South Africa', 'Mozambique': 'Mozambique',
-  'Sierra Leone': 'Sierra Leone', 'Gambia': 'Gambia', 'Togo': 'Togo',
-  'Slovenia': 'Slovenia', 'Finland': 'Finland', 'Ukraine': 'Ukraine',
-  'Russia': 'Russia', 'Montenegro': 'Montenegro', 'Bosnia-Herzegovina': 'Bosnia and Herzegovina',
-  'Kosovo': 'Kosovo', 'North Macedonia': 'North Macedonia', 'Albania': 'Albania',
-  'Greece': 'Greece', 'Cyprus': 'Cyprus', 'Israel': 'Israel'
-};
+/* ===================== UTILITY FUNCTIONS ===================== */
+function tPos(p) { return POS_ES[p] || p; }
 
-/** Base layout for all Plotly charts */
-const BASE_LAYOUT = {
-  paper_bgcolor: 'transparent',
-  plot_bgcolor:  'transparent',
-  font: { family: 'Inter, sans-serif', color: '#f1f5f9', size: 12 },
-  margin: { t: 20, r: 20, b: 40, l: 50 },
-  legend: { bgcolor: 'transparent', font: { color: '#94a3b8', size: 11 } },
-  xaxis: {
-    gridcolor: 'rgba(255,255,255,0.07)',
-    zerolinecolor: 'rgba(255,255,255,0.12)',
-    tickfont: { color: '#94a3b8' },
-    linecolor: 'rgba(255,255,255,0.1)'
-  },
-  yaxis: {
-    gridcolor: 'rgba(255,255,255,0.07)',
-    zerolinecolor: 'rgba(255,255,255,0.12)',
-    tickfont: { color: '#94a3b8' },
-    linecolor: 'rgba(255,255,255,0.1)'
-  }
-};
+function clubShield(name) {
+  const id = CLUB_IDS[name];
+  return id ? `https://tmssl.akamaized.net/images/wappen/normquad/${id}.png` : '';
+}
 
-const PLOTLY_CONFIG = { responsive: true, displayModeBar: true, displaylogo: false };
-
-/* ============================================================
-   UTILITY FUNCTIONS
-   ============================================================ */
-
-/**
- * Parse monetary string like "€300k", "€1.00m", "€22,950,000" → number
- */
 function parseMonetary(s) {
-  if (!s || s === '-' || s === '' || s === 'null') return 0;
-  s = String(s).replace('€', '').replace(',', '.').trim();
+  if (!s || s === '-') return 0;
+  s = String(s).replace('€','').replace(',','.').trim();
   if (/m$/i.test(s)) return parseFloat(s) * 1e6;
   if (/k$/i.test(s)) return parseFloat(s) * 1e3;
   if (/th\.?$/i.test(s)) return parseFloat(s) * 1e3;
-  const n = parseFloat(s);
-  return isNaN(n) ? 0 : n;
+  return parseFloat(s) || 0;
 }
 
-/** Group array of objects by key */
 function groupBy(arr, key) {
   return arr.reduce((a, r) => {
-    const k = (r[key] !== undefined && r[key] !== null && r[key] !== '') ? r[key] : '?';
+    const k = r[key] || '?';
     (a[k] = a[k] || []).push(r);
     return a;
   }, {});
 }
 
-/** Sum numeric field */
-function sumBy(arr, key) {
-  return arr.reduce((a, r) => a + (+r[key] || 0), 0);
-}
-
-/** Mean of numeric field */
-function meanBy(arr, key) {
-  if (!arr.length) return 0;
-  return sumBy(arr, key) / arr.length;
-}
-
-/** Top N entries from object {key: value} */
+function sumBy(arr, key) { return arr.reduce((a, r) => a + (+r[key] || 0), 0); }
+function meanBy(arr, key) { return arr.length ? sumBy(arr, key) / arr.length : 0; }
 function topN(obj, n = 10, asc = false) {
-  return Object.entries(obj)
-    .sort((a, b) => asc ? a[1] - b[1] : b[1] - a[1])
-    .slice(0, n);
+  return Object.entries(obj).sort((a, b) => asc ? a[1] - b[1] : b[1] - a[1]).slice(0, n);
 }
-
-/** Format number as monetary string */
 function formatM(n) {
-  if (isNaN(n) || n === null || n === undefined) return '—';
-  if (n >= 1e6) return `€${(n / 1e6).toFixed(2)}M`;
+  if (n >= 1e6) return `€${(n / 1e6).toFixed(1)}M`;
   if (n >= 1e3) return `€${(n / 1e3).toFixed(0)}k`;
-  return n > 0 ? `€${Math.round(n).toLocaleString('es-ES')}` : '—';
+  return n > 0 ? `€${n}` : '-';
 }
+function fmt(n) { return new Intl.NumberFormat('es-ES').format(Math.round(n)); }
 
-/** Format large number with thousand separators */
-function formatNum(n) {
-  if (isNaN(n)) return '0';
-  return Math.round(n).toLocaleString('es-ES');
-}
+const BASE_LAYOUT = {
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor: 'rgba(0,0,0,0)',
+  font: { color: '#1a2332', family: 'Inter, sans-serif', size: 11 },
+  xaxis: { gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+  yaxis: { gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+  margin: { t: 45, r: 20, b: 50, l: 60 },
+  legend: { bgcolor: 'rgba(0,0,0,0)', font: { size: 10 } }
+};
 
-/** Deep merge layout objects */
-function mergeLayout(overrides) {
-  return Object.assign({}, BASE_LAYOUT,
-    { xaxis: Object.assign({}, BASE_LAYOUT.xaxis, overrides.xaxis || {}) },
-    { yaxis: Object.assign({}, BASE_LAYOUT.yaxis, overrides.yaxis || {}) },
-    overrides
+function layout(overrides) {
+  return Object.assign({}, BASE_LAYOUT, overrides,
+    overrides.xaxis ? { xaxis: Object.assign({}, BASE_LAYOUT.xaxis, overrides.xaxis) } : {},
+    overrides.yaxis ? { yaxis: Object.assign({}, BASE_LAYOUT.yaxis, overrides.yaxis) } : {}
   );
 }
 
-/** Debounce */
-function debounce(fn, delay) {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn.apply(this, args), delay);
-  };
+function plot(id, data, layoutOverrides, config = {}) {
+  try {
+    Plotly.purge(id);
+    Plotly.newPlot(id, data, layout(layoutOverrides), Object.assign({ responsive: true, displayModeBar: false }, config));
+  } catch(e) { console.warn('plot error', id, e); }
 }
 
-/** Animated count-up */
-function animateCount(el, target, duration = 1000, prefix = '', suffix = '', decimals = 0) {
-  const start = performance.now();
-  const update = (now) => {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-    const value = eased * target;
-    el.textContent = prefix + value.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + suffix;
-    if (progress < 1) requestAnimationFrame(update);
-  };
-  requestAnimationFrame(update);
+/* ===================== GLOBAL STATE ===================== */
+let ALL_DATA = [];
+let REV_DATA = [];
+let currentTab = 'tab-inicio';
+let selectedSeason = '2025-26';
+let currentMetric = 'gasto';
+let dtInstance = null;
+let chartsRendered = {};
+
+/* ===================== DATA LOADING ===================== */
+function loadAll() {
+  let loaded = 0;
+  const check = () => { if (++loaded === 2) onAllLoaded(); };
+
+  Papa.parse('data/final/segunda_division_fichajes_2021_2026.csv', {
+    header: true,
+    dynamicTyping: true,
+    download: true,
+    complete: r => {
+      processMain(r.data.filter(d => d.jugador));
+      check();
+    },
+    error: () => {
+      showFileInputFallback();
+    }
+  });
+
+  Papa.parse('data/final/revalorizacion.csv', {
+    header: true,
+    dynamicTyping: true,
+    download: true,
+    complete: r => {
+      REV_DATA = r.data.filter(d => d.jugador);
+      check();
+    },
+    error: () => {
+      REV_DATA = [];
+      check();
+    }
+  });
 }
 
-/** Translate position to Spanish */
-function translatePos(pos) {
-  return POS_ES[pos] || pos;
+function processMain(data) {
+  // Ensure importe_numerico is numeric
+  ALL_DATA = data.map(d => {
+    const imp = +d.importe_numerico || 0;
+    const vm = parseMonetary(d.valor_mercado);
+    return Object.assign({}, d, {
+      importe_numerico: imp,
+      _vm: vm
+    });
+  });
 }
 
-/** Safe Plotly update — purge + newPlot */
-function plotlyUpdate(divId, data, layout, config) {
-  const el = document.getElementById(divId);
+function showFileInputFallback() {
+  const overlay = document.getElementById('loading-overlay');
+  overlay.innerHTML = `
+    <div style="color:white;text-align:center;padding:40px">
+      <h3 style="font-size:1.3rem;margin-bottom:12px">No se pudieron cargar los datos</h3>
+      <p style="color:rgba(255,255,255,0.7);margin-bottom:20px">Asegúrate de que los archivos CSV están disponibles en <code>data/final/</code></p>
+      <p style="color:rgba(255,255,255,0.5);font-size:0.8rem">Ejecuta el dashboard desde un servidor local (ej: <code>python -m http.server</code>)</p>
+    </div>`;
+}
+
+function onAllLoaded() {
+  hideLoading();
+  populateFilters();
+  renderCurrentTab();
+  setupEventListeners();
+}
+
+function hideLoading() {
+  const el = document.getElementById('loading-overlay');
+  el.classList.add('hidden');
+  setTimeout(() => { el.style.display = 'none'; }, 500);
+}
+
+/* ===================== EVENT LISTENERS ===================== */
+function setupEventListeners() {
+  // Sidebar navigation
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const tab = link.dataset.tab;
+      switchTab(tab);
+    });
+  });
+
+  // Metric selector (Clubes tab)
+  document.querySelectorAll('.metric-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.metric-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      currentMetric = card.dataset.metric;
+      renderClubRanking(ALL_DATA);
+    });
+  });
+
+  // Season cards (Temporadas tab)
+  document.querySelectorAll('.season-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.season-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      selectedSeason = card.dataset.season;
+      renderTemporadasTab();
+    });
+  });
+
+  // Mercado filter
+  document.getElementById('mkt-apply').addEventListener('click', () => {
+    chartsRendered['tab-mercado'] = false;
+    renderMercadoTab();
+  });
+
+  // Jugadores filter
+  document.getElementById('jug-apply').addEventListener('click', () => {
+    chartsRendered['tab-jugadores'] = false;
+    renderJugadoresTab();
+  });
+
+  // Club filter in Clubes tab
+  document.getElementById('club-filter').addEventListener('change', () => {
+    renderClubesTab();
+  });
+}
+
+/* ===================== TAB SWITCHING ===================== */
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+
+  currentTab = tabId;
+  renderCurrentTab();
+}
+
+function renderCurrentTab() {
+  if (ALL_DATA.length === 0 && currentTab !== 'tab-inicio') return;
+
+  switch (currentTab) {
+    case 'tab-inicio':       renderInicioTab(); break;
+    case 'tab-mercado':      if (!chartsRendered['tab-mercado']) { renderMercadoTab(); chartsRendered['tab-mercado'] = true; } break;
+    case 'tab-clubes':       if (!chartsRendered['tab-clubes']) { renderClubesTab(); chartsRendered['tab-clubes'] = true; } break;
+    case 'tab-posiciones':   if (!chartsRendered['tab-posiciones']) { renderPosicionesTab(); chartsRendered['tab-posiciones'] = true; } break;
+    case 'tab-jugadores':    if (!chartsRendered['tab-jugadores']) { renderJugadoresTab(); chartsRendered['tab-jugadores'] = true; } break;
+    case 'tab-revalorizacion': if (!chartsRendered['tab-revalorizacion']) { renderRevalorizacionTab(); chartsRendered['tab-revalorizacion'] = true; } break;
+    case 'tab-temporadas':   renderTemporadasTab(); break;
+    case 'tab-bbdd':         if (!chartsRendered['tab-bbdd']) { renderBBDDTab(); chartsRendered['tab-bbdd'] = true; } break;
+  }
+}
+
+/* ===================== FILTER HELPERS ===================== */
+function populateFilters() {
+  const clubs = [...new Set(ALL_DATA.map(d => d.club))].filter(Boolean).sort();
+  const positions = [...new Set(ALL_DATA.map(d => d.posicion))].filter(Boolean).sort();
+
+  // Clubes tab filter
+  const clubFilter = document.getElementById('club-filter');
+  clubs.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    clubFilter.appendChild(opt);
+  });
+
+  // Jugadores filters
+  const jugClub = document.getElementById('jug-club');
+  clubs.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    jugClub.appendChild(opt);
+  });
+
+  const jugPos = document.getElementById('jug-pos');
+  positions.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.textContent = tPos(p);
+    jugPos.appendChild(opt);
+  });
+}
+
+function getMktData() {
+  const season = document.getElementById('mkt-season').value;
+  const tipo = document.getElementById('mkt-tipo').value;
+  const mov = document.getElementById('mkt-mov').value;
+  return ALL_DATA.filter(d =>
+    (season === 'all' || d.temporada === season) &&
+    (tipo === 'all' || (d.tipo_operacion || '').toLowerCase() === tipo.toLowerCase()) &&
+    (mov === 'all' || (d.movimiento || '').toLowerCase() === mov.toLowerCase())
+  );
+}
+
+function getJugData() {
+  const season = document.getElementById('jug-season').value;
+  const club = document.getElementById('jug-club').value;
+  const pos = document.getElementById('jug-pos').value;
+  return ALL_DATA.filter(d =>
+    (season === 'all' || d.temporada === season) &&
+    (club === 'all' || d.club === club) &&
+    (pos === 'all' || d.posicion === pos)
+  );
+}
+
+/* ===================== TAB 1: INICIO ===================== */
+function renderInicioTab() {
+  if (ALL_DATA.length === 0) return;
+
+  const totalOps = ALL_DATA.length;
+  const uniquePlayers = new Set(ALL_DATA.map(d => d.jugador)).size;
+  const uniqueClubs = new Set(ALL_DATA.map(d => d.club)).size;
+  const totalMoney = sumBy(ALL_DATA, 'importe_numerico');
+
+  animateCount('kpi-ops', 0, totalOps, 1200, v => fmt(v));
+  animateCount('kpi-jugadores', 0, uniquePlayers, 1200, v => fmt(v));
+  animateCount('kpi-clubs', 0, uniqueClubs, 800, v => fmt(v));
+  animateCountMoney('kpi-money', totalMoney, 1500);
+  animateCount('kpi-temps', 0, 5, 500, v => String(v));
+
+  // Top fichaje
+  const withImport = ALL_DATA.filter(d => d.importe_numerico > 0)
+    .sort((a, b) => b.importe_numerico - a.importe_numerico);
+  if (withImport.length) {
+    const top = withImport[0];
+    document.getElementById('hl-top-fichaje').textContent = `${top.jugador} — ${formatM(top.importe_numerico)}`;
+    document.getElementById('hl-top-fichaje-sub').textContent = `${top.club} · ${top.temporada}`;
+  }
+
+  // Most active club
+  const byClub = groupBy(ALL_DATA, 'club');
+  const topClub = topN(Object.fromEntries(Object.entries(byClub).map(([k,v])=>[k,v.length])), 1)[0];
+  if (topClub) {
+    document.getElementById('hl-club-activo').textContent = `${topClub[0]} — ${fmt(topClub[1])} ops`;
+  }
+
+  // Top revalorized
+  if (REV_DATA.length) {
+    const topRev = [...REV_DATA].sort((a, b) => (b.revalorizacion_pct||0) - (a.revalorizacion_pct||0))[0];
+    if (topRev) {
+      const pct = +topRev.revalorizacion_pct;
+      document.getElementById('hl-top-rev').textContent =
+        `${topRev.jugador} — +${fmt(pct)}%`;
+      document.getElementById('hl-top-rev-sub').textContent = topRev.club || '';
+    }
+  }
+}
+
+function animateCount(id, start, end, duration, format) {
+  const el = document.getElementById(id);
   if (!el) return;
-  Plotly.purge(el);
-  Plotly.newPlot(divId, data, mergeLayout(layout || {}), config || PLOTLY_CONFIG);
+  const startTime = performance.now();
+  const step = now => {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = format(Math.round(start + (end - start) * eased));
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 
-/* ============================================================
-   APPLICATION STATE
-   ============================================================ */
+function animateCountMoney(id, end, duration) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const startTime = performance.now();
+  const step = now => {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const val = end * eased;
+    el.textContent = formatM(val);
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
 
-const STATE = {
-  rawData: [],      // All parsed CSV rows
-  filtered: [],     // Currently filtered rows
-  dtTable: null,    // DataTables instance
-  dtInitialized: false,
-  filters: {
-    temporadas: [],
-    clubs: [],
-    posiciones: [],
-    movimientos: ['alta', 'baja'],
-    tipos: [],
-    nacionalidades: [],
-    edadMin: 17,
-    edadMax: 41,
-    importeMin: 0
-  }
-};
+/* ===================== TAB 2: MERCADO GENERAL ===================== */
+function renderMercadoTab() {
+  const data = getMktData();
+  renderEvolucion(data);
+  renderTipoOp(data);
+  renderEvolucionOps(data);
+  renderTreemap(data);
+  renderSankey(data);
+  renderInsights(data);
+}
 
-/* ============================================================
-   MULTI-SELECT COMPONENT
-   ============================================================ */
+function renderEvolucion(data) {
+  const seasons = [...new Set(data.map(d => d.temporada))].filter(Boolean).sort();
+  const altas = seasons.map(s => sumBy(data.filter(d => d.temporada === s && d.movimiento === 'alta'), 'importe_numerico') / 1e6);
+  const bajas = seasons.map(s => sumBy(data.filter(d => d.temporada === s && d.movimiento === 'baja'), 'importe_numerico') / 1e6);
 
-const MultiSelect = {
-  instances: {},
-
-  /**
-   * Initialize a multi-select component
-   * @param {string} id - prefix id (e.g. 'ms-temporada')
-   * @param {string[]} options - list of option values
-   * @param {function} onChange - callback when selection changes
-   * @param {boolean} hasSearch - show search input
-   */
-  init(id, options, onChange, hasSearch = false) {
-    const btn = document.getElementById(`${id}-btn`);
-    const drop = document.getElementById(`${id}-drop`);
-    const optsContainer = document.getElementById(`${id}-opts`);
-    const labelEl = document.getElementById(`${id}-label`);
-
-    if (!btn || !drop || !optsContainer) return;
-
-    const selected = new Set(options); // all selected by default
-    this.instances[id] = { options, selected, onChange, labelEl };
-
-    // Render options
-    const renderOptions = (filter = '') => {
-      optsContainer.innerHTML = '';
-      options
-        .filter(o => !filter || o.toLowerCase().includes(filter.toLowerCase()))
-        .forEach(opt => {
-          const div = document.createElement('div');
-          div.className = 'multi-select-option';
-          const chk = document.createElement('input');
-          chk.type = 'checkbox';
-          chk.value = opt;
-          chk.checked = selected.has(opt);
-          chk.addEventListener('change', () => {
-            if (chk.checked) selected.add(opt);
-            else selected.delete(opt);
-            this._updateLabel(id);
-            onChange(Array.from(selected));
-          });
-          const span = document.createElement('span');
-          span.textContent = opt;
-          div.appendChild(chk);
-          div.appendChild(span);
-          div.addEventListener('click', (e) => { if (e.target !== chk) chk.click(); });
-          optsContainer.appendChild(div);
-        });
-    };
-
-    renderOptions();
-
-    // Search
-    if (hasSearch) {
-      const searchInput = document.getElementById(`${id}-search`);
-      if (searchInput) {
-        searchInput.addEventListener('input', () => renderOptions(searchInput.value));
-      }
-    }
-
-    // Toggle dropdown
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = drop.classList.contains('open');
-      // Close all others
-      document.querySelectorAll('.multi-select-dropdown.open').forEach(d => {
-        if (d !== drop) {
-          d.classList.remove('open');
-          d.previousElementSibling && d.previousElementSibling.classList.remove('open');
-        }
-      });
-      drop.classList.toggle('open', !isOpen);
-      btn.classList.toggle('open', !isOpen);
-    });
-
-    // Close on outside click
-    document.addEventListener('click', (e) => {
-      if (!btn.contains(e.target) && !drop.contains(e.target)) {
-        drop.classList.remove('open');
-        btn.classList.remove('open');
-      }
-    });
-
-    // Action buttons (All / None)
-    drop.querySelectorAll('.multi-select-actions button').forEach(actionBtn => {
-      actionBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (actionBtn.dataset.action === 'all') {
-          options.forEach(o => selected.add(o));
-        } else {
-          selected.clear();
-        }
-        renderOptions(hasSearch ? (document.getElementById(`${id}-search`) || {}).value || '' : '');
-        this._updateLabel(id);
-        onChange(Array.from(selected));
-      });
-    });
-
-    this._updateLabel(id);
-  },
-
-  _updateLabel(id) {
-    const inst = this.instances[id];
-    if (!inst) return;
-    const labelEl = inst.labelEl;
-    const count = inst.selected.size;
-    const total = inst.options.length;
-    if (!labelEl) return;
-    if (count === 0) labelEl.textContent = 'Ninguno';
-    else if (count === total) labelEl.textContent = 'Todos';
-    else if (count <= 2) labelEl.textContent = Array.from(inst.selected).slice(0, 2).join(', ');
-    else labelEl.textContent = `${count} seleccionados`;
-  },
-
-  getSelected(id) {
-    const inst = this.instances[id];
-    return inst ? Array.from(inst.selected) : [];
-  },
-
-  setAll(id) {
-    const inst = this.instances[id];
-    if (!inst) return;
-    inst.options.forEach(o => inst.selected.add(o));
-    this._updateLabel(id);
-    // Re-render checkboxes
-    const optsContainer = document.getElementById(`${id}-opts`);
-    if (optsContainer) {
-      optsContainer.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = true; });
-    }
-  }
-};
-
-/* ============================================================
-   FILTER LOGIC
-   ============================================================ */
-
-function applyFilters() {
-  const f = STATE.filters;
-  const temSet  = new Set(f.temporadas);
-  const clubSet = new Set(f.clubs);
-  const posSet  = new Set(f.posiciones);
-  const tipSet  = new Set(f.tipos);
-  const nacSet  = new Set(f.nacionalidades);
-  const movSet  = new Set(f.movimientos);
-
-  STATE.filtered = STATE.rawData.filter(r => {
-    if (temSet.size  && !temSet.has(r.temporada))      return false;
-    if (clubSet.size && !clubSet.has(r.club))          return false;
-    if (posSet.size  && !posSet.has(r.posicion))       return false;
-    if (tipSet.size  && !tipSet.has(r.tipo_operacion)) return false;
-    if (nacSet.size  && !nacSet.has(r.nacionalidad))   return false;
-    if (!movSet.has(r.movimiento))                     return false;
-    const edad = +r.edad || 0;
-    if (edad < f.edadMin || edad > f.edadMax)          return false;
-    const imp = +r.importe_numerico || 0;
-    if (imp < f.importeMin)                            return false;
-    return true;
+  plot('chart-evolucion', [
+    { x: seasons, y: altas, name: 'Altas', type: 'bar', marker: { color: CHART_COLORS[0] },
+      text: altas.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 } },
+    { x: seasons, y: bajas, name: 'Bajas', type: 'bar', marker: { color: CHART_COLORS[2] },
+      text: bajas.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 } }
+  ], {
+    barmode: 'group',
+    yaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 45, r: 20, b: 50, l: 70 }
   });
-
-  document.getElementById('filtered-count').textContent = formatNum(STATE.filtered.length);
-
-  // Count active filters (non-default)
-  let activeCount = 0;
-  if (f.temporadas.length !== STATE._allTemporadas.length) activeCount++;
-  if (f.clubs.length !== STATE._allClubs.length) activeCount++;
-  if (f.posiciones.length !== STATE._allPosiciones.length) activeCount++;
-  if (f.tipos.length !== STATE._allTipos.length) activeCount++;
-  if (f.nacionalidades.length !== STATE._allNacionalidades.length) activeCount++;
-  if (f.movimientos.length !== 2) activeCount++;
-  if (f.edadMin !== 17 || f.edadMax !== 41) activeCount++;
-  if (f.importeMin > 0) activeCount++;
-
-  const badge = document.getElementById('filter-active-count');
-  badge.textContent = activeCount;
-  badge.classList.toggle('visible', activeCount > 0);
 }
 
-/* ============================================================
-   RENDER ALL (debounced)
-   ============================================================ */
+function renderTipoOp(data) {
+  const byTipo = groupBy(data, 'tipo_operacion');
+  const labels = Object.keys(byTipo);
+  const values = labels.map(k => byTipo[k].length);
 
-const debouncedRender = debounce(renderAll, 300);
-
-function renderAll() {
-  applyFilters();
-  renderKPIs();
-  renderBloque1();
-  renderBloque2();
-  renderBloque3();
-  renderBloque4();
-  renderBloque5();
-  renderInsights();
-  updateDataTable();
-}
-
-/* ============================================================
-   KPI RENDERING
-   ============================================================ */
-
-function renderKPIs() {
-  const d = STATE.filtered;
-
-  // Total operaciones
-  const totalOps = d.length;
-  const elOps = document.getElementById('kpi-total-ops');
-  animateCount(elOps, totalOps, 800);
-
-  // Jugadores únicos
-  const uniqueJugadores = new Set(d.map(r => r.jugador)).size;
-  const elJug = document.getElementById('kpi-jugadores');
-  animateCount(elJug, uniqueJugadores, 800);
-
-  // Importe total
-  const totalImporte = sumBy(d.filter(r => r.importe_numerico > 0), 'importe_numerico');
-  const elImp = document.getElementById('kpi-importe');
-  const impM = totalImporte / 1e6;
-  animateCount(elImp, impM, 1000, '€', 'M', 2);
-
-  // Valor medio traspasos
-  const traspasos = d.filter(r => r.tipo_operacion === 'traspaso' && r.importe_numerico > 0);
-  const medioTrasp = traspasos.length ? sumBy(traspasos, 'importe_numerico') / traspasos.length : 0;
-  const elMed = document.getElementById('kpi-medio');
-  animateCount(elMed, medioTrasp / 1e6, 900, '€', 'M', 2);
-  document.getElementById('kpi-medio-d').textContent = `${traspasos.length} traspasos`;
-
-  // Edad media
-  const edadMedia = meanBy(d, 'edad');
-  const elEdad = document.getElementById('kpi-edad');
-  animateCount(elEdad, edadMedia, 700, '', ' años', 1);
-
-  // Clubes únicos
-  const uniqueClubs = new Set(d.map(r => r.club)).size;
-  const elClubs = document.getElementById('kpi-clubes');
-  animateCount(elClubs, uniqueClubs, 700);
-
-  // Secondary stats
-  document.getElementById('kpi-total-ops-d').textContent = `${new Set(d.map(r => r.temporada)).size} temporadas`;
-  document.getElementById('kpi-jugadores-d').textContent = `${formatM(totalImporte / Math.max(d.length, 1))} media/op`;
-  document.getElementById('kpi-importe-d').textContent = `Suma importe declarado`;
-  document.getElementById('kpi-edad-d').textContent = `Rango: ${Math.min(...d.map(r => +r.edad || 99))}–${Math.max(...d.map(r => +r.edad || 0))} años`;
-  document.getElementById('kpi-clubes-d').textContent = `De los 39 en total`;
-
-  // Update header badge
-  document.getElementById('header-badge').textContent = `${formatNum(totalOps)} operaciones`;
-}
-
-/* ============================================================
-   BLOQUE 1 — Radiografía Económica
-   ============================================================ */
-
-function renderBloque1() {
-  const d = STATE.filtered;
-
-  // --- chart-compradores: top 10 clubs by altas spend ---
-  const altas = d.filter(r => r.movimiento === 'alta' && r.importe_numerico > 0);
-  const gastoPorClub = {};
-  altas.forEach(r => { gastoPorClub[r.club] = (gastoPorClub[r.club] || 0) + r.importe_numerico; });
-  const topCompradores = topN(gastoPorClub, 10);
-  plotlyUpdate('chart-compradores',
-    [{
-      type: 'bar', orientation: 'h',
-      x: topCompradores.map(e => e[1]),
-      y: topCompradores.map(e => e[0]),
-      marker: { color: PALETTE[0], opacity: 0.85 },
-      text: topCompradores.map(e => formatM(e[1])),
-      textposition: 'outside',
-      textfont: { size: 10, color: '#94a3b8' },
-      hovertemplate: '<b>%{y}</b><br>Gasto: %{text}<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 90, b: 40, l: 120 },
-      xaxis: { tickformat: ',.0f', title: 'Importe (€)', tickprefix: '€' },
-      yaxis: { automargin: true, tickfont: { size: 11 } }
-    }
-  );
-
-  // --- chart-vendedores: top 10 clubs by bajas income ---
-  const bajas = d.filter(r => r.movimiento === 'baja' && r.importe_numerico > 0);
-  const ingresosPorClub = {};
-  bajas.forEach(r => { ingresosPorClub[r.club] = (ingresosPorClub[r.club] || 0) + r.importe_numerico; });
-  const topVendedores = topN(ingresosPorClub, 10);
-  plotlyUpdate('chart-vendedores',
-    [{
-      type: 'bar', orientation: 'h',
-      x: topVendedores.map(e => e[1]),
-      y: topVendedores.map(e => e[0]),
-      marker: { color: PALETTE[1], opacity: 0.85 },
-      text: topVendedores.map(e => formatM(e[1])),
-      textposition: 'outside',
-      textfont: { size: 10, color: '#94a3b8' },
-      hovertemplate: '<b>%{y}</b><br>Ingreso: %{text}<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 90, b: 40, l: 120 },
-      xaxis: { tickformat: ',.0f', title: 'Importe (€)', tickprefix: '€' },
-      yaxis: { automargin: true, tickfont: { size: 11 } }
-    }
-  );
-
-  // --- chart-balance: net balance per club ---
-  const allClubsSet = new Set(d.map(r => r.club));
-  const balances = {};
-  allClubsSet.forEach(club => {
-    const ga = sumBy(d.filter(r => r.club === club && r.movimiento === 'alta' && r.importe_numerico > 0), 'importe_numerico');
-    const gi = sumBy(d.filter(r => r.club === club && r.movimiento === 'baja' && r.importe_numerico > 0), 'importe_numerico');
-    balances[club] = ga - gi;
-  });
-  const sortedBalances = Object.entries(balances).sort((a, b) => a[1] - b[1]);
-  const balColors = sortedBalances.map(e => e[1] >= 0 ? '#ef4444' : '#00c896'); // red = spent more, green = earned more
-  plotlyUpdate('chart-balance',
-    [{
-      type: 'bar', orientation: 'h',
-      x: sortedBalances.map(e => e[1]),
-      y: sortedBalances.map(e => e[0]),
-      marker: { color: balColors, opacity: 0.85 },
-      text: sortedBalances.map(e => formatM(Math.abs(e[1]))),
-      textposition: 'outside',
-      textfont: { size: 9, color: '#94a3b8' },
-      hovertemplate: '<b>%{y}</b><br>Balance: %{x:,.0f}€<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 90, b: 40, l: 140 },
-      xaxis: { title: 'Balance neto (€)', tickformat: ',.0f', zeroline: true, zerolinewidth: 1, zerolinecolor: 'rgba(255,255,255,0.2)' },
-      yaxis: { automargin: true, tickfont: { size: 10 } },
-      height: 420
-    }
-  );
-
-  // --- chart-evolucion-eco: grouped bar by season ---
-  const seasons = [...new Set(d.map(r => r.temporada))].sort();
-  const gastoPorTemp = seasons.map(t => sumBy(d.filter(r => r.temporada === t && r.movimiento === 'alta' && r.importe_numerico > 0), 'importe_numerico'));
-  const ingPorTemp   = seasons.map(t => sumBy(d.filter(r => r.temporada === t && r.movimiento === 'baja' && r.importe_numerico > 0), 'importe_numerico'));
-  plotlyUpdate('chart-evolucion-eco',
-    [
-      { type: 'bar', name: 'Gasto Altas', x: seasons, y: gastoPorTemp,
-        marker: { color: PALETTE[0] }, hovertemplate: '%{x}<br>Gasto: €%{y:,.0f}<extra></extra>' },
-      { type: 'bar', name: 'Ingresos Bajas', x: seasons, y: ingPorTemp,
-        marker: { color: PALETTE[1] }, hovertemplate: '%{x}<br>Ingreso: €%{y:,.0f}<extra></extra>' }
-    ],
-    {
-      barmode: 'group',
-      xaxis: { title: 'Temporada' },
-      yaxis: { title: 'Importe (€)', tickprefix: '€', tickformat: ',.0f' },
-      margin: { t: 20, r: 20, b: 50, l: 80 }
-    }
-  );
-
-  // --- chart-treemap: total money moved per club ---
-  const movidoPorClub = {};
-  d.filter(r => r.importe_numerico > 0).forEach(r => {
-    movidoPorClub[r.club] = (movidoPorClub[r.club] || 0) + r.importe_numerico;
-  });
-  const topMovido = topN(movidoPorClub, 25);
-  plotlyUpdate('chart-treemap',
-    [{
-      type: 'treemap',
-      labels: topMovido.map(e => e[0]),
-      parents: topMovido.map(() => ''),
-      values: topMovido.map(e => e[1]),
-      textinfo: 'label+value+percent parent',
-      texttemplate: '<b>%{label}</b><br>%{customdata}',
-      customdata: topMovido.map(e => formatM(e[1])),
-      hovertemplate: '<b>%{label}</b><br>Total: %{customdata}<extra></extra>',
-      marker: {
-        colors: topMovido.map((_, i) => PALETTE[i % PALETTE.length]),
-        line: { width: 1, color: 'rgba(0,0,0,0.3)' }
-      }
-    }],
-    {
-      margin: { t: 10, r: 10, b: 10, l: 10 }
-    }
-  );
-}
-
-/* ============================================================
-   BLOQUE 2 — Análisis por Posiciones
-   ============================================================ */
-
-function renderBloque2() {
-  const d = STATE.filtered;
-
-  const byPos = groupBy(d, 'posicion');
-  const posNames = Object.keys(byPos).sort((a, b) => byPos[b].length - byPos[a].length);
-  const posLabels = posNames.map(translatePos);
-
-  // --- chart-pos-dinero ---
-  const posDinero = posNames.map(p => sumBy(byPos[p].filter(r => r.importe_numerico > 0), 'importe_numerico'));
-  const sortedPDIdx = [...posDinero.keys()].sort((a, b) => posDinero[b] - posDinero[a]);
-  plotlyUpdate('chart-pos-dinero',
-    [{
-      type: 'bar',
-      x: sortedPDIdx.map(i => posLabels[i]),
-      y: sortedPDIdx.map(i => posDinero[i]),
-      marker: { color: PALETTE, opacity: 0.85 },
-      text: sortedPDIdx.map(i => formatM(posDinero[i])),
-      textposition: 'outside',
-      textfont: { size: 9 },
-      hovertemplate: '<b>%{x}</b><br>%{text}<extra></extra>'
-    }],
-    {
-      xaxis: { tickangle: -35, tickfont: { size: 10 } },
-      yaxis: { title: 'Importe (€)', tickprefix: '€', tickformat: ',.0f' },
-      margin: { t: 20, r: 20, b: 100, l: 80 }
-    }
-  );
-
-  // --- chart-pos-ops ---
-  const posOps = posNames.map(p => byPos[p].length);
-  const sortedPOIdx = [...posOps.keys()].sort((a, b) => posOps[b] - posOps[a]);
-  plotlyUpdate('chart-pos-ops',
-    [{
-      type: 'bar',
-      x: sortedPOIdx.map(i => posLabels[i]),
-      y: sortedPOIdx.map(i => posOps[i]),
-      marker: { color: PALETTE.slice().reverse(), opacity: 0.85 },
-      text: sortedPOIdx.map(i => posOps[i]),
-      textposition: 'outside',
-      textfont: { size: 10 },
-      hovertemplate: '<b>%{x}</b><br>Operaciones: %{y}<extra></extra>'
-    }],
-    {
-      xaxis: { tickangle: -35, tickfont: { size: 10 } },
-      yaxis: { title: 'Número de operaciones' },
-      margin: { t: 20, r: 20, b: 100, l: 60 }
-    }
-  );
-
-  // --- chart-pos-valor-medio ---
-  const posValMed = posNames.map(p => {
-    const withVal = byPos[p].filter(r => r.importe_numerico > 0);
-    return withVal.length ? meanBy(withVal, 'importe_numerico') : 0;
-  });
-  const sortedPVMIdx = [...posValMed.keys()].sort((a, b) => posValMed[b] - posValMed[a]);
-  plotlyUpdate('chart-pos-valor-medio',
-    [{
-      type: 'bar',
-      x: sortedPVMIdx.map(i => posLabels[i]),
-      y: sortedPVMIdx.map(i => posValMed[i]),
-      marker: { color: '#8b5cf6', opacity: 0.85 },
-      text: sortedPVMIdx.map(i => formatM(posValMed[i])),
-      textposition: 'outside',
-      textfont: { size: 9 },
-      hovertemplate: '<b>%{x}</b><br>Media: %{text}<extra></extra>'
-    }],
-    {
-      xaxis: { tickangle: -35, tickfont: { size: 10 } },
-      yaxis: { title: 'Importe medio (€)', tickprefix: '€', tickformat: ',.0f' },
-      margin: { t: 20, r: 20, b: 100, l: 80 }
-    }
-  );
-
-  // --- chart-pos-boxplot ---
-  const boxTraces = posNames
-    .filter(p => byPos[p].filter(r => r.importe_numerico > 0).length >= 2)
-    .map((p, i) => ({
-      type: 'box',
-      name: translatePos(p),
-      y: byPos[p].filter(r => r.importe_numerico > 0).map(r => r.importe_numerico),
-      marker: { color: PALETTE[i % PALETTE.length] },
-      boxpoints: 'outliers',
-      jitter: 0.3,
-      hovertemplate: '<b>%{x}</b><br>€%{y:,.0f}<extra></extra>'
-    }));
-  plotlyUpdate('chart-pos-boxplot',
-    boxTraces,
-    {
-      xaxis: { tickangle: -35, tickfont: { size: 9 } },
-      yaxis: { title: 'Importe (€)', tickprefix: '€', tickformat: ',.0f' },
-      margin: { t: 20, r: 20, b: 100, l: 80 },
-      showlegend: false
-    }
-  );
-
-  // --- chart-pos-edad-media ---
-  const posEdadMedia = posNames.map(p => meanBy(byPos[p], 'edad'));
-  const sortedPEIdx = [...posEdadMedia.keys()].sort((a, b) => posEdadMedia[b] - posEdadMedia[a]);
-  plotlyUpdate('chart-pos-edad-media',
-    [{
-      type: 'bar',
-      x: sortedPEIdx.map(i => posLabels[i]),
-      y: sortedPEIdx.map(i => posEdadMedia[i]),
-      marker: { color: '#06b6d4', opacity: 0.85 },
-      text: sortedPEIdx.map(i => posEdadMedia[i].toFixed(1)),
-      textposition: 'outside',
-      textfont: { size: 10 },
-      hovertemplate: '<b>%{x}</b><br>Edad media: %{y:.1f} años<extra></extra>'
-    }],
-    {
-      xaxis: { tickangle: -35, tickfont: { size: 10 } },
-      yaxis: { title: 'Edad media (años)', range: [18, 32] },
-      margin: { t: 20, r: 20, b: 100, l: 60 }
-    }
-  );
-}
-
-/* ============================================================
-   BLOQUE 3 — Análisis de Scouting
-   ============================================================ */
-
-function renderBloque3() {
-  const d = STATE.filtered;
-
-  // --- chart-nac-pie: donut top 12 ---
-  const nacCount = {};
-  d.forEach(r => { nacCount[r.nacionalidad] = (nacCount[r.nacionalidad] || 0) + 1; });
-  const topNac = topN(nacCount, 12);
-  const otherCount = d.length - topNac.reduce((s, e) => s + e[1], 0);
-  const pieLabels = topNac.map(e => e[0]);
-  const pieValues = topNac.map(e => e[1]);
-  if (otherCount > 0) { pieLabels.push('Otros'); pieValues.push(otherCount); }
-  plotlyUpdate('chart-nac-pie',
-    [{
-      type: 'pie', hole: 0.45,
-      labels: pieLabels, values: pieValues,
-      marker: { colors: PALETTE },
-      textinfo: 'label+percent',
-      textposition: 'outside',
+  plot('chart-tipo-op', [
+    { labels, values, type: 'pie', hole: 0.45,
+      marker: { colors: CHART_COLORS },
+      textinfo: 'percent+label',
       textfont: { size: 11 },
-      hovertemplate: '<b>%{label}</b><br>%{value} jugadores (%{percent})<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 20, b: 20, l: 20 },
-      showlegend: false
-    }
-  );
-
-  // --- chart-nac-mapa: choropleth ---
-  const countries = Object.keys(nacCount).map(nac => NAC_COUNTRY_MAP[nac] || nac);
-  const countryCount = {};
-  Object.entries(nacCount).forEach(([nac, cnt]) => {
-    const mapped = NAC_COUNTRY_MAP[nac] || nac;
-    countryCount[mapped] = (countryCount[mapped] || 0) + cnt;
-  });
-  plotlyUpdate('chart-nac-mapa',
-    [{
-      type: 'choropleth',
-      locationmode: 'country names',
-      locations: Object.keys(countryCount),
-      z: Object.values(countryCount),
-      colorscale: [
-        [0, '#1a2235'], [0.2, '#00503c'], [0.5, '#00c896'], [1, '#7fffdf']
-      ],
-      autocolorscale: false,
-      colorbar: {
-        title: 'Jugadores',
-        tickfont: { color: '#94a3b8', size: 10 },
-        bgcolor: 'transparent',
-        outlinewidth: 0
-      },
-      hovertemplate: '<b>%{location}</b><br>%{z} jugadores<extra></extra>'
-    }],
-    {
-      geo: {
-        bgcolor: 'transparent',
-        showframe: false,
-        showcoastlines: true,
-        coastlinecolor: 'rgba(255,255,255,0.15)',
-        showland: true, landcolor: 'rgba(255,255,255,0.05)',
-        showocean: true, oceancolor: 'rgba(0,0,0,0.3)',
-        showlakes: false,
-        showcountries: true, countrycolor: 'rgba(255,255,255,0.12)',
-        projection: { type: 'natural earth' }
-      },
-      margin: { t: 10, r: 10, b: 10, l: 10 }
-    }
-  );
-
-  // --- chart-edad-scatter ---
-  const tiposUniq = [...new Set(d.map(r => r.tipo_operacion))];
-  const scatterTraces = tiposUniq.map((tipo, i) => {
-    const rows = d.filter(r => r.tipo_operacion === tipo && r.importe_numerico > 0);
-    return {
-      type: 'scatter', mode: 'markers', name: tipo,
-      x: rows.map(r => +r.edad || 0),
-      y: rows.map(r => r.importe_numerico),
-      text: rows.map(r => r.jugador),
-      marker: { color: PALETTE[i % PALETTE.length], size: 6, opacity: 0.7 },
-      hovertemplate: '<b>%{text}</b><br>Edad: %{x}<br>Importe: €%{y:,.0f}<extra></extra>'
-    };
-  });
-  plotlyUpdate('chart-edad-scatter',
-    scatterTraces,
-    {
-      xaxis: { title: 'Edad', range: [15, 45] },
-      yaxis: { title: 'Importe (€)', tickprefix: '€', tickformat: ',.0f' },
-      margin: { t: 20, r: 20, b: 60, l: 100 },
-      hovermode: 'closest'
-    }
-  );
-
-  // --- chart-top-caros: top 15 by importe ---
-  const withImp = [...d].filter(r => r.importe_numerico > 0)
-    .sort((a, b) => b.importe_numerico - a.importe_numerico)
-    .slice(0, 15);
-  plotlyUpdate('chart-top-caros',
-    [{
-      type: 'bar', orientation: 'h',
-      x: withImp.map(r => r.importe_numerico),
-      y: withImp.map(r => `${r.jugador} — ${r.club}`),
-      marker: { color: PALETTE[2], opacity: 0.85 },
-      text: withImp.map(r => formatM(r.importe_numerico)),
-      textposition: 'outside',
-      textfont: { size: 10, color: '#94a3b8' },
-      hovertemplate: '<b>%{y}</b><br>%{text}<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 90, b: 40, l: 220 },
-      xaxis: { title: 'Importe (€)', tickprefix: '€', tickformat: ',.0f' },
-      yaxis: { automargin: true, tickfont: { size: 10 } }
-    }
-  );
-
-  // --- chart-top-valor: top 15 by valor_mercado ---
-  const withValor = d.map(r => ({ ...r, vm: parseMonetary(r.valor_mercado) }))
-    .filter(r => r.vm > 0)
-    .sort((a, b) => b.vm - a.vm)
-    .slice(0, 15);
-  plotlyUpdate('chart-top-valor',
-    [{
-      type: 'bar', orientation: 'h',
-      x: withValor.map(r => r.vm),
-      y: withValor.map(r => `${r.jugador} — ${r.club}`),
-      marker: { color: PALETTE[4], opacity: 0.85 },
-      text: withValor.map(r => formatM(r.vm)),
-      textposition: 'outside',
-      textfont: { size: 10, color: '#94a3b8' },
-      hovertemplate: '<b>%{y}</b><br>Valor mercado: %{text}<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 90, b: 40, l: 220 },
-      xaxis: { title: 'Valor mercado (€)', tickprefix: '€', tickformat: ',.0f' },
-      yaxis: { automargin: true, tickfont: { size: 10 } }
-    }
-  );
-
-  // --- chart-dist-edad: histogram ---
-  plotlyUpdate('chart-dist-edad',
-    [{
-      type: 'histogram',
-      x: d.map(r => +r.edad || 0).filter(e => e >= 15 && e <= 45),
-      xbins: { size: 1 },
-      marker: { color: PALETTE[0], opacity: 0.8, line: { color: 'rgba(0,0,0,0.4)', width: 1 } },
-      hovertemplate: 'Edad: %{x}<br>Jugadores: %{y}<extra></extra>'
-    }],
-    {
-      xaxis: { title: 'Edad', dtick: 2 },
-      yaxis: { title: 'Nº de jugadores' },
-      bargap: 0.05,
-      margin: { t: 20, r: 20, b: 50, l: 60 }
-    }
-  );
+      hovertemplate: '%{label}: %{value} ops (%{percent})<extra></extra>' }
+  ], { margin: { t: 20, r: 20, b: 20, l: 20 }, showlegend: true });
 }
 
-/* ============================================================
-   BLOQUE 4 — Análisis de Mercado
-   ============================================================ */
+function renderEvolucionOps(data) {
+  const seasons = [...new Set(data.map(d => d.temporada))].filter(Boolean).sort();
+  const altas = seasons.map(s => data.filter(d => d.temporada === s && d.movimiento === 'alta').length);
+  const bajas = seasons.map(s => data.filter(d => d.temporada === s && d.movimiento === 'baja').length);
 
-function renderBloque4() {
-  const d = STATE.filtered;
-
-  // --- chart-tipo-ops: donut ---
-  const tipoCount = {};
-  d.forEach(r => { tipoCount[r.tipo_operacion] = (tipoCount[r.tipo_operacion] || 0) + 1; });
-  const tipoEntries = Object.entries(tipoCount).sort((a, b) => b[1] - a[1]);
-  plotlyUpdate('chart-tipo-ops',
-    [{
-      type: 'pie', hole: 0.45,
-      labels: tipoEntries.map(e => e[0]),
-      values: tipoEntries.map(e => e[1]),
-      marker: { colors: PALETTE },
-      textinfo: 'label+percent',
-      textfont: { size: 11 },
-      hovertemplate: '<b>%{label}</b><br>%{value} ops (%{percent})<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 20, b: 20, l: 20 },
-      legend: { orientation: 'v', font: { size: 11 }, x: 1.02, xanchor: 'left' }
-    }
-  );
-
-  // --- chart-evolucion-mkt: area stacked ---
-  const seasons = [...new Set(d.map(r => r.temporada))].sort();
-  const altasSeasons = seasons.map(t => d.filter(r => r.temporada === t && r.movimiento === 'alta').length);
-  const bajasSeasons = seasons.map(t => d.filter(r => r.temporada === t && r.movimiento === 'baja').length);
-  plotlyUpdate('chart-evolucion-mkt',
-    [
-      {
-        type: 'scatter', mode: 'lines', fill: 'tozeroy', name: 'Altas',
-        x: seasons, y: altasSeasons,
-        line: { color: PALETTE[0], width: 2 },
-        fillcolor: 'rgba(0,200,150,0.15)',
-        hovertemplate: '%{x}<br>Altas: %{y}<extra></extra>'
-      },
-      {
-        type: 'scatter', mode: 'lines', fill: 'tonexty', name: 'Bajas',
-        x: seasons, y: bajasSeasons,
-        line: { color: PALETTE[1], width: 2 },
-        fillcolor: 'rgba(59,130,246,0.15)',
-        hovertemplate: '%{x}<br>Bajas: %{y}<extra></extra>'
-      }
-    ],
-    {
-      xaxis: { title: 'Temporada' },
-      yaxis: { title: 'Nº operaciones' },
-      margin: { t: 20, r: 20, b: 50, l: 60 }
-    }
-  );
-
-  // --- chart-clubes-ops: top 15 by count ---
-  const clubOpsCount = {};
-  d.forEach(r => { clubOpsCount[r.club] = (clubOpsCount[r.club] || 0) + 1; });
-  const topClubOps = topN(clubOpsCount, 15);
-  plotlyUpdate('chart-clubes-ops',
-    [{
-      type: 'bar', orientation: 'h',
-      x: topClubOps.map(e => e[1]),
-      y: topClubOps.map(e => e[0]),
-      marker: { color: PALETTE[5], opacity: 0.85 },
-      text: topClubOps.map(e => e[1]),
-      textposition: 'outside',
-      hovertemplate: '<b>%{y}</b><br>%{x} operaciones<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 60, b: 40, l: 140 },
-      xaxis: { title: 'Nº operaciones' },
-      yaxis: { automargin: true, tickfont: { size: 11 } }
-    }
-  );
-
-  // --- chart-heatmap-club: top 20 clubs × position ---
-  const top20clubs = topN(clubOpsCount, 20).map(e => e[0]);
-  const allPos = [...new Set(d.map(r => r.posicion))].sort();
-  const heatMatrix = top20clubs.map(club =>
-    allPos.map(pos => d.filter(r => r.club === club && r.posicion === pos).length)
-  );
-  plotlyUpdate('chart-heatmap-club',
-    [{
-      type: 'heatmap',
-      z: heatMatrix,
-      x: allPos.map(translatePos),
-      y: top20clubs,
-      colorscale: 'Teal',
-      hovertemplate: 'Club: <b>%{y}</b><br>Pos: <b>%{x}</b><br>Ops: %{z}<extra></extra>',
-      colorbar: { tickfont: { color: '#94a3b8', size: 10 }, bgcolor: 'transparent', outlinewidth: 0 }
-    }],
-    {
-      margin: { t: 20, r: 80, b: 120, l: 140 },
-      xaxis: { tickangle: -40, tickfont: { size: 9 }, automargin: true },
-      yaxis: { tickfont: { size: 10 }, automargin: true }
-    }
-  );
-
-  // --- chart-heatmap-season: season × position ---
-  const heatMatrixSeason = seasons.map(t =>
-    allPos.map(pos => d.filter(r => r.temporada === t && r.posicion === pos).length)
-  );
-  plotlyUpdate('chart-heatmap-season',
-    [{
-      type: 'heatmap',
-      z: heatMatrixSeason,
-      x: allPos.map(translatePos),
-      y: seasons,
-      colorscale: 'Blues',
-      hovertemplate: 'Temporada: <b>%{y}</b><br>Pos: <b>%{x}</b><br>Ops: %{z}<extra></extra>',
-      colorbar: { tickfont: { color: '#94a3b8', size: 10 }, bgcolor: 'transparent', outlinewidth: 0 }
-    }],
-    {
-      margin: { t: 20, r: 80, b: 120, l: 80 },
-      xaxis: { tickangle: -40, tickfont: { size: 9 }, automargin: true },
-      yaxis: { tickfont: { size: 11 } }
-    }
-  );
+  plot('chart-evolucion-ops', [
+    { x: seasons, y: altas, name: 'Altas', type: 'scatter', mode: 'lines+markers',
+      fill: 'tozeroy', fillcolor: 'rgba(0,154,68,0.15)', line: { color: CHART_COLORS[0], width: 2 },
+      marker: { color: CHART_COLORS[0], size: 7 } },
+    { x: seasons, y: bajas, name: 'Bajas', type: 'scatter', mode: 'lines+markers',
+      fill: 'tozeroy', fillcolor: 'rgba(224,123,57,0.15)', line: { color: CHART_COLORS[2], width: 2 },
+      marker: { color: CHART_COLORS[2], size: 7 } }
+  ], {
+    yaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    xaxis: { gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' }
+  });
 }
 
-/* ============================================================
-   BLOQUE 5 — Análisis Avanzado
-   ============================================================ */
-
-function renderBloque5() {
-  const d = STATE.filtered;
-
-  // ---- SANKEY ----
-  renderSankey(d);
-
-  // ---- SUNBURST ----
-  const posGroups = groupBy(d, 'posicion');
-  const sunIds = ['Total'];
-  const sunParents = [''];
-  const sunValues = [d.length];
-  const sunColors = ['rgba(0,0,0,0)'];
-
-  Object.entries(posGroups).forEach(([pos, rows], pi) => {
-    const posLabel = translatePos(pos);
-    sunIds.push(posLabel);
-    sunParents.push('Total');
-    sunValues.push(rows.length);
-    sunColors.push(PALETTE[pi % PALETTE.length]);
-
-    const tiposInPos = groupBy(rows, 'tipo_operacion');
-    Object.entries(tiposInPos).forEach(([tipo, tRows]) => {
-      const uid = `${posLabel}|${tipo}`;
-      sunIds.push(uid);
-      sunParents.push(posLabel);
-      sunValues.push(tRows.length);
-      sunColors.push(PALETTE[pi % PALETTE.length] + '99'); // semi-transparent
-    });
-  });
-
-  plotlyUpdate('chart-sunburst',
-    [{
-      type: 'sunburst',
-      ids: sunIds,
-      labels: sunIds.map(id => id.includes('|') ? id.split('|')[1] : id),
-      parents: sunParents,
-      values: sunValues,
-      marker: { colors: sunColors, line: { width: 0.5, color: 'rgba(0,0,0,0.3)' } },
-      branchvalues: 'total',
-      hovertemplate: '<b>%{label}</b><br>Ops: %{value}<extra></extra>',
-      textfont: { size: 10 }
-    }],
-    {
-      margin: { t: 10, r: 10, b: 10, l: 10 }
-    }
-  );
-
-  // ---- RANKING ACTIVIDAD ----
-  const clubSeasons = {};
-  const clubTotalOps = {};
-  d.forEach(r => {
-    if (!clubSeasons[r.club]) clubSeasons[r.club] = new Set();
-    clubSeasons[r.club].add(r.temporada);
-    clubTotalOps[r.club] = (clubTotalOps[r.club] || 0) + 1;
-  });
-  const actividadMedia = {};
-  Object.keys(clubTotalOps).forEach(club => {
-    actividadMedia[club] = clubTotalOps[club] / (clubSeasons[club].size || 1);
-  });
-  const topActiv = topN(actividadMedia, 20);
-  plotlyUpdate('chart-ranking-actividad',
-    [{
-      type: 'bar', orientation: 'h',
-      x: topActiv.map(e => e[1]).reverse(),
-      y: topActiv.map(e => e[0]).reverse(),
-      marker: { color: PALETTE[6], opacity: 0.85 },
-      text: topActiv.map(e => e[1].toFixed(1)).reverse(),
-      textposition: 'outside',
-      textfont: { size: 10 },
-      hovertemplate: '<b>%{y}</b><br>Media: %{x:.1f} ops/temp<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 60, b: 40, l: 140 },
-      xaxis: { title: 'Ops medias / temporada' },
-      yaxis: { automargin: true, tickfont: { size: 10 } }
-    }
-  );
-
-  // ---- RANKING EFICIENCIA ----
-  const allClubsEf = [...new Set(d.map(r => r.club))];
-  const eficiencia = {};
-  allClubsEf.forEach(club => {
-    const cRows = d.filter(r => r.club === club);
-    const gasto   = sumBy(cRows.filter(r => r.movimiento === 'alta' && r.importe_numerico > 0), 'importe_numerico');
-    const ingreso = sumBy(cRows.filter(r => r.movimiento === 'baja' && r.importe_numerico > 0), 'importe_numerico');
-    const balance = ingreso - gasto;
-    eficiencia[club] = cRows.length > 0 ? balance / cRows.length : 0;
-  });
-  const topEf = topN(eficiencia, 20);
-  const efColors = topEf.map(e => e[1] >= 0 ? '#00c896' : '#ef4444');
-  plotlyUpdate('chart-ranking-eficiencia',
-    [{
-      type: 'bar', orientation: 'h',
-      x: topEf.map(e => e[1]).reverse(),
-      y: topEf.map(e => e[0]).reverse(),
-      marker: { color: efColors.reverse(), opacity: 0.85 },
-      text: topEf.map(e => formatM(Math.abs(e[1]))).reverse(),
-      textposition: 'outside',
-      textfont: { size: 9, color: '#94a3b8' },
-      hovertemplate: '<b>%{y}</b><br>Balance/op: €%{x:,.0f}<extra></extra>'
-    }],
-    {
-      margin: { t: 20, r: 90, b: 40, l: 140 },
-      xaxis: { title: 'Balance neto por operación (€)', zeroline: true, zerolinewidth: 1, zerolinecolor: 'rgba(255,255,255,0.2)' },
-      yaxis: { automargin: true, tickfont: { size: 10 } }
-    }
-  );
-
-  // ---- HEATMAP ACTIVOS TEMPORADA ----
-  const seasons = [...new Set(d.map(r => r.temporada))].sort();
-  const top20ClubsAct = topN(clubTotalOps, 20).map(e => e[0]);
-  const heatActivos = seasons.map(t =>
-    top20ClubsAct.map(club => d.filter(r => r.temporada === t && r.club === club).length)
-  );
-  plotlyUpdate('chart-activos-temporada',
-    [{
-      type: 'heatmap',
-      z: heatActivos,
-      x: top20ClubsAct,
-      y: seasons,
-      colorscale: [
-        [0, '#0c0f1e'], [0.2, '#00503c'], [0.6, '#00c896'], [1, '#7fffdf']
-      ],
-      hovertemplate: 'Club: <b>%{x}</b><br>Temp: <b>%{y}</b><br>Ops: %{z}<extra></extra>',
-      colorbar: { tickfont: { color: '#94a3b8', size: 10 }, bgcolor: 'transparent', outlinewidth: 0 }
-    }],
-    {
-      margin: { t: 20, r: 80, b: 120, l: 80 },
-      xaxis: { tickangle: -40, tickfont: { size: 9 }, automargin: true },
-      yaxis: { tickfont: { size: 11 } }
-    }
-  );
-}
-
-/** Render Sankey separately (complex logic) */
-function renderSankey(d) {
-  const sankeyDiv = document.getElementById('chart-sankey');
-  if (!sankeyDiv) return;
-
-  // Only altas with importe_numerico > 0 and known clubs
-  const flows = d.filter(r =>
-    r.movimiento === 'alta' &&
-    r.importe_numerico > 0 &&
-    r.club_origen && r.club_origen !== '-' && r.club_origen !== '?' &&
-    r.club_destino && r.club_destino !== '-' && r.club_destino !== '?' &&
-    r.club_origen !== r.club_destino
-  );
-
-  // Aggregate flows
-  const flowMap = {};
-  flows.forEach(r => {
-    const key = `${r.club_origen}|||${r.club_destino}`;
-    flowMap[key] = (flowMap[key] || 0) + r.importe_numerico;
-  });
-
-  const topFlows = Object.entries(flowMap)
-    .sort((a, b) => b[1] - a[1])
+function renderTreemap(data) {
+  const byClub = groupBy(data, 'club');
+  const clubTotals = Object.entries(byClub)
+    .map(([club, rows]) => ({ club, total: sumBy(rows, 'importe_numerico') }))
+    .filter(d => d.total > 0)
+    .sort((a, b) => b.total - a.total)
     .slice(0, 30);
 
-  if (topFlows.length < 3) {
-    Plotly.purge(sankeyDiv);
-    sankeyDiv.innerHTML = `
-      <div style="height:400px; display:flex; align-items:center; justify-content:center;
-           color:#64748b; font-size:14px; border:1px dashed rgba(255,255,255,0.1); border-radius:8px;">
-        ⚠️ No hay datos suficientes para mostrar el diagrama Sankey con los filtros actuales.
-      </div>`;
-    return;
-  }
+  if (clubTotals.length === 0) return;
 
-  // Build node list
-  const nodeSet = new Set();
-  topFlows.forEach(([key]) => {
-    const [src, tgt] = key.split('|||');
-    nodeSet.add(src); nodeSet.add(tgt);
+  plot('chart-treemap', [
+    {
+      type: 'treemap',
+      labels: clubTotals.map(d => d.club),
+      parents: clubTotals.map(() => ''),
+      values: clubTotals.map(d => d.total / 1e6),
+      texttemplate: '%{label}<br>€%{value:.1f}M',
+      hovertemplate: '%{label}: €%{value:.2f}M<extra></extra>',
+      marker: { colorscale: [[0,'#e8f5ee'],[1,'#009a44']], showscale: false }
+    }
+  ], { margin: { t: 10, r: 10, b: 10, l: 10 } });
+}
+
+function renderSankey(data) {
+  const flows = data.filter(d => d.movimiento === 'alta' && d.importe_numerico > 0 && d.club_origen && d.club);
+  const flowMap = {};
+  flows.forEach(d => {
+    const key = `${d.club_origen}|||${d.club}`;
+    flowMap[key] = (flowMap[key] || 0) + d.importe_numerico;
   });
+
+  const sorted = Object.entries(flowMap).sort((a, b) => b[1] - a[1]).slice(0, 25);
+  if (sorted.length === 0) return;
+
+  const nodeSet = new Set();
+  sorted.forEach(([key]) => { const [o, d] = key.split('|||'); nodeSet.add(o); nodeSet.add(d); });
   const nodes = [...nodeSet];
-  const nodeIdx = {};
-  nodes.forEach((n, i) => nodeIdx[n] = i);
+  const nodeIndex = Object.fromEntries(nodes.map((n, i) => [n, i]));
 
-  const sources = topFlows.map(([key]) => nodeIdx[key.split('|||')[0]]);
-  const targets = topFlows.map(([key]) => nodeIdx[key.split('|||')[1]]);
-  const values  = topFlows.map(([, v]) => v);
+  const sources = sorted.map(([k]) => nodeIndex[k.split('|||')[0]]);
+  const targets = sorted.map(([k]) => nodeIndex[k.split('|||')[1]]);
+  const values = sorted.map(([,v]) => v / 1e6);
 
-  Plotly.purge(sankeyDiv);
-  Plotly.newPlot(sankeyDiv,
-    [{
+  plot('chart-sankey', [
+    {
       type: 'sankey',
       orientation: 'h',
       node: {
-        pad: 15, thickness: 20, line: { color: 'rgba(0,0,0,0.3)', width: 0.5 },
+        pad: 12, thickness: 20,
         label: nodes,
-        color: nodes.map((_, i) => PALETTE[i % PALETTE.length]),
-        hoverlabel: { bgcolor: '#1a2235', bordercolor: 'rgba(0,200,150,0.5)', font: { family: 'Inter', color: '#f1f5f9' } }
+        color: nodes.map(() => '#009a44')
       },
       link: {
         source: sources, target: targets, value: values,
-        color: sources.map(s => PALETTE[s % PALETTE.length] + '55'),
-        customdata: values.map(v => formatM(v)),
-        hovertemplate: '<b>%{source.label}</b> → <b>%{target.label}</b><br>%{customdata}<extra></extra>'
+        color: sources.map(() => 'rgba(0,154,68,0.25)'),
+        hovertemplate: '%{source.label} → %{target.label}: €%{value:.2f}M<extra></extra>'
       }
-    }],
-    mergeLayout({
-      margin: { t: 20, r: 20, b: 20, l: 20 },
-      font: { size: 10, color: '#94a3b8' }
-    }),
-    PLOTLY_CONFIG
-  );
+    }
+  ], {
+    margin: { t: 20, r: 30, b: 20, l: 30 },
+    font: { size: 10, color: '#1a2332' }
+  });
 }
 
-/* ============================================================
-   INSIGHTS PANEL
-   ============================================================ */
-
-function renderInsights() {
-  const d = STATE.filtered;
-  const container = document.getElementById('insights-grid');
+function renderInsights(data) {
+  const container = document.getElementById('chart-mercado-insights');
   if (!container) return;
 
-  if (d.length === 0) {
-    container.innerHTML = '<p style="color:var(--muted); grid-column:1/-1;">No hay datos con los filtros actuales.</p>';
+  const byClubAlta = groupBy(data.filter(d => d.movimiento === 'alta'), 'club');
+  const byClubBaja = groupBy(data.filter(d => d.movimiento === 'baja'), 'club');
+  const byTemp = groupBy(data, 'temporada');
+
+  const topGastoEntry = topN(Object.fromEntries(
+    Object.entries(byClubAlta).map(([k,v]) => [k, sumBy(v,'importe_numerico')])), 1)[0];
+  const topIngresoEntry = topN(Object.fromEntries(
+    Object.entries(byClubBaja).map(([k,v]) => [k, sumBy(v,'importe_numerico')])), 1)[0];
+  const topTempEntry = topN(Object.fromEntries(
+    Object.entries(byTemp).map(([k,v]) => [k, v.length])), 1)[0];
+
+  const withImport = data.filter(d => d.importe_numerico > 0).sort((a,b) => b.importe_numerico - a.importe_numerico);
+  const topPlayer = withImport[0];
+
+  const cards = [
+    { label: 'Club que más gastó', value: topGastoEntry ? topGastoEntry[0] : '—', sub: topGastoEntry ? formatM(topGastoEntry[1]) : '' },
+    { label: 'Club que más ingresó', value: topIngresoEntry ? topIngresoEntry[0] : '—', sub: topIngresoEntry ? formatM(topIngresoEntry[1]) : '' },
+    { label: 'Temporada más activa', value: topTempEntry ? topTempEntry[0] : '—', sub: topTempEntry ? `${fmt(topTempEntry[1])} operaciones` : '' },
+    { label: 'Jugador más caro', value: topPlayer ? topPlayer.jugador : '—', sub: topPlayer ? `${topPlayer.club} · ${formatM(topPlayer.importe_numerico)}` : '' }
+  ];
+
+  container.innerHTML = cards.map(c => `
+    <div class="insight-card">
+      <div class="insight-label">${c.label}</div>
+      <div class="insight-value">${c.value}</div>
+      <div class="insight-sub">${c.sub}</div>
+    </div>`).join('');
+}
+
+/* ===================== TAB 3: CLUBES ===================== */
+function renderClubesTab() {
+  const filter = document.getElementById('club-filter').value;
+  const data = filter === 'all' ? ALL_DATA : ALL_DATA.filter(d => d.club === filter);
+
+  renderClubRanking(data);
+  renderCompradores(data);
+  renderVendedores(data);
+  renderBalance(data);
+}
+
+function getClubMetric(data, metric) {
+  const byClub = groupBy(data, 'club');
+  switch (metric) {
+    case 'gasto':
+      return Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, sumBy(v.filter(d => d.movimiento==='alta'), 'importe_numerico')]));
+    case 'ingreso':
+      return Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, sumBy(v.filter(d => d.movimiento==='baja'), 'importe_numerico')]));
+    case 'balance': {
+      return Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k,
+        sumBy(v.filter(d=>d.movimiento==='baja'),'importe_numerico') - sumBy(v.filter(d=>d.movimiento==='alta'),'importe_numerico')
+      ]));
+    }
+    case 'ops':
+      return Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, v.length]));
+    default: return {};
+  }
+}
+
+function renderClubRanking(data) {
+  const titles = {
+    gasto: 'Ranking de clubes — Mayor gasto',
+    ingreso: 'Ranking de clubes — Mayor ingreso',
+    balance: 'Ranking de clubes — Balance neto',
+    ops: 'Ranking de clubes — Más operaciones'
+  };
+  document.getElementById('ranking-title').textContent = titles[currentMetric];
+
+  const metrics = getClubMetric(data, currentMetric);
+  const sorted = Object.entries(metrics).sort((a, b) => {
+    if (currentMetric === 'balance') return b[1] - a[1];
+    return b[1] - a[1];
+  }).slice(0, 20);
+
+  if (sorted.length === 0) return;
+  const maxVal = Math.max(...sorted.map(([,v]) => Math.abs(v)));
+
+  const tbody = document.getElementById('ranking-body');
+  tbody.innerHTML = sorted.map(([club, val], i) => {
+    const shield = clubShield(club);
+    const shieldImg = shield ? `<img src="${shield}" width="28" height="28" style="object-fit:contain" onerror="this.onerror=null;this.style.opacity='0'">` : '';
+    const display = currentMetric === 'ops' ? fmt(val) : formatM(val);
+    const pct = maxVal > 0 ? Math.abs(val) / maxVal * 100 : 0;
+    const isNeg = val < 0;
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><div class="club-cell">${shieldImg}<span>${club}</span></div></td>
+      <td style="font-weight:600;color:${isNeg ? 'var(--danger)' : 'var(--success)'}">${display}</td>
+      <td class="bar-cell">
+        <div class="inline-bar-wrap">
+          <div class="inline-bar ${isNeg ? 'negative' : ''}" style="width:${pct}%"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCompradores(data) {
+  const altas = data.filter(d => d.movimiento === 'alta');
+  const byClub = groupBy(altas, 'club');
+  const top = topN(Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, sumBy(v,'importe_numerico')])), 10);
+  const clubs = top.map(d => d[0]).reverse();
+  const vals = top.map(d => d[1] / 1e6).reverse();
+
+  plot('chart-compradores', [
+    { x: vals, y: clubs, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[0] },
+      text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 80, b: 50, l: 150 }
+  });
+}
+
+function renderVendedores(data) {
+  const bajas = data.filter(d => d.movimiento === 'baja');
+  const byClub = groupBy(bajas, 'club');
+  const top = topN(Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, sumBy(v,'importe_numerico')])), 10);
+  const clubs = top.map(d => d[0]).reverse();
+  const vals = top.map(d => d[1] / 1e6).reverse();
+
+  plot('chart-vendedores', [
+    { x: vals, y: clubs, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[2] },
+      text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 80, b: 50, l: 150 }
+  });
+}
+
+function renderBalance(data) {
+  const byClub = groupBy(data, 'club');
+  const balances = Object.entries(byClub).map(([club, rows]) => ({
+    club,
+    balance: sumBy(rows.filter(d=>d.movimiento==='baja'),'importe_numerico') - sumBy(rows.filter(d=>d.movimiento==='alta'),'importe_numerico')
+  })).sort((a, b) => b.balance - a.balance);
+
+  const clubs = balances.map(d => d.club).reverse();
+  const vals = balances.map(d => d.balance / 1e6).reverse();
+
+  plot('chart-balance', [
+    { x: vals, y: clubs, type: 'bar', orientation: 'h',
+      marker: { color: vals.map(v => v >= 0 ? CHART_COLORS[0] : '#dc2626') },
+      text: vals.map(v => `${v >= 0 ? '+' : ''}€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 9 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 100, b: 50, l: 160 }
+  });
+}
+
+/* ===================== TAB 4: POSICIONES ===================== */
+function renderPosicionesTab() {
+  renderPosOps();
+  renderPosDinero();
+  renderPosValorMedio();
+  renderPosEdadMedia();
+  renderPosTipo();
+  renderPosSunburst();
+}
+
+function renderPosOps() {
+  const byPos = groupBy(ALL_DATA, 'posicion');
+  const sorted = topN(Object.fromEntries(Object.entries(byPos).map(([k,v]) => [k,v.length])), 14);
+  const labels = sorted.map(d => tPos(d[0])).reverse();
+  const vals = sorted.map(d => d[1]).reverse();
+
+  plot('chart-pos-ops', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[0] },
+      text: vals.map(v => fmt(v)), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: %{x} ops<extra></extra>' }
+  ], {
+    xaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 60, b: 50, l: 140 }
+  });
+}
+
+function renderPosDinero() {
+  const byPos = groupBy(ALL_DATA, 'posicion');
+  const sorted = topN(Object.fromEntries(Object.entries(byPos).map(([k,v]) => [k, sumBy(v,'importe_numerico')])), 14);
+  const labels = sorted.map(d => tPos(d[0])).reverse();
+  const vals = sorted.map(d => d[1] / 1e6).reverse();
+
+  plot('chart-pos-dinero', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[1] },
+      text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 80, b: 50, l: 140 }
+  });
+}
+
+function renderPosValorMedio() {
+  const byPos = groupBy(ALL_DATA, 'posicion');
+  const sorted = topN(Object.fromEntries(Object.entries(byPos).map(([k,v]) => [k, meanBy(v,'_vm')])), 14);
+  const labels = sorted.map(d => tPos(d[0])).reverse();
+  const vals = sorted.map(d => d[1] / 1e6).reverse();
+
+  plot('chart-pos-valor-medio', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[3] },
+      text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'VM Medio (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 90, b: 50, l: 140 }
+  });
+}
+
+function renderPosEdadMedia() {
+  const byPos = groupBy(ALL_DATA.filter(d => d.edad), 'posicion');
+  const sorted = Object.entries(byPos).map(([k,v]) => [k, meanBy(v,'edad')]).sort((a,b) => b[1]-a[1]).slice(0, 14);
+  const labels = sorted.map(d => tPos(d[0])).reverse();
+  const vals = sorted.map(d => +d[1].toFixed(1)).reverse();
+
+  plot('chart-pos-edad-media', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[4] },
+      text: vals.map(v => `${v} años`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: %{x} años<extra></extra>' }
+  ], {
+    xaxis: { title: 'Edad media', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 80, b: 50, l: 140 }
+  });
+}
+
+function renderPosTipo() {
+  const tipos = [...new Set(ALL_DATA.map(d => d.tipo_operacion))].filter(Boolean);
+  const byPos = groupBy(ALL_DATA, 'posicion');
+  const topPos = topN(Object.fromEntries(Object.entries(byPos).map(([k,v])=>[k,v.length])), 8).map(d=>d[0]);
+
+  const traces = tipos.map((tipo, i) => ({
+    x: topPos.map(p => tPos(p)),
+    y: topPos.map(p => (byPos[p]||[]).filter(d => d.tipo_operacion === tipo).length),
+    name: tipo,
+    type: 'bar',
+    marker: { color: CHART_COLORS[i % CHART_COLORS.length] }
+  }));
+
+  plot('chart-pos-tipo', traces, {
+    barmode: 'stack',
+    xaxis: { title: 'Posición', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 40, r: 20, b: 80, l: 60 }
+  });
+}
+
+function renderPosSunburst() {
+  const byPos = groupBy(ALL_DATA, 'posicion');
+  const topPos = topN(Object.fromEntries(Object.entries(byPos).map(([k,v])=>[k,v.length])), 8).map(d=>d[0]);
+  const tipos = [...new Set(ALL_DATA.map(d => d.tipo_operacion))].filter(Boolean);
+
+  const ids = [], labels = [], parents = [], values = [];
+  ids.push('root'); labels.push('Total'); parents.push(''); values.push(ALL_DATA.length);
+
+  topPos.forEach(pos => {
+    const posLabel = tPos(pos);
+    const count = (byPos[pos] || []).length;
+    ids.push(posLabel); labels.push(posLabel); parents.push('root'); values.push(count);
+    tipos.forEach(tipo => {
+      const c = (byPos[pos]||[]).filter(d => d.tipo_operacion === tipo).length;
+      if (c > 0) {
+        const idStr = `${posLabel}|${tipo}`;
+        ids.push(idStr); labels.push(tipo); parents.push(posLabel); values.push(c);
+      }
+    });
+  });
+
+  plot('chart-sunburst', [
+    { type: 'sunburst', ids, labels, parents, values,
+      branchvalues: 'total',
+      marker: { colorscale: [[0,'#e8f5ee'],[0.5,'#009a44'],[1,'#00521c']] },
+      hovertemplate: '%{label}: %{value} ops (%{percentParent:.1%})<extra></extra>',
+      textfont: { size: 10 } }
+  ], {
+    margin: { t: 20, r: 20, b: 20, l: 20 }
+  });
+}
+
+/* ===================== TAB 5: JUGADORES ===================== */
+function renderJugadoresTab() {
+  const data = getJugData();
+  renderTopCaros(data);
+  renderTopValorMercado(data);
+  renderEdadImporte(data);
+  renderDistEdad(data);
+  renderNacBar(data);
+  renderNacMapa(data);
+}
+
+function renderTopCaros(data) {
+  const sorted = data.filter(d => d.importe_numerico > 0)
+    .sort((a, b) => b.importe_numerico - a.importe_numerico).slice(0, 15);
+  const labels = sorted.map(d => `${d.jugador} — ${d.club} (${d.temporada})`).reverse();
+  const vals = sorted.map(d => d.importe_numerico / 1e6).reverse();
+
+  plot('chart-top-caros', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[0] },
+      text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0', tickfont: { size: 9 } },
+    margin: { t: 30, r: 90, b: 50, l: 220 }
+  });
+}
+
+function renderTopValorMercado(data) {
+  const sorted = data.filter(d => d._vm > 0)
+    .sort((a, b) => b._vm - a._vm).slice(0, 15);
+  const labels = sorted.map(d => `${d.jugador} — ${d.club}`).reverse();
+  const vals = sorted.map(d => d._vm / 1e6).reverse();
+
+  plot('chart-top-valor-mercado', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[1] },
+      text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
+      hovertemplate: '%{y}: €%{x:.2f}M VM<extra></extra>' }
+  ], {
+    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0', tickfont: { size: 9 } },
+    margin: { t: 30, r: 90, b: 50, l: 200 }
+  });
+}
+
+function renderEdadImporte(data) {
+  const traspasos = data.filter(d => d.tipo_operacion === 'traspaso' && d.importe_numerico > 0 && d.edad);
+  const positions = [...new Set(traspasos.map(d => d.posicion))].filter(Boolean);
+
+  const traces = positions.map((pos, i) => {
+    const rows = traspasos.filter(d => d.posicion === pos);
+    return {
+      x: rows.map(d => d.edad),
+      y: rows.map(d => d.importe_numerico / 1e6),
+      mode: 'markers',
+      name: tPos(pos),
+      type: 'scatter',
+      marker: {
+        color: CHART_COLORS[i % CHART_COLORS.length],
+        size: rows.map(d => Math.max(6, Math.min(20, d.importe_numerico / 1e6 * 3))),
+        opacity: 0.75,
+        line: { width: 1, color: 'rgba(0,0,0,0.1)' }
+      },
+      text: rows.map(d => `${d.jugador} (${d.temporada})`),
+      hovertemplate: '%{text}<br>Edad: %{x} · €%{y:.2f}M<extra></extra>'
+    };
+  });
+
+  plot('chart-edad-importe', traces, {
+    xaxis: { title: 'Edad', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { title: 'Importe (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    showlegend: true,
+    legend: { bgcolor: 'rgba(0,0,0,0)', font: { size: 9 } },
+    margin: { t: 40, r: 20, b: 50, l: 70 }
+  });
+}
+
+function renderDistEdad(data) {
+  const altas = data.filter(d => d.movimiento === 'alta' && d.edad).map(d => d.edad);
+  const bajas = data.filter(d => d.movimiento === 'baja' && d.edad).map(d => d.edad);
+
+  plot('chart-dist-edad', [
+    { x: altas, name: 'Altas', type: 'histogram', xbins: { size: 1 },
+      marker: { color: 'rgba(0,154,68,0.75)', line: { color: '#009a44', width: 1 } },
+      opacity: 0.8 },
+    { x: bajas, name: 'Bajas', type: 'histogram', xbins: { size: 1 },
+      marker: { color: 'rgba(224,123,57,0.75)', line: { color: '#e07b39', width: 1 } },
+      opacity: 0.8 }
+  ], {
+    barmode: 'overlay',
+    xaxis: { title: 'Edad', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { title: 'Frecuencia', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 40, r: 20, b: 50, l: 60 }
+  });
+}
+
+function renderNacBar(data) {
+  const byNac = groupBy(data, 'nacionalidad');
+  const top = topN(Object.fromEntries(Object.entries(byNac).map(([k,v]) => [k,v.length])), 15);
+  const labels = top.map(d => d[0]).reverse();
+  const vals = top.map(d => d[1]).reverse();
+
+  plot('chart-nac-bar', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[5] },
+      text: vals.map(v => fmt(v)), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: %{x} jugadores<extra></extra>' }
+  ], {
+    xaxis: { title: 'Jugadores', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 60, b: 50, l: 120 }
+  });
+}
+
+function renderNacMapa(data) {
+  const byNac = groupBy(data, 'nacionalidad');
+  const nacData = Object.entries(byNac).map(([k,v]) => ({ country: k, count: v.length }));
+
+  plot('chart-nac-mapa', [
+    {
+      type: 'choropleth',
+      locationmode: 'country names',
+      locations: nacData.map(d => d.country),
+      z: nacData.map(d => d.count),
+      colorscale: [[0,'#e8f5ee'],[1,'#009a44']],
+      colorbar: { title: 'Jugadores', tickfont: { size: 10 } },
+      hovertemplate: '%{location}: %{z} jugadores<extra></extra>'
+    }
+  ], {
+    geo: {
+      showframe: false, showcoastlines: true,
+      projection: { type: 'natural earth' },
+      bgcolor: 'rgba(0,0,0,0)',
+      coastlinecolor: '#e2e8f0',
+      landcolor: '#f4f6f9',
+      countrycolor: '#e2e8f0'
+    },
+    margin: { t: 10, r: 10, b: 10, l: 10 }
+  });
+}
+
+/* ===================== TAB 6: REVALORIZACIÓN ===================== */
+function renderRevalorizacionTab() {
+  if (REV_DATA.length === 0) {
+    document.getElementById('rev-kpi-pares').textContent = 'N/D';
     return;
   }
 
-  const insights = [];
+  const positives = REV_DATA.filter(d => (+d.revalorizacion_abs || 0) > 0);
 
-  // 1. Club que más gastó
-  const gastoPorClub = {};
-  d.filter(r => r.movimiento === 'alta' && r.importe_numerico > 0).forEach(r => {
-    gastoPorClub[r.club] = (gastoPorClub[r.club] || 0) + r.importe_numerico;
-  });
-  const topGastor = topN(gastoPorClub, 1)[0];
-  insights.push({
-    icon: '🏆', label: 'Mayor Inversor',
-    value: topGastor ? topGastor[0] : '—',
-    mini: topGastor ? formatM(topGastor[1]) + ' en altas' : ''
-  });
+  document.getElementById('rev-kpi-pares').textContent = fmt(REV_DATA.length);
+  document.getElementById('rev-kpi-pos').textContent = fmt(positives.length);
+  document.getElementById('rev-kpi-total').textContent = formatM(sumBy(positives, 'revalorizacion_abs'));
+  const meanPct = meanBy(positives.filter(d => d.revalorizacion_pct != null), 'revalorizacion_pct');
+  document.getElementById('rev-kpi-media').textContent = `+${meanPct.toFixed(0)}%`;
 
-  // 2. Club que más ingresó
-  const ingresosPorClub = {};
-  d.filter(r => r.movimiento === 'baja' && r.importe_numerico > 0).forEach(r => {
-    ingresosPorClub[r.club] = (ingresosPorClub[r.club] || 0) + r.importe_numerico;
-  });
-  const topVendedor = topN(ingresosPorClub, 1)[0];
-  insights.push({
-    icon: '💸', label: 'Mayor Vendedor',
-    value: topVendedor ? topVendedor[0] : '—',
-    mini: topVendedor ? formatM(topVendedor[1]) + ' en bajas' : ''
-  });
-
-  // 3. Balance neto más positivo (mejor gestor — ingresó más de lo que gastó)
-  const balanceNet = {};
-  const allClubs = [...new Set(d.map(r => r.club))];
-  allClubs.forEach(club => {
-    const ga = sumBy(d.filter(r => r.club === club && r.movimiento === 'alta' && r.importe_numerico > 0), 'importe_numerico');
-    const gi = sumBy(d.filter(r => r.club === club && r.movimiento === 'baja' && r.importe_numerico > 0), 'importe_numerico');
-    balanceNet[club] = gi - ga;
-  });
-  const topBalance = topN(balanceNet, 1)[0];
-  insights.push({
-    icon: '📈', label: 'Mejor Balance Neto',
-    value: topBalance ? topBalance[0] : '—',
-    mini: topBalance ? formatM(topBalance[1]) + ' superávit' : ''
-  });
-
-  // 4. Posición más demandada
-  const posCounts = {};
-  d.forEach(r => { posCounts[r.posicion] = (posCounts[r.posicion] || 0) + 1; });
-  const topPos = topN(posCounts, 1)[0];
-  insights.push({
-    icon: '⚽', label: 'Posición más Demandada',
-    value: topPos ? translatePos(topPos[0]) : '—',
-    mini: topPos ? `${formatNum(topPos[1])} operaciones` : ''
-  });
-
-  // 5. Fichaje más caro
-  const caros = d.filter(r => r.importe_numerico > 0).sort((a, b) => b.importe_numerico - a.importe_numerico);
-  const topCaro = caros[0];
-  insights.push({
-    icon: '💰', label: 'Fichaje más Caro',
-    value: topCaro ? topCaro.jugador : '—',
-    mini: topCaro ? `${formatM(topCaro.importe_numerico)} · ${topCaro.club}` : ''
-  });
-
-  // 6. Temporada más activa
-  const tempCounts = {};
-  d.forEach(r => { tempCounts[r.temporada] = (tempCounts[r.temporada] || 0) + 1; });
-  const topTemp = topN(tempCounts, 1)[0];
-  insights.push({
-    icon: '📅', label: 'Temporada más Activa',
-    value: topTemp ? topTemp[0] : '—',
-    mini: topTemp ? `${formatNum(topTemp[1])} operaciones` : ''
-  });
-
-  // 7. Jugador con mayor valor de mercado
-  const topValor = d.map(r => ({ ...r, vm: parseMonetary(r.valor_mercado) }))
-    .filter(r => r.vm > 0)
-    .sort((a, b) => b.vm - a.vm)[0];
-  insights.push({
-    icon: '⭐', label: 'Mayor Valor de Mercado',
-    value: topValor ? topValor.jugador : '—',
-    mini: topValor ? `${formatM(topValor.vm)} · ${topValor.club}` : ''
-  });
-
-  // 8. Nacionalidad más frecuente
-  const nacCounts = {};
-  d.forEach(r => { nacCounts[r.nacionalidad] = (nacCounts[r.nacionalidad] || 0) + 1; });
-  const topNacI = topN(nacCounts, 1)[0];
-  insights.push({
-    icon: '🌍', label: 'Nac. más Frecuente',
-    value: topNacI ? topNacI[0] : '—',
-    mini: topNacI ? `${formatNum(topNacI[1])} jugadores` : ''
-  });
-
-  container.innerHTML = insights.map(ins => `
-    <div class="insight-card">
-      <div class="insight-icon-wrap">${ins.icon}</div>
-      <div class="insight-body">
-        <div class="insight-label">${ins.label}</div>
-        <div class="insight-value" title="${ins.value}">${ins.value}</div>
-        <div class="insight-mini">${ins.mini}</div>
-      </div>
-    </div>
-  `).join('');
+  renderRevClubes();
+  renderRevClubesMedia();
+  renderRevJugadores();
+  renderRevPos();
+  renderRevEdad();
+  renderRevTemporada();
+  renderRevNac();
+  renderRevROI();
+  renderRevTable();
 }
 
-/* ============================================================
-   DATATABLE
-   ============================================================ */
+function renderRevClubes() {
+  const byClub = groupBy(REV_DATA, 'club');
+  const top = topN(Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, sumBy(v,'revalorizacion_abs')])), 15);
+  const labels = top.map(d => d[0]).reverse();
+  const vals = top.map(d => d[1] / 1e6).reverse();
 
-function initDataTable() {
-  if (STATE.dtInitialized) return;
+  plot('chart-rev-clubes', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: vals.map(v => v >= 0 ? CHART_COLORS[0] : '#dc2626') },
+      text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Revalorización (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 90, b: 50, l: 160 }
+  });
+}
 
-  STATE.dtTable = $('#main-table').DataTable({
-    data: [],
-    columns: [
-      { data: 'temporada' },
-      { data: 'jugador' },
-      { data: 'club' },
-      {
-        data: 'movimiento',
-        render: (data) => {
-          const cls = data === 'alta' ? 'badge-alta' : 'badge-baja';
-          return `<span class="badge ${cls}">${data}</span>`;
-        }
-      },
-      { data: 'club_origen', defaultContent: '—' },
-      { data: 'club_destino', defaultContent: '—' },
-      { data: 'posicion', render: (d) => translatePos(d) },
-      { data: 'edad' },
-      { data: 'nacionalidad' },
-      { data: 'importe_original', defaultContent: '—' },
-      {
-        data: 'importe_numerico',
-        render: (data) => data > 0 ? `€${formatNum(data)}` : '—',
-        className: 'text-right'
-      }
-    ],
+function renderRevClubesMedia() {
+  const byClub = groupBy(REV_DATA.filter(d => d.revalorizacion_pct != null), 'club');
+  const clubMeans = Object.entries(byClub)
+    .filter(([,v]) => v.length >= 2)
+    .map(([k,v]) => [k, meanBy(v,'revalorizacion_pct')]);
+  const top = clubMeans.sort((a,b) => b[1]-a[1]).slice(0,15);
+  const labels = top.map(d => d[0]).reverse();
+  const vals = top.map(d => +d[1].toFixed(1)).reverse();
+
+  plot('chart-rev-clubes-media', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[1] },
+      text: vals.map(v => `${v}%`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: %{x:.1f}%<extra></extra>' }
+  ], {
+    xaxis: { title: '% Medio', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 70, b: 50, l: 160 }
+  });
+}
+
+function renderRevJugadores() {
+  const sorted = [...REV_DATA].sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0,15);
+  const labels = sorted.map(d => `${d.jugador} (${d.club})`).reverse();
+  const vals = sorted.map(d => (+d.revalorizacion_abs||0) / 1e6).reverse();
+
+  plot('chart-rev-jugadores', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: vals.map(v => v >= 0 ? CHART_COLORS[0] : '#dc2626') },
+      text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Revalorización (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0', tickfont: { size: 9 } },
+    margin: { t: 30, r: 90, b: 50, l: 200 }
+  });
+}
+
+function renderRevPos() {
+  const byPos = groupBy(REV_DATA, 'posicion');
+  const top = topN(Object.fromEntries(Object.entries(byPos).map(([k,v]) => [k, sumBy(v,'revalorizacion_abs')])), 14);
+  const labels = top.map(d => tPos(d[0])).reverse();
+  const vals = top.map(d => d[1] / 1e6).reverse();
+
+  plot('chart-rev-pos', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[3] },
+      text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Revalorización (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 90, b: 50, l: 140 }
+  });
+}
+
+function renderRevEdad() {
+  const data = REV_DATA.filter(d => d.edad_llegada && d.revalorizacion_pct != null);
+  const positions = [...new Set(data.map(d => d.posicion))].filter(Boolean);
+
+  const traces = positions.slice(0, 8).map((pos, i) => {
+    const rows = data.filter(d => d.posicion === pos);
+    return {
+      x: rows.map(d => +d.edad_llegada),
+      y: rows.map(d => +d.revalorizacion_pct),
+      mode: 'markers',
+      name: tPos(pos),
+      type: 'scatter',
+      marker: { color: CHART_COLORS[i % CHART_COLORS.length], size: 7, opacity: 0.7 },
+      text: rows.map(d => d.jugador),
+      hovertemplate: '%{text}<br>Edad llegada: %{x}<br>Revalorización: %{y:.1f}%<extra></extra>'
+    };
+  });
+
+  plot('chart-rev-edad', traces, {
+    xaxis: { title: 'Edad de llegada', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { title: 'Revalorización %', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    showlegend: true,
+    legend: { bgcolor: 'rgba(0,0,0,0)', font: { size: 9 } },
+    margin: { t: 40, r: 20, b: 50, l: 70 }
+  });
+}
+
+function renderRevTemporada() {
+  const byTemp = groupBy(REV_DATA.filter(d => d.temporada_salida), 'temporada_salida');
+  const seasons = Object.keys(byTemp).sort();
+  const vals = seasons.map(s => sumBy(byTemp[s],'revalorizacion_abs') / 1e6);
+
+  plot('chart-rev-temporada', [
+    { x: seasons, y: vals, type: 'bar',
+      marker: { color: vals.map(v => v >= 0 ? CHART_COLORS[0] : '#dc2626') },
+      text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{x}: €%{y:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Temporada salida', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { title: 'Revalorización (M€)', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 40, r: 20, b: 60, l: 70 }
+  });
+}
+
+function renderRevNac() {
+  const byNac = groupBy(REV_DATA.filter(d => d.revalorizacion_pct != null), 'nacionalidad');
+  const nacMeans = Object.entries(byNac).filter(([,v]) => v.length >= 2)
+    .map(([k,v]) => [k, meanBy(v,'revalorizacion_pct')]);
+  const top = nacMeans.sort((a,b) => b[1]-a[1]).slice(0,10);
+  const labels = top.map(d => d[0]).reverse();
+  const vals = top.map(d => +d[1].toFixed(1)).reverse();
+
+  plot('chart-rev-nac', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[6] },
+      text: vals.map(v => `${v}%`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: %{x:.1f}%<extra></extra>' }
+  ], {
+    xaxis: { title: '% Medio', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 70, b: 50, l: 130 }
+  });
+}
+
+function renderRevROI() {
+  const data = REV_DATA.filter(d => (+d.vm_llegada||0) > 0);
+  const byClub = groupBy(data, 'club');
+  const clubROI = Object.entries(byClub)
+    .filter(([,v]) => v.length >= 2)
+    .map(([k,v]) => {
+      const roi = sumBy(v,'revalorizacion_abs') / sumBy(v,'vm_llegada') * 100;
+      return [k, roi];
+    });
+  const top = clubROI.sort((a,b) => b[1]-a[1]).slice(0,15);
+  const labels = top.map(d => d[0]).reverse();
+  const vals = top.map(d => +d[1].toFixed(1)).reverse();
+
+  plot('chart-rev-roi', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: vals.map(v => v >= 0 ? CHART_COLORS[7] : '#dc2626') },
+      text: vals.map(v => `${v}%`), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: ROI %{x:.1f}%<extra></extra>' }
+  ], {
+    xaxis: { title: 'ROI %', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 80, b: 50, l: 160 }
+  });
+}
+
+function renderRevTable() {
+  const sorted = [...REV_DATA].sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0,20);
+  const tbody = document.getElementById('rev-top-tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = sorted.map((d, i) => {
+    const abs = +d.revalorizacion_abs || 0;
+    const pct = +d.revalorizacion_pct || 0;
+    const isPos = abs >= 0;
+    const arrow = isPos ? '<span class="arrow-up">▲</span>' : '<span class="arrow-down">▼</span>';
+    return `<tr class="${isPos ? 'row-positive' : 'row-negative'}">
+      <td>${i + 1}</td>
+      <td style="font-weight:600">${d.jugador || '—'}</td>
+      <td>${d.club || '—'}</td>
+      <td>${tPos(d.posicion || '')}</td>
+      <td>${d.temporada_llegada || '—'}</td>
+      <td>${d.temporada_salida || '—'}</td>
+      <td>${formatM(+d.vm_llegada||0)}</td>
+      <td>${formatM(+d.vm_salida||0)}</td>
+      <td>${arrow} ${formatM(Math.abs(abs))}</td>
+      <td style="font-weight:700;color:${isPos ? 'var(--success)' : 'var(--danger)'}">
+        ${isPos ? '+' : ''}${pct.toFixed(1)}%
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ===================== TAB 7: TEMPORADAS ===================== */
+function renderTemporadasTab() {
+  const data = ALL_DATA.filter(d => d.temporada === selectedSeason);
+
+  // KPIs
+  document.getElementById('temp-kpi-ops').textContent = fmt(data.length);
+  document.getElementById('temp-kpi-money').textContent = formatM(sumBy(data,'importe_numerico'));
+  document.getElementById('temp-kpi-clubs').textContent = fmt(new Set(data.map(d=>d.club)).size);
+
+  // Charts
+  renderTempClubesOps(data);
+  renderTempTipo(data);
+  renderTempTopFichajes(data);
+  renderTempPosiciones(data);
+  renderTempTraspasos(data);
+}
+
+function renderTempClubesOps(data) {
+  const byClub = groupBy(data, 'club');
+  const sorted = topN(Object.fromEntries(Object.entries(byClub).map(([k,v])=>[k,v.length])), 20);
+  const labels = sorted.map(d => d[0]).reverse();
+  const vals = sorted.map(d => d[1]).reverse();
+
+  plot('chart-temp-clubes-ops', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[0] },
+      text: vals.map(v => fmt(v)), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: %{x} ops<extra></extra>' }
+  ], {
+    xaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 60, b: 50, l: 160 }
+  });
+}
+
+function renderTempTipo(data) {
+  const byTipo = groupBy(data, 'tipo_operacion');
+  const labels = Object.keys(byTipo);
+  const values = labels.map(k => byTipo[k].length);
+
+  plot('chart-temp-tipo', [
+    { labels, values, type: 'pie', hole: 0.45,
+      marker: { colors: CHART_COLORS },
+      textinfo: 'percent+label',
+      textfont: { size: 11 },
+      hovertemplate: '%{label}: %{value} ops (%{percent})<extra></extra>' }
+  ], { margin: { t: 20, r: 20, b: 20, l: 20 }, showlegend: true });
+}
+
+function renderTempTopFichajes(data) {
+  const sorted = data.filter(d => d.importe_numerico > 0).sort((a,b) => b.importe_numerico - a.importe_numerico).slice(0,10);
+  const labels = sorted.map(d => `${d.jugador} — ${d.club}`).reverse();
+  const vals = sorted.map(d => d.importe_numerico / 1e6).reverse();
+
+  if (vals.length === 0) return;
+
+  plot('chart-temp-top-fichajes', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[4] },
+      text: vals.map(v => `€${v.toFixed(2)}M`), textposition: 'outside', textfont: { size: 9 },
+      hovertemplate: '%{y}: €%{x:.2f}M<extra></extra>' }
+  ], {
+    xaxis: { title: 'Millones €', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0', tickfont: { size: 9 } },
+    margin: { t: 30, r: 90, b: 50, l: 200 }
+  });
+}
+
+function renderTempPosiciones(data) {
+  const byPos = groupBy(data, 'posicion');
+  const sorted = topN(Object.fromEntries(Object.entries(byPos).map(([k,v])=>[k,v.length])), 14);
+  const labels = sorted.map(d => tPos(d[0])).reverse();
+  const vals = sorted.map(d => d[1]).reverse();
+
+  plot('chart-temp-posiciones', [
+    { x: vals, y: labels, type: 'bar', orientation: 'h',
+      marker: { color: CHART_COLORS[2] },
+      text: vals.map(v => fmt(v)), textposition: 'outside', textfont: { size: 10 },
+      hovertemplate: '%{y}: %{x} ops<extra></extra>' }
+  ], {
+    xaxis: { title: 'Operaciones', gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    yaxis: { automargin: true, gridcolor: '#e2e8f0', linecolor: '#e2e8f0', zerolinecolor: '#e2e8f0' },
+    margin: { t: 30, r: 60, b: 50, l: 140 }
+  });
+}
+
+function renderTempTraspasos(data) {
+  const sorted = data.filter(d => d.tipo_operacion === 'traspaso')
+    .sort((a,b) => (+b.importe_numerico||0) - (+a.importe_numerico||0));
+  const tbody = document.getElementById('temp-traspasos-tbody');
+  if (!tbody) return;
+
+  if (sorted.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted)">No hay traspasos en esta temporada</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = sorted.map(d => `<tr>
+    <td style="font-weight:600">${d.jugador || '—'}</td>
+    <td><span style="padding:2px 8px;border-radius:4px;font-size:0.72rem;font-weight:600;background:${d.movimiento==='alta'?'#e8f5ee':'#fff1f2'};color:${d.movimiento==='alta'?'var(--success)':'var(--danger)'}">${d.movimiento || '—'}</span></td>
+    <td>${d.club || '—'}</td>
+    <td style="font-weight:600;color:var(--primary)">${d.importe_original || '—'}</td>
+    <td>${tPos(d.posicion || '')}</td>
+    <td>${d.edad || '—'}</td>
+  </tr>`).join('');
+}
+
+/* ===================== TAB 8: BASE DE DATOS ===================== */
+function renderBBDDTab() {
+  if (dtInstance) { dtInstance.destroy(); dtInstance = null; }
+
+  const tbody = document.querySelector('#bbdd-table tbody');
+  tbody.innerHTML = ALL_DATA.map(d => `<tr>
+    <td>${d.temporada||''}</td>
+    <td>${d.jugador||''}</td>
+    <td>${d.club||''}</td>
+    <td>${d.movimiento||''}</td>
+    <td>${d.club_origen||''}</td>
+    <td>${d.club_destino||''}</td>
+    <td>${tPos(d.posicion||'')}</td>
+    <td>${d.edad||''}</td>
+    <td>${d.nacionalidad||''}</td>
+    <td>${d.importe_original||''}</td>
+    <td>${d.importe_numerico > 0 ? fmt(d.importe_numerico) : ''}</td>
+    <td>${d.tipo_operacion||''}</td>
+    <td>${d.valor_mercado||''}</td>
+  </tr>`).join('');
+
+  dtInstance = $('#bbdd-table').DataTable({
     pageLength: 25,
-    lengthMenu: [10, 25, 50, 100],
-    dom: 'Bfrtip',
-    buttons: [
-      { extend: 'csvHtml5', text: '⬇ CSV', className: 'dt-button', filename: 'segunda_division_fichajes' },
-      { extend: 'excelHtml5', text: '⬇ Excel', className: 'dt-button', filename: 'segunda_division_fichajes' }
-    ],
+    order: [[0, 'desc']],
     language: {
-      url: '',
       search: 'Buscar:',
       lengthMenu: 'Mostrar _MENU_ registros',
-      info: 'Mostrando _START_ - _END_ de _TOTAL_ registros',
-      infoFiltered: '(filtrado de _MAX_ total)',
-      paginate: { first: '«', last: '»', next: '›', previous: '‹' },
-      zeroRecords: 'No se encontraron resultados',
-      emptyTable: 'Sin datos disponibles'
+      info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+      infoEmpty: 'Mostrando 0 registros',
+      paginate: { first:'Inicio', last:'Fin', next:'Siguiente', previous:'Anterior' }
     },
-    order: [[0, 'asc']],
-    scrollX: false,
-    autoWidth: false
-  });
-
-  // Move buttons to custom area
-  const buttonsEl = $('.dt-buttons').detach();
-  $('#dt-buttons-area').append(buttonsEl);
-
-  STATE.dtInitialized = true;
-}
-
-function updateDataTable() {
-  if (!STATE.dtInitialized) {
-    initDataTable();
-  }
-  if (STATE.dtTable) {
-    STATE.dtTable.clear();
-    STATE.dtTable.rows.add(STATE.filtered);
-    STATE.dtTable.draw();
-  }
-}
-
-/* ============================================================
-   FILTER UI INITIALIZATION
-   ============================================================ */
-
-function initFilters() {
-  const raw = STATE.rawData;
-
-  // Extract unique values
-  STATE._allTemporadas   = [...new Set(raw.map(r => r.temporada))].sort();
-  STATE._allClubs        = [...new Set(raw.map(r => r.club))].sort();
-  STATE._allPosiciones   = [...new Set(raw.map(r => r.posicion))].sort();
-  STATE._allTipos        = [...new Set(raw.map(r => r.tipo_operacion))].sort();
-  STATE._allNacionalidades = [...new Set(raw.map(r => r.nacionalidad))].sort();
-
-  // Set defaults
-  STATE.filters.temporadas    = [...STATE._allTemporadas];
-  STATE.filters.clubs         = [...STATE._allClubs];
-  STATE.filters.posiciones    = [...STATE._allPosiciones];
-  STATE.filters.tipos         = [...STATE._allTipos];
-  STATE.filters.nacionalidades = [...STATE._allNacionalidades];
-
-  document.getElementById('total-count').textContent = formatNum(raw.length);
-
-  // Init multi-selects
-  MultiSelect.init('ms-temporada', STATE._allTemporadas, (sel) => {
-    STATE.filters.temporadas = sel; debouncedRender();
-  });
-  MultiSelect.init('ms-club', STATE._allClubs, (sel) => {
-    STATE.filters.clubs = sel; debouncedRender();
-  }, true);
-  MultiSelect.init('ms-posicion', STATE._allPosiciones, (sel) => {
-    STATE.filters.posiciones = sel; debouncedRender();
-  });
-  MultiSelect.init('ms-tipo', STATE._allTipos, (sel) => {
-    STATE.filters.tipos = sel; debouncedRender();
-  });
-  MultiSelect.init('ms-nac', STATE._allNacionalidades, (sel) => {
-    STATE.filters.nacionalidades = sel; debouncedRender();
-  }, true);
-
-  // Movimiento checkboxes
-  const cbAlta = document.getElementById('cb-alta');
-  const cbBaja = document.getElementById('cb-baja');
-  const updateMov = () => {
-    const movs = [];
-    if (cbAlta.checked) movs.push('alta');
-    if (cbBaja.checked) movs.push('baja');
-    STATE.filters.movimientos = movs;
-    debouncedRender();
-  };
-  cbAlta.addEventListener('change', updateMov);
-  cbBaja.addEventListener('change', updateMov);
-
-  // Edad
-  const edadMinEl = document.getElementById('edad-min');
-  const edadMaxEl = document.getElementById('edad-max');
-  const updateEdad = debounce(() => {
-    STATE.filters.edadMin = parseInt(edadMinEl.value) || 17;
-    STATE.filters.edadMax = parseInt(edadMaxEl.value) || 41;
-    debouncedRender();
-  }, 200);
-  edadMinEl.addEventListener('input', updateEdad);
-  edadMaxEl.addEventListener('input', updateEdad);
-
-  // Importe mínimo
-  const importeMinEl = document.getElementById('importe-min');
-  const updateImporte = debounce(() => {
-    STATE.filters.importeMin = parseFloat(importeMinEl.value) || 0;
-    debouncedRender();
-  }, 300);
-  importeMinEl.addEventListener('input', updateImporte);
-
-  // Filter panel toggle
-  const filterToggleBtn = document.getElementById('filter-toggle-btn');
-  const filterBody      = document.getElementById('filter-body');
-  const filterChevron   = document.getElementById('filter-chevron');
-  filterToggleBtn.addEventListener('click', () => {
-    const isOpen = filterBody.classList.contains('open');
-    filterBody.classList.toggle('open', !isOpen);
-    filterChevron.classList.toggle('open', !isOpen);
-  });
-  // Open by default
-  filterBody.classList.add('open');
-  filterChevron.classList.add('open');
-
-  // Reset button
-  document.getElementById('btn-reset').addEventListener('click', resetFilters);
-}
-
-function resetFilters() {
-  STATE.filters.temporadas    = [...STATE._allTemporadas];
-  STATE.filters.clubs         = [...STATE._allClubs];
-  STATE.filters.posiciones    = [...STATE._allPosiciones];
-  STATE.filters.tipos         = [...STATE._allTipos];
-  STATE.filters.nacionalidades = [...STATE._allNacionalidades];
-  STATE.filters.movimientos   = ['alta', 'baja'];
-  STATE.filters.edadMin       = 17;
-  STATE.filters.edadMax       = 41;
-  STATE.filters.importeMin    = 0;
-
-  // Reset UI
-  ['ms-temporada','ms-club','ms-posicion','ms-tipo','ms-nac'].forEach(id => MultiSelect.setAll(id));
-  document.getElementById('cb-alta').checked = true;
-  document.getElementById('cb-baja').checked = true;
-  document.getElementById('edad-min').value = 17;
-  document.getElementById('edad-max').value = 41;
-  document.getElementById('importe-min').value = 0;
-
-  debouncedRender();
-}
-
-/* ============================================================
-   SIDEBAR SCROLL SPY
-   ============================================================ */
-
-function initScrollSpy() {
-  const sections = ['sec-kpis','sec-bloque1','sec-bloque2','sec-bloque3','sec-bloque4','sec-bloque5','sec-insights','sec-tabla'];
-
-  const navItems = document.querySelectorAll('.nav-item');
-
-  // Click handler
-  navItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = item.dataset.target;
-      const el = document.getElementById(target);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  });
-
-  // Scroll spy
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        navItems.forEach(item => {
-          item.classList.toggle('active', item.dataset.target === id);
-        });
-      }
-    });
-  }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
-
-  sections.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) observer.observe(el);
+    dom: 'Bfrtip',
+    buttons: [
+      { extend: 'csv', text: 'Exportar CSV', filename: 'fichajes_segunda_division' },
+      { extend: 'excel', text: 'Exportar Excel', filename: 'fichajes_segunda_division' }
+    ],
+    columnDefs: [
+      { targets: '_all', defaultContent: '' }
+    ]
   });
 }
 
-/* ============================================================
-   DATA LOADING
-   ============================================================ */
-
-/**
- * Parse a CSV row — coerce types
- */
-function parseRow(row) {
-  return {
-    temporada:        (row.temporada || '').trim(),
-    club:             (row.club || '').trim(),
-    jugador:          (row.jugador || '').trim(),
-    movimiento:       (row.movimiento || '').trim().toLowerCase(),
-    club_origen:      (row.club_origen || '').trim(),
-    club_destino:     (row.club_destino || '').trim(),
-    pais_club:        (row.pais_club || '').trim(),
-    fecha:            (row.fecha || '').trim(),
-    importe_original: (row.importe_original || '').trim(),
-    importe_numerico: parseFloat(row.importe_numerico) || 0,
-    tipo_operacion:   (row.tipo_operacion || '').trim().toLowerCase(),
-    valor_mercado:    (row.valor_mercado || '').trim(),
-    posicion:         (row.posicion || '').trim(),
-    edad:             parseInt(row.edad) || 0,
-    nacionalidad:     (row.nacionalidad || '').trim()
-  };
-}
-
-/**
- * Load CSV via PapaParse HTTP download
- */
-function loadCSV() {
-  Papa.parse(CSV_PATH, {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: (results) => {
-      if (!results.data || results.data.length === 0) {
-        showFileFallback();
-        return;
-      }
-      STATE.rawData = results.data.map(parseRow);
-      onDataLoaded();
-    },
-    error: (err) => {
-      console.warn('PapaParse fetch error:', err);
-      showFileFallback();
-    }
-  });
-}
-
-function showFileFallback() {
-  document.getElementById('loading-overlay').classList.add('hidden');
-  document.getElementById('file-fallback').classList.add('visible');
-
-  document.getElementById('csv-file-input').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    document.getElementById('file-fallback').classList.remove('visible');
-    document.getElementById('loading-overlay').classList.remove('hidden');
-
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        STATE.rawData = results.data.map(parseRow);
-        onDataLoaded();
-      },
-      error: (err) => {
-        console.error('PapaParse file error:', err);
-        document.getElementById('loading-overlay').querySelector('.loading-text').textContent =
-          'Error al procesar el archivo. Comprueba que sea el CSV correcto.';
-      }
-    });
-  });
-}
-
-function onDataLoaded() {
-  initFilters();
-  initScrollSpy();
-  initDataTable();
-  renderAll();
-
-  // Hide loading overlay with fade
-  setTimeout(() => {
-    document.getElementById('loading-overlay').classList.add('hidden');
-  }, 400);
-}
-
-/* ============================================================
-   ENTRY POINT
-   ============================================================ */
-
+/* ===================== INIT ===================== */
 document.addEventListener('DOMContentLoaded', () => {
-  loadCSV();
+  loadAll();
 });
