@@ -5,29 +5,29 @@
 
 /* ---------- CSS Variables — Dark Professional Theme ---------- */
 :root {
-  --bg:           #0e1621;
-  --bg-2:         #111d2b;
-  --bg-card:      #162032;
-  --bg-card-hover:#1c2a40;
-  --sidebar-bg:   #091410;
-  --sidebar-text: #e0ead8;
-  --sidebar-hover:rgba(0,154,68,0.18);
-  --primary:      #00b84a;
-  --primary-dark: #009a44;
-  --primary-light:rgba(0,154,68,0.12);
+  --bg:           #f0f2f5;
+  --bg-2:         #e8eaee;
+  --bg-card:      #ffffff;
+  --bg-card-hover:#f8fafb;
+  --sidebar-bg:   #1a3928;
+  --sidebar-text: #e8f0e4;
+  --sidebar-hover:rgba(0,154,68,0.20);
+  --primary:      #009a44;
+  --primary-dark: #006e31;
+  --primary-light:#e8f5ee;
   --accent:       #c8a951;
-  --text:         #dce8dc;
-  --text-muted:   #7a9080;
-  --border:       rgba(255,255,255,0.07);
-  --border-strong:rgba(0,154,68,0.25);
-  --success:      #00b84a;
-  --danger:       #e05252;
+  --text:         #1a2332;
+  --text-muted:   #6b7280;
+  --border:       #e5e7eb;
+  --border-strong:#d1d5db;
+  --success:      #059669;
+  --danger:       #dc2626;
   --warning:      #d4a017;
   --sidebar-width:220px;
   --header-height:60px;
   --radius:       10px;
-  --shadow:       0 2px 16px rgba(0,0,0,0.35);
-  --shadow-md:    0 4px 28px rgba(0,0,0,0.5);
+  --shadow:       0 1px 8px rgba(0,0,0,0.08);
+  --shadow-md:    0 4px 20px rgba(0,0,0,0.14);
 }
 
 /* ---------- Reset ---------- */
@@ -47,7 +47,7 @@ body {
 #loading-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,82,28,0.95);
+  background: rgba(26,57,40,0.97);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,7 +65,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  color: white;
+  color: #fff;
 }
 
 .loader-shield {
@@ -95,7 +95,7 @@ body {
   font-size: 1rem;
   font-weight: 500;
   letter-spacing: 0.05em;
-  color: rgba(255,255,255,0.9);
+  color: #fff;
 }
 
 /* ---------- Sidebar ---------- */
@@ -139,7 +139,7 @@ body {
 
 .sidebar-divider {
   border: none;
-  border-top: 1px solid rgba(255,255,255,0.12);
+  border-top: 1px solid rgba(255,255,255,0.10);
   margin: 0 16px 8px;
 }
 
@@ -156,7 +156,7 @@ body {
   align-items: center;
   gap: 10px;
   padding: 11px 18px;
-  color: rgba(255,255,255,0.8);
+  color: rgba(232,240,228,0.85);
   text-decoration: none;
   font-size: 0.835rem;
   font-weight: 500;
@@ -171,7 +171,7 @@ body {
 }
 
 .nav-link.active {
-  background: rgba(255,255,255,0.15);
+  background: rgba(0,154,68,0.25);
   border-left: 3px solid var(--accent);
   color: #fff;
 }
@@ -194,7 +194,7 @@ body {
   z-index: 50;
   height: var(--header-height);
   background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
   box-shadow: var(--shadow);
   display: flex;
   align-items: center;
@@ -295,7 +295,7 @@ body {
   border-radius: var(--radius);
   padding: 20px 18px 16px;
   box-shadow: var(--shadow);
-  border-top: 4px solid var(--primary);
+  border-top: 3px solid var(--primary); border: 1px solid var(--border);
   text-align: center;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -415,7 +415,7 @@ body {
 .btn-primary {
   padding: 8px 18px;
   background: var(--primary);
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 6px;
   font-family: 'Inter', sans-serif;
@@ -456,7 +456,7 @@ body {
   color: var(--text);
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
   letter-spacing: -0.01em;
 }
 
@@ -577,7 +577,7 @@ body {
 .ranking-table td {
   padding: 9px 12px;
   vertical-align: middle;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
 }
 
 .ranking-table td:first-child {
@@ -652,7 +652,7 @@ body {
 .season-card.active {
   background: var(--primary);
   border-color: var(--primary-dark);
-  color: white;
+  color: #fff;
   box-shadow: var(--shadow-md);
 }
 
@@ -681,7 +681,7 @@ body {
 
 .rev-table td {
   padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
   vertical-align: middle;
   white-space: nowrap;
 }
@@ -692,8 +692,8 @@ body {
   text-align: center;
 }
 
-tr.row-positive { background: rgba(0,154,68,0.12); }
-tr.row-negative { background: rgba(220,80,80,0.12); }
+tr.row-positive { background: var(--primary-light); }
+tr.row-negative { background: #fef2f2; }
 
 .arrow-up { color: var(--success); font-weight: 700; }
 .arrow-down { color: var(--danger); font-weight: 700; }
@@ -775,7 +775,7 @@ table.dataTable thead .sorting_desc {
   z-index: 9998;
   flex-direction: column;
   gap: 20px;
-  color: white;
+  color: #fff;
   text-align: center;
 }
 
@@ -786,7 +786,7 @@ table.dataTable thead .sorting_desc {
   display: inline-block;
   padding: 10px 22px;
   background: var(--accent);
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 7px;
   font-size: 0.9rem;
