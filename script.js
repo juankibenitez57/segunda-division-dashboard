@@ -1805,7 +1805,7 @@ async function tmFetch(url) {
   // 1. Intentar con el proxy propio de Render (más fiable, sin bloqueos)
   try {
     const endpoint = `${RENDER_PROXY}/tm?url=${encodeURIComponent(url)}`;
-    const r = await fetch(endpoint, { signal: AbortSignal.timeout(12000) });
+    const r = await fetch(endpoint, { signal: AbortSignal.timeout(35000) });
     if (r.ok) return r;
   } catch { /* continuar con fallbacks */ }
 
@@ -1845,33 +1845,43 @@ function parseTMSearchHTML(html) {
 
   for (const table of doc.querySelectorAll('table.items')) {
     for (const row of table.querySelectorAll('tbody tr')) {
-      const link = row.querySelector('a[href*="/spieler/"]');
-      if (!link) continue;
-      const href = link.getAttribute('href') || '';
+      const tds = [...row.querySelectorAll('td')];
+      if (tds.length < 6) continue;
+
+      // Nombre e ID: están en td con class "hauptlink"
+      const nameCell = tds.find(td => td.classList.contains('hauptlink'));
+      if (!nameCell) continue;
+      const nameLink = nameCell.querySelector('a[href*="/spieler/"]');
+      if (!nameLink) continue;
+
+      const href = nameLink.getAttribute('href') || '';
       const m    = href.match(idRe);
       if (!m) continue;
 
-      const pid    = m[1];
-      const name   = (link.title || link.textContent).trim();
+      const pid  = m[1];
+      const name = (nameLink.title || nameLink.textContent).trim();
       if (!name || name.length < 2) continue;
 
-      const tds    = [...row.querySelectorAll('td')];
-      const pos    = tds[2]?.textContent.trim() || '';
-      const age    = tds[3]?.textContent.trim() || '';
-      const natImg = tds[4]?.querySelector('img');
-      const nat    = natImg?.title || natImg?.alt || '';
-      // Club puede estar en distintas columnas según la versión de TM
-      let club = '';
-      for (let i = 5; i < tds.length - 1; i++) {
-        const t = tds[i]?.textContent.trim();
-        if (t && t.length > 1 && !/^[\d,. ]+$/.test(t)) { club = t; break; }
-      }
-      const mvText = tds[tds.length - 1]?.textContent.trim() || '';
-      const mvNum  = parseTMMV(mvText);
+      // Columnas reales de TM (verificadas contra HTML real):
+      // td[3] = club, td[4] = posición abrev, td[6] = edad, td[7] = bandera, td[8] = VM
+      const club    = tds[3]?.textContent.trim() || '';
+      const pos     = tds[4]?.textContent.trim() || '';
+      const age     = tds[6]?.textContent.trim() || '';
+      const natImg  = tds[7]?.querySelector('img');
+      const nat     = natImg?.title || natImg?.alt || '';
+      // VM: buscar td con class rechts hauptlink o el antepenúltimo
+      const mvCell  = tds.find(td => td.classList.contains('rechts') && td.classList.contains('hauptlink'))
+                   || tds[tds.length - 2];
+      const mvText  = mvCell?.textContent.trim() || '';
+      const mvNum   = parseTMMV(mvText);
 
       players.push({
-        id: pid, name, position: pos, age, nationality: nat, club,
-        mv_display: mvNum ? mvText.replace('\n','').trim() : '—',
+        id: pid, name,
+        position: pos,
+        age,
+        nationality: nat,
+        club,
+        mv_display: mvNum ? mvText.replace(/\s+/g,' ').trim() : '—',
         market_value: mvNum,
         profile_url: `${TM_BASE}${href}`,
       });
