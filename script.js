@@ -1794,28 +1794,94 @@ async function executeSearch(query, type) {
   }
 }
 
+/* ── Transfermarkt directo desde el navegador (sin proxy local) ── */
+const TM_BASE = 'https://www.transfermarkt.com';
+// Probamos varios CORS proxies públicos como fallback
+const CORS_PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+];
+
+async function tmFetch(url) {
+  for (const proxy of CORS_PROXIES) {
+    try {
+      const r = await fetch(proxy(url), { signal: AbortSignal.timeout(9000) });
+      if (r.ok) return r;
+    } catch { /* probar siguiente */ }
+  }
+  throw new Error('No se pudo conectar con Transfermarkt');
+}
+
+async function tmSearchPlayers(query) {
+  const url = `${TM_BASE}/schnellsuche/ergebnis/schnellsuche?query=${encodeURIComponent(query)}&Spieler_page=0`;
+  const r   = await tmFetch(url);
+  const html = await r.text();
+  return parseTMSearchHTML(html);
+}
+
+async function tmPlayerValue(spielerId) {
+  const url = `${TM_BASE}/ceapi/marketValueDevelopment/graph/${spielerId}`;
+  const r   = await tmFetch(url);
+  const data = await r.json();
+  const list = data.list || [];
+  return list.length ? list[list.length - 1] : null;
+}
+
+function parseTMSearchHTML(html) {
+  const doc     = new DOMParser().parseFromString(html, 'text/html');
+  const players = [];
+  const idRe    = /\/spieler\/(\d+)/;
+
+  for (const table of doc.querySelectorAll('table.items')) {
+    for (const row of table.querySelectorAll('tbody tr')) {
+      const link = row.querySelector('a[href*="/spieler/"]');
+      if (!link) continue;
+      const href = link.getAttribute('href') || '';
+      const m    = href.match(idRe);
+      if (!m) continue;
+
+      const pid    = m[1];
+      const name   = (link.title || link.textContent).trim();
+      if (!name || name.length < 2) continue;
+
+      const tds    = [...row.querySelectorAll('td')];
+      const pos    = tds[2]?.textContent.trim() || '';
+      const age    = tds[3]?.textContent.trim() || '';
+      const natImg = tds[4]?.querySelector('img');
+      const nat    = natImg?.title || natImg?.alt || '';
+      // Club puede estar en distintas columnas según la versión de TM
+      let club = '';
+      for (let i = 5; i < tds.length - 1; i++) {
+        const t = tds[i]?.textContent.trim();
+        if (t && t.length > 1 && !/^[\d,. ]+$/.test(t)) { club = t; break; }
+      }
+      const mvText = tds[tds.length - 1]?.textContent.trim() || '';
+      const mvNum  = parseTMMV(mvText);
+
+      players.push({
+        id: pid, name, position: pos, age, nationality: nat, club,
+        mv_display: mvNum ? mvText.replace('\n','').trim() : '—',
+        market_value: mvNum,
+        profile_url: `${TM_BASE}${href}`,
+      });
+      if (players.length >= 8) break;
+    }
+    if (players.length) break;
+  }
+  return players;
+}
+
+function parseTMMV(text) {
+  const m = text.replace(/\s/g,'').match(/([\d,.]+)(Mio\.|k)€/i);
+  if (!m) return null;
+  const n = parseFloat(m[1].replace(/\./g,'').replace(',','.'));
+  return m[2].toLowerCase().includes('mio') ? Math.round(n * 1e6) : Math.round(n * 1e3);
+}
+
 async function searchWithTM(query, container) {
-  // Primero comprueba si el proxy está activo
-  let proxyUp = _proxyOk;
-  if (!proxyUp) {
-    proxyUp = await checkProxy();
-  }
+  const tmBadge = `<span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);
+    padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;margin-left:6px">🌐 Transfermarkt</span>`;
 
-  if (!proxyUp) {
-    container.innerHTML = noResults(query) +
-      `<div class="no-results" style="margin-top:8px;border-color:var(--primary)">
-        <p style="color:var(--primary-dark)">
-          🌐 <strong>¿Buscas fuera de la Segunda División?</strong><br>
-          <span style="font-size:0.82rem;color:var(--text-muted)">
-            Ejecuta <code style="background:var(--bg);padding:2px 6px;border-radius:4px">python3 scoutgpt_proxy.py</code>
-            para buscar cualquier jugador en Transfermarkt en tiempo real.
-          </span>
-        </p>
-      </div>`;
-    return;
-  }
-
-  // Proxy activo → buscar en TM con loading
   container.innerHTML = `
     <div class="no-results">
       <p style="color:var(--text-muted)">
@@ -1827,26 +1893,21 @@ async function searchWithTM(query, container) {
     </div>`;
 
   try {
-    const r   = await fetch(`${PROXY_URL}/search/player?q=${encodeURIComponent(query)}`);
-    const d   = await r.json();
-    const tmBadge = `<span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);
-      padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700">🌐 Transfermarkt</span>`;
-
-    if (!d.players || !d.players.length) {
-      container.innerHTML = `<div class="no-results"><p>Sin resultados para "<strong>${query}</strong>" ni en el dataset ni en Transfermarkt.</p></div>`;
+    const players = await tmSearchPlayers(query);
+    if (!players.length) {
+      container.innerHTML = `<div class="no-results"><p>Sin resultados para "<strong>${query}</strong>".</p></div>`;
       return;
     }
-
-    const cards = d.players.map(p => buildTMPlayerCard(p)).join('');
     container.innerHTML = `
       <div class="result-header-bar">
         <span class="result-type-tag player-tag">👤 Jugadores</span>
         ${tmBadge}
-        <span class="result-count">${d.players.length} resultado${d.players.length !== 1 ? 's' : ''}</span>
+        <span class="result-count">${players.length} resultado${players.length !== 1 ? 's' : ''}</span>
       </div>
-      ${cards}`;
+      ${players.map(buildTMPlayerCard).join('')}`;
   } catch (e) {
-    container.innerHTML = noResults(query);
+    container.innerHTML = `<div class="no-results"><p>No se pudo conectar con Transfermarkt.<br>
+      <span style="font-size:0.8rem;color:var(--text-muted)">${e.message}</span></p></div>`;
   }
 }
 
@@ -2203,17 +2264,7 @@ function noResults(query) {
    SCOUTGPT — Motor de consultas en lenguaje natural
    ============================================================ */
 
-const PROXY_URL = 'http://localhost:5050';
-let _sgptReady  = false;
-let _proxyOk    = false;
-
-async function checkProxy() {
-  try {
-    const r = await fetch(`${PROXY_URL}/status`, { signal: AbortSignal.timeout(1500) });
-    _proxyOk = r.ok;
-  } catch { _proxyOk = false; }
-  return _proxyOk;
-}
+let _sgptReady = false;
 
 function renderScoutGPTTab() {
   if (_sgptReady) return;
@@ -2228,40 +2279,26 @@ function renderScoutGPTTab() {
     input.value = '';
     addSgptMessage('user', q);
 
-    const isLive = isLiveQuery(q);
-    if (isLive && _proxyOk) {
+    if (isLiveQuery(q)) {
       addSgptTyping();
       const html = await processLiveQuery(q);
       removeTyping();
       addSgptMessage('bot', html);
     } else {
-      setTimeout(() => {
-        const resp = processScoutQuery(q);
-        addSgptMessage('bot', resp);
-      }, 280);
+      setTimeout(() => addSgptMessage('bot', processScoutQuery(q)), 280);
     }
   };
 
   btn.addEventListener('click', send);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
-
   document.querySelectorAll('.sgpt-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      input.value = chip.textContent.trim();
-      send();
-    });
+    chip.addEventListener('click', () => { input.value = chip.textContent.trim(); send(); });
   });
 
-  // Comprobar proxy en background y mostrar bienvenida
-  checkProxy().then(ok => {
-    const proxyNote = ok
-      ? `<span style="color:var(--success);font-weight:600">🌐 Proxy activo</span> — puedo buscar cualquier jugador en Transfermarkt en tiempo real.`
-      : `<span class="muted">💡 Tip: ejecuta <code>python3 scoutgpt_proxy.py</code> para buscar en Transfermarkt en tiempo real.</span>`;
-    addSgptMessage('bot', `
-      <strong>Hola, soy ScoutGPT 👋</strong><br>
-      Respondo preguntas sobre Segunda División 2021-2026 usando los datos del proyecto.<br>
-      ${proxyNote}`);
-  });
+  addSgptMessage('bot', `
+    <strong>Hola, soy ScoutGPT 👋</strong><br>
+    Respondo preguntas sobre Segunda División 2021-2026.<br>
+    <span class="muted">También puedo buscar <strong>cualquier jugador del mundo</strong> en Transfermarkt en tiempo real. 🌐</span>`);
 }
 
 /* --- Typing indicator helpers --- */
@@ -2293,39 +2330,37 @@ function isLiveQuery(raw) {
   return false;
 }
 
-/* --- Live query handler (calls proxy) --- */
+/* --- Live query handler (usa CORS proxy, sin instalación) --- */
 async function processLiveQuery(raw) {
-  const q   = norm(raw);
   const badge = `<span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);
-    padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;margin-left:6px">
-    🌐 Transfermarkt</span>`;
+    padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;margin-left:6px">🌐 Transfermarkt</span>`;
 
   try {
-    // 1. Detectar si pide valor de un jugador ya en nuestro dataset por ID
-    const idMatch = matchLocalPlayerForProxy(raw);
+    // Si tenemos el ID del jugador en nuestro dataset → buscar valor actual directo
+    const idMatch = matchLocalPlayerById(raw);
     if (idMatch) {
-      const r = await fetch(`${PROXY_URL}/player/${idMatch.id}/value`);
-      const d = await r.json();
-      if (d.market_value) {
+      const last = await tmPlayerValue(idMatch.id);
+      if (last) {
         return `<strong>${idMatch.name}</strong>${badge}<br>
-          Valor actual: <span style="color:var(--success);font-weight:800;font-size:1.1rem">${fmtMv(d.market_value)}</span><br>
-          Club: ${d.club || '—'} · Actualizado: ${d.date || '—'}`;
+          Valor actual: <span style="color:var(--success);font-weight:800;font-size:1.1rem">${fmtMv(last.y)}</span><br>
+          Club: ${last.verein || '—'} · ${last.datum_mw || ''}`;
       }
     }
 
-    // 2. Búsqueda libre en TM
-    const searchTerm = extractSearchTerm(raw);
-    const r2 = await fetch(`${PROXY_URL}/search/player?q=${encodeURIComponent(searchTerm)}`);
-    const d2 = await r2.json();
+    // Búsqueda libre por nombre
+    const term    = extractSearchTerm(raw);
+    const players = await tmSearchPlayers(term);
 
-    if (!d2.players || !d2.players.length) {
-      return `No se encontraron resultados en Transfermarkt para "<strong>${searchTerm}</strong>".${badge}`;
+    if (!players.length) {
+      return `Sin resultados en Transfermarkt para "<strong>${term}</strong>".${badge}<br>
+        <span class="muted">Intenta con el nombre completo o en inglés.</span>`;
     }
 
-    const rows = d2.players.map((p, i) => `
+    const rows = players.map((p, i) => `
       <tr>
         <td>${i + 1}</td>
-        <td class="bold">${p.name}</td>
+        <td class="bold"><a href="${p.profile_url}" target="_blank"
+          style="color:var(--primary);text-decoration:none">${p.name} ↗</a></td>
         <td class="muted">${p.position || '—'}</td>
         <td class="muted">${p.age || '—'}</td>
         <td class="muted">${p.nationality || '—'}</td>
@@ -2333,32 +2368,28 @@ async function processLiveQuery(raw) {
         <td class="green">${p.mv_display || '—'}</td>
       </tr>`).join('');
 
-    return `Resultados en Transfermarkt para "<strong>${searchTerm}</strong>"${badge}<br>
+    return `Resultados para "<strong>${term}</strong>"${badge}<br>
       <table>
-        <thead><tr><th>#</th><th>Jugador</th><th>Posición</th><th>Edad</th><th>Nac.</th><th>Club actual</th><th>VM</th></tr></thead>
+        <thead><tr><th>#</th><th>Jugador</th><th>Posición</th><th>Edad</th><th>Nac.</th><th>Club</th><th>VM</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
 
   } catch (e) {
-    _proxyOk = false;
-    return `No se pudo conectar con el proxy (${e.message}). Asegúrate de que <code>python3 scoutgpt_proxy.py</code> está corriendo.<br>
-      <span class="muted">Respondiendo con datos locales…</span><br><br>` + processScoutQuery(raw);
+    return processScoutQuery(raw) +
+      `<br><span class="muted" style="font-size:0.78rem">⚠ Sin conexión a Transfermarkt: ${e.message}</span>`;
   }
 }
 
-function matchLocalPlayerForProxy(raw) {
-  if (typeof Papa === 'undefined') return null;
-  // Buscar en jugador_ids si está cargado
-  if (window._jugadorIds) {
-    const q = norm(raw);
-    const match = window._jugadorIds.find(r => norm(r.jugador).split(' ').some(w => w.length > 3 && q.includes(w)));
-    return match ? { id: match.spieler_id, name: match.jugador } : null;
-  }
-  return null;
+function matchLocalPlayerById(raw) {
+  if (!window._jugadorIds) return null;
+  const q = norm(raw);
+  const m = window._jugadorIds.find(r =>
+    norm(r.jugador).split(' ').some(w => w.length > 3 && q.includes(w))
+  );
+  return m ? { id: m.spieler_id, name: m.jugador } : null;
 }
 
 function extractSearchTerm(raw) {
-  // Quita stopwords de pregunta para quedarse con el nombre/término
   return raw
     .replace(/busca|encuentra|dime|cuánto vale|cuanto vale|valor de mercado de|quién es|quien es|información de|datos de/gi, '')
     .replace(/en transfermarkt|tiempo real|valor actual|ahora/gi, '')
