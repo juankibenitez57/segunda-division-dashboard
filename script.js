@@ -1939,14 +1939,20 @@ async function searchWithTM(query, container) {
   }
 }
 
+/* Función global de fallback para errores de foto — NO inline para evitar bugs de escape */
+window._tmPhotoError = function(el, name, size) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = playerAvatar(name, size);
+  el.replaceWith(tmp.firstElementChild || tmp);
+};
+
 function playerPhoto(name, photoUrl, size = 60) {
-  if (photoUrl) {
-    return `<img src="${photoUrl}" alt="${name}"
-      style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;
-             border:2px solid var(--border);flex-shrink:0;background:var(--bg)"
-      onerror="this.replaceWith(Object.assign(document.createElement('div'), {innerHTML: '${playerAvatar(name, size).replace(/'/g, "\\'")}'.replace(/onerror[^>]*/g,'')}))">`;
-  }
-  return playerAvatar(name, size);
+  if (!photoUrl) return playerAvatar(name, size);
+  const safeName = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  return `<img src="${photoUrl}" alt="${name}"
+    style="width:${size}px;height:${size}px;border-radius:10px;object-fit:cover;
+           object-position:top;border:2px solid var(--border);flex-shrink:0;background:var(--bg)"
+    onerror="_tmPhotoError(this,'${safeName}',${size})">`;
 }
 
 async function playerPhotoFromProxy(name, spielerId, size = 60) {
@@ -1959,6 +1965,47 @@ async function playerPhotoFromProxy(name, spielerId, size = 60) {
     }
   } catch { /* fallback */ }
   return playerAvatar(name, size);
+}
+
+/* Carga stats de temporada del jugador desde el proxy */
+async function loadPlayerStats(spielerId, containerId) {
+  if (!spielerId) return;
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  try {
+    const r = await fetch(`${RENDER_PROXY}/player-stats/${spielerId}`, { signal: AbortSignal.timeout(12000) });
+    if (!r.ok) return;
+    const d = await r.json();
+    if (!d.stats || !d.stats.length) return;
+
+    const rows = d.stats.map(s => `
+      <tr>
+        <td>${s.season}</td>
+        <td>${s.competition || '—'}</td>
+        <td>${s.club || '—'}</td>
+        <td style="text-align:center">${s.appearances ?? '—'}</td>
+        <td style="text-align:center;font-weight:700;color:var(--primary)">${s.goals ?? '—'}</td>
+        <td style="text-align:center;color:var(--success)">${s.assists ?? '—'}</td>
+        <td style="text-align:center">${s.minutes ? s.minutes+"'" : '—'}</td>
+        <td style="text-align:center">${s.yellow > 0 ? `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem">${s.yellow}</span>` : '—'}</td>
+        <td style="text-align:center">${s.red > 0 ? `<span style="background:var(--danger);color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem">${s.red}</span>` : '—'}</td>
+      </tr>`).join('');
+
+    el.innerHTML = `
+      <div class="ppc-section-title" style="margin-bottom:10px">📊 Estadísticas por temporada</div>
+      <table class="ppc-table">
+        <thead><tr>
+          <th>Temp.</th><th>Competición</th><th>Club</th>
+          <th style="text-align:center">PJ</th>
+          <th style="text-align:center">⚽</th>
+          <th style="text-align:center">🅰</th>
+          <th style="text-align:center">Min</th>
+          <th style="text-align:center">🟨</th>
+          <th style="text-align:center">🟥</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  } catch { /* sin stats */ }
 }
 
 function buildTMPlayerCard(p) {
@@ -2067,25 +2114,29 @@ function buildPlayerCard(name) {
       </div>`;
   }
 
-  // Buscar spieler_id del jugador para cargar foto
-  const idEntry  = window._jugadorIds?.find(r => r.jugador === name);
+  // IDs únicos para foto y stats
+  const idEntry   = window._jugadorIds?.find(r => r.jugador === name);
   const spielerId = idEntry?.spieler_id || null;
-  const photoId  = `photo-${name.replace(/\s+/g,'_')}`;
+  const uid       = name.replace(/[^a-zA-Z0-9]/g,'_');
+  const photoId   = `photo_${uid}`;
+  const statsId   = `stats_${uid}`;
 
-  // Foto: inicialmente avatar, se sustituye en background si hay ID
-  if (spielerId) {
-    setTimeout(async () => {
+  // Carga foto y stats en background
+  setTimeout(async () => {
+    if (spielerId) {
       const el = document.getElementById(photoId);
-      if (!el) return;
-      const html = await playerPhotoFromProxy(name, spielerId, 60);
-      el.outerHTML = html;
-    }, 0);
-  }
+      if (el) {
+        const html = await playerPhotoFromProxy(name, spielerId, 72);
+        el.outerHTML = html;
+      }
+      loadPlayerStats(spielerId, statsId);
+    }
+  }, 0);
 
   return `
     <div class="player-profile-card">
       <div class="ppc-header">
-        <div id="${photoId}">${playerAvatar(name, 60)}</div>
+        <div id="${photoId}">${playerAvatar(name, 72)}</div>
         <div class="ppc-header-info">
           <h3 class="ppc-name">${name}</h3>
           <div class="ppc-badges">
@@ -2100,6 +2151,7 @@ function buildPlayerCard(name) {
         </div>
       </div>
       ${opsHTML}${revHTML}
+      <div class="ppc-section" id="${statsId}" style="min-height:20px"></div>
     </div>`;
 }
 

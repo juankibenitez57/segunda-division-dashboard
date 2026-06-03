@@ -294,6 +294,85 @@ def player_photo_url(pid: str):
     return jsonify({"url": None}), 404
 
 
+@app.route("/player-stats/<pid>")
+def player_stats(pid: str):
+    """
+    Devuelve estadísticas por temporada de un jugador.
+    Scrape de https://www.transfermarkt.com/x/leistungsdaten/spieler/{id}/plus/1
+    """
+    url  = f"{BASE_TM}/x/leistungsdaten/spieler/{pid}/plus/1"
+    soup = _fetch_html(url)
+    if not soup:
+        return jsonify({"stats": []}), 503
+
+    stats = []
+    for table in soup.find_all("table", {"class": "items"}):
+        for row in table.find_all("tr", class_=["odd", "even"]):
+            cells = row.find_all("td")
+            if len(cells) < 7:
+                continue
+
+            # Temporada (primera celda con formato YYYY/YY)
+            season_text = cells[0].get_text(strip=True)
+            if not re.match(r"\d{4}/\d{2}", season_text):
+                continue
+
+            # Competición
+            comp_img = cells[1].find("img")
+            competition = comp_img.get("title", "") if comp_img else cells[1].get_text(strip=True)
+
+            # Club (buscar celda con link a club)
+            club = ""
+            for c in cells[2:5]:
+                a = c.find("a")
+                if a and a.get_text(strip=True):
+                    club = a.get_text(strip=True)
+                    break
+
+            def safe_int(cell_idx):
+                try:
+                    t = cells[cell_idx].get_text(strip=True).replace(".", "").replace("-", "0")
+                    return int(t) if t.isdigit() else None
+                except (IndexError, ValueError):
+                    return None
+
+            # Columnas típicas de TM leistungsdaten:
+            # [4]=apariciones [5]=desde_el_banco [6]=goles [7]=asistencias [8]=...
+            # [9 o 10]=amarillas [10 o 11]=amarilla-roja [11 o 12]=rojas [13]=minutos
+            apps    = safe_int(4)
+            goals   = safe_int(6)
+            assists = safe_int(7)
+
+            # Minutos: última celda numérica con "'" o gran número
+            minutes = None
+            for c in reversed(cells):
+                t = c.get_text(strip=True).replace("'", "").replace(".", "").replace(" ", "")
+                if t.isdigit() and int(t) > 100:
+                    minutes = int(t)
+                    break
+
+            # Tarjetas: buscar celdas con colores o texto numérico en posiciones correctas
+            yellow = safe_int(9) if len(cells) > 9 else None
+            red    = safe_int(11) if len(cells) > 11 else None
+
+            if apps is None:
+                continue
+
+            stats.append({
+                "season":      season_text,
+                "competition": competition,
+                "club":        club,
+                "appearances": apps,
+                "goals":       goals,
+                "assists":     assists,
+                "minutes":     minutes,
+                "yellow":      yellow or 0,
+                "red":         red or 0,
+            })
+
+    return jsonify({"stats": stats})
+
+
 @app.route("/tm")
 def tm_relay():
     """
