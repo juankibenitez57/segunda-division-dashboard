@@ -202,12 +202,25 @@ function seasonsBetween(from, to) {
 }
 
 function isExternoMain(d) {
-  const pais   = (d.pais_club   || '').trim();
-  const origen = (d.club_origen || '').trim();
+  const pais   = (d.pais_club      || '').trim();
+  const origen = (d.club_origen    || '').trim();
+  const dest   = (d.club_destino   || '').trim();
+  const tipo   = (d.tipo_operacion || '').trim();
+
+  // Procedente de o hacia liga extranjera mayor
   if (LIGAS_MAYORES_EXT.has(pais)) return true;
-  if (pais === 'Spain' && origen && !CLUB_IDS_SET.has(origen) && (d._vm || 0) > 1000000) return true;
+
+  // Alta desde club español de Primera (no aparece en Segunda)
+  if (d.movimiento === 'alta' && pais === 'Spain' && origen && !CLUB_IDS_SET.has(origen) && (d._vm || 0) > 1000000) return true;
+
+  // Retorno de cesión a club español que no es de Segunda = vuelve a Primera
+  // (ej: Bryan Gil devuelto a Sevilla FC tras cesión en Eibar)
+  if (tipo === 'retorno de cesión' && pais === 'Spain' && dest && !CLUB_IDS_SET.has(dest)) return true;
+
+  // Club del jugador estuvo en Primera esa temporada
   const clubPrim = CLUBS_PRIMERA_SEASONS[d.club];
   if (clubPrim && clubPrim.has(d.temporada)) return true;
+
   return false;
 }
 
