@@ -1949,9 +1949,12 @@ window._tmPhotoError = function(el, name, size) {
 function playerPhoto(name, photoUrl, size = 60) {
   if (!photoUrl) return playerAvatar(name, size);
   const safeName = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  // Proporción retrato TM (3:4) → más foto visible, menos zoom
+  const w = size, h = Math.round(size * 1.33);
   return `<img src="${photoUrl}" alt="${name}"
-    style="width:${size}px;height:${size}px;border-radius:10px;object-fit:cover;
-           object-position:top;border:2px solid var(--border);flex-shrink:0;background:var(--bg)"
+    style="width:${w}px;height:${h}px;border-radius:10px;object-fit:cover;
+           object-position:center top;border:2px solid var(--border);
+           flex-shrink:0;background:var(--bg-2)"
     onerror="_tmPhotoError(this,'${safeName}',${size})">`;
 }
 
@@ -1967,45 +1970,44 @@ async function playerPhotoFromProxy(name, spielerId, size = 60) {
   return playerAvatar(name, size);
 }
 
-/* Carga stats de temporada del jugador desde el proxy */
-async function loadPlayerStats(spielerId, containerId) {
+/* Carga evolución del valor de mercado desde TM JSON endpoint */
+async function loadPlayerMVHistory(spielerId, containerId) {
   if (!spielerId) return;
   const el = document.getElementById(containerId);
   if (!el) return;
   try {
-    const r = await fetch(`${RENDER_PROXY}/player-stats/${spielerId}`, { signal: AbortSignal.timeout(12000) });
-    if (!r.ok) return;
-    const d = await r.json();
-    if (!d.stats || !d.stats.length) return;
+    const url  = `${TM_BASE}/ceapi/marketValueDevelopment/graph/${spielerId}`;
+    const resp = await tmFetch(url);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const list = (data.list || []).filter(e => e.y);
+    if (!list.length) return;
 
-    const rows = d.stats.map(s => `
-      <tr>
-        <td>${s.season}</td>
-        <td>${s.competition || '—'}</td>
-        <td>${s.club || '—'}</td>
-        <td style="text-align:center">${s.appearances ?? '—'}</td>
-        <td style="text-align:center;font-weight:700;color:var(--primary)">${s.goals ?? '—'}</td>
-        <td style="text-align:center;color:var(--success)">${s.assists ?? '—'}</td>
-        <td style="text-align:center">${s.minutes ? s.minutes+"'" : '—'}</td>
-        <td style="text-align:center">${s.yellow > 0 ? `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem">${s.yellow}</span>` : '—'}</td>
-        <td style="text-align:center">${s.red > 0 ? `<span style="background:var(--danger);color:#fff;padding:1px 6px;border-radius:3px;font-size:0.7rem">${s.red}</span>` : '—'}</td>
-      </tr>`).join('');
+    // Agrupar por año para mostrar resumen compacto
+    const maxVal = Math.max(...list.map(e => e.y));
+    const rows = list.map(e => {
+      const pct  = Math.round((e.y / maxVal) * 100);
+      const fmt  = e.y >= 1e6 ? `€${(e.y/1e6).toFixed(2).replace('.00','')}M` : `€${(e.y/1e3).toFixed(0)}k`;
+      const color = e.y === maxVal ? 'var(--success)' : 'var(--text)';
+      return `<tr>
+        <td style="color:var(--text-muted);font-size:0.78rem">${e.datum_mw}</td>
+        <td style="font-size:0.8rem">${e.verein || '—'}</td>
+        <td style="font-weight:700;color:${color};text-align:right">${fmt}</td>
+        <td style="width:100px;padding-left:8px">
+          <div style="background:var(--border);border-radius:3px;height:6px">
+            <div style="width:${pct}%;height:100%;background:${e.y===maxVal?'var(--success)':'var(--primary)'};border-radius:3px"></div>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
 
     el.innerHTML = `
-      <div class="ppc-section-title" style="margin-bottom:10px">📊 Estadísticas por temporada</div>
-      <table class="ppc-table">
-        <thead><tr>
-          <th>Temp.</th><th>Competición</th><th>Club</th>
-          <th style="text-align:center">PJ</th>
-          <th style="text-align:center">⚽</th>
-          <th style="text-align:center">🅰</th>
-          <th style="text-align:center">Min</th>
-          <th style="text-align:center">🟨</th>
-          <th style="text-align:center">🟥</th>
-        </tr></thead>
+      <div class="ppc-section-title" style="margin-bottom:10px">📈 Evolución del valor de mercado <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem">— Transfermarkt</span></div>
+      <table class="ppc-table" style="font-size:0.8rem">
+        <thead><tr><th>Fecha</th><th>Club</th><th style="text-align:right">Valor</th><th></th></tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
-  } catch { /* sin stats */ }
+  } catch { /* sin datos */ }
 }
 
 function buildTMPlayerCard(p) {
@@ -2121,15 +2123,15 @@ function buildPlayerCard(name) {
   const photoId   = `photo_${uid}`;
   const statsId   = `stats_${uid}`;
 
-  // Carga foto y stats en background
+  // Carga foto y evolución de VM en background
   setTimeout(async () => {
     if (spielerId) {
       const el = document.getElementById(photoId);
       if (el) {
-        const html = await playerPhotoFromProxy(name, spielerId, 72);
+        const html = await playerPhotoFromProxy(name, spielerId, 75);
         el.outerHTML = html;
       }
-      loadPlayerStats(spielerId, statsId);
+      loadPlayerMVHistory(spielerId, statsId);
     }
   }, 0);
 
