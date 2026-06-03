@@ -21,7 +21,8 @@ from bs4 import BeautifulSoup
 from flask import Flask, jsonify, request
 
 # ── Config ────────────────────────────────────────────────────────────────────
-PORT    = 5050
+import os
+PORT    = int(os.environ.get("PORT", 5050))
 BASE_TM = "https://www.transfermarkt.com"
 
 logging.basicConfig(
@@ -252,7 +253,44 @@ def parse_player_profile(soup: BeautifulSoup, pid: str) -> dict:
 
 @app.route("/status")
 def status():
-    return jsonify({"ok": True, "source": "transfermarkt", "version": "1.0"})
+    return jsonify({"ok": True, "source": "transfermarkt", "version": "1.1"})
+
+
+@app.route("/tm")
+def tm_relay():
+    """
+    Relay genérico: recibe ?url=https://www.transfermarkt.com/...
+    y devuelve la respuesta tal cual. Usado por el frontend para
+    evitar bloqueos CORS sin depender de proxies públicos.
+    """
+    url = request.args.get("url", "")
+    if not url or not url.startswith("https://www.transfermarkt.com"):
+        return jsonify({"error": "URL no permitida"}), 400
+
+    accept = request.headers.get("Accept", "text/html")
+    is_json = "json" in accept or "javascript" in accept
+
+    global _last_request_time
+    elapsed = time.time() - _last_request_time
+    if elapsed < 1.5:
+        time.sleep(1.5 - elapsed)
+
+    try:
+        headers = {}
+        if is_json:
+            headers = {
+                "Accept": "application/json, text/javascript, */*; q=0.01",
+                "X-Requested-With": "XMLHttpRequest",
+            }
+        resp = _session.get(url, headers=headers, timeout=15)
+        _last_request_time = time.time()
+        resp.raise_for_status()
+
+        content_type = resp.headers.get("Content-Type", "text/html")
+        return resp.content, resp.status_code, {"Content-Type": content_type}
+    except Exception as e:
+        logger.error(f"Relay error {url}: {e}")
+        return jsonify({"error": str(e)}), 503
 
 
 @app.route("/search/player")
@@ -337,6 +375,5 @@ if __name__ == "__main__":
     print("=" * 52)
     print("  ScoutGPT Proxy — Transfermarkt")
     print(f"  Escuchando en http://localhost:{PORT}")
-    print("  Mantén esta ventana abierta mientras usas el dashboard")
     print("=" * 52)
     app.run(host="0.0.0.0", port=PORT, debug=False)

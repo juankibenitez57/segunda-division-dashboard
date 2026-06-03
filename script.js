@@ -1794,16 +1794,27 @@ async function executeSearch(query, type) {
   }
 }
 
-/* ── Transfermarkt directo desde el navegador (sin proxy local) ── */
+/* ── Transfermarkt — proxy propio en Render + fallbacks CORS ── */
 const TM_BASE = 'https://www.transfermarkt.com';
-// Probamos varios CORS proxies públicos como fallback
-const CORS_PROXIES = [
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-];
+
+// URL del proxy desplegado en Render (funciona para todos los usuarios)
+// Cuando tengas la URL de Render, actualiza esta constante:
+const RENDER_PROXY = 'https://betis-scoutgpt-proxy.onrender.com';
 
 async function tmFetch(url) {
-  for (const proxy of CORS_PROXIES) {
+  // 1. Intentar con el proxy propio de Render (más fiable, sin bloqueos)
+  try {
+    const endpoint = `${RENDER_PROXY}/tm?url=${encodeURIComponent(url)}`;
+    const r = await fetch(endpoint, { signal: AbortSignal.timeout(12000) });
+    if (r.ok) return r;
+  } catch { /* continuar con fallbacks */ }
+
+  // 2. Fallbacks CORS públicos
+  const proxies = [
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  ];
+  for (const proxy of proxies) {
     try {
       const r = await fetch(proxy(url), { signal: AbortSignal.timeout(9000) });
       if (r.ok) return r;
