@@ -379,6 +379,8 @@ function renderCurrentTab() {
     case 'tab-revalorizacion': if (!chartsRendered['tab-revalorizacion']) { renderRevalorizacionTab(); chartsRendered['tab-revalorizacion'] = true; } break;
     case 'tab-temporadas':   renderTemporadasTab(); break;
     case 'tab-sub23':        renderSub23Tab(); break;
+    case 'tab-buscador':     if (!chartsRendered['tab-buscador']) { renderBuscadorTab(); chartsRendered['tab-buscador'] = true; } break;
+    case 'tab-scoutgpt':     if (!chartsRendered['tab-scoutgpt']) { renderScoutGPTTab(); chartsRendered['tab-scoutgpt'] = true; } break;
     case 'tab-bbdd':         if (!chartsRendered['tab-bbdd']) { renderBBDDTab(); chartsRendered['tab-bbdd'] = true; } break;
   }
 }
@@ -1722,6 +1724,759 @@ function renderSub23Tab() {
         </tbody>
       </table>`;
   }
+}
+
+/* ============================================================
+   BUSCADOR INTELIGENTE
+   ============================================================ */
+
+let _buscadorType = 'auto';
+let _buscadorReady = false;
+
+function renderBuscadorTab() {
+  if (_buscadorReady) return;
+  _buscadorReady = true;
+
+  const input = document.getElementById('buscador-input');
+  const btn   = document.getElementById('buscador-btn');
+
+  btn.addEventListener('click', () => {
+    const q = input.value.trim();
+    if (q) executeSearch(q, _buscadorType);
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const q = input.value.trim();
+      if (q) executeSearch(q, _buscadorType);
+    }
+  });
+
+  document.querySelectorAll('.search-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.search-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      _buscadorType = pill.dataset.type;
+    });
+  });
+
+  document.querySelectorAll('.suggestion-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      input.value = chip.dataset.query;
+      executeSearch(chip.dataset.query, 'auto');
+    });
+  });
+}
+
+function norm(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+}
+
+function executeSearch(query, type) {
+  const results = document.getElementById('buscador-results');
+  const t = type === 'auto' ? detectSearchType(query) : type;
+  switch (t) {
+    case 'jugador':      results.innerHTML = searchPlayer(query); break;
+    case 'club':         results.innerHTML = searchClub(query); break;
+    case 'temporada':    results.innerHTML = searchSeason(query); break;
+    case 'posicion':     results.innerHTML = searchPosition(query); break;
+    case 'nacionalidad': results.innerHTML = searchNationality(query); break;
+    default:             results.innerHTML = searchPlayer(query);
+  }
+}
+
+function detectSearchType(query) {
+  const q = norm(query);
+  if (/^\d{4}-\d{2}$/.test(query.trim())) return 'temporada';
+  const clubs = [...new Set(ALL_DATA.map(d => d.club))].filter(Boolean);
+  if (clubs.some(c => norm(c).includes(q) || q.includes(norm(c)))) return 'club';
+  const posES = Object.values(POS_ES).map(norm);
+  const posEN = Object.keys(POS_ES).map(norm);
+  if (posES.some(p => p.includes(q) || q.includes(p)) || posEN.some(p => p.includes(q))) return 'posicion';
+  const nacs = [...new Set(ALL_DATA.map(d => d.nacionalidad))].filter(Boolean);
+  if (nacs.some(n => norm(n).includes(q))) return 'nacionalidad';
+  return 'jugador';
+}
+
+/* --- PLAYER SEARCH --- */
+function searchPlayer(query) {
+  const q = norm(query);
+  const players = [...new Set(ALL_DATA.map(d => d.jugador))].filter(Boolean);
+  const matches = players.filter(p => norm(p).includes(q));
+  if (!matches.length) return noResults(query);
+  const shown = matches.slice(0, 6);
+  return `
+    <div class="result-header-bar">
+      <span class="result-type-tag player-tag">👤 Jugadores</span>
+      <span class="result-count">${matches.length} resultado${matches.length !== 1 ? 's' : ''}</span>
+    </div>
+    ${shown.map(buildPlayerCard).join('')}
+    ${matches.length > 6 ? `<p class="more-results">… y ${matches.length - 6} más. Afina la búsqueda.</p>` : ''}`;
+}
+
+function buildPlayerCard(name) {
+  const ops = ALL_DATA.filter(d => d.jugador === name);
+  if (!ops.length) return '';
+  const ord = ['2021-22','2022-23','2023-24','2024-25','2025-26'];
+  const latest = [...ops].sort((a,b) => ord.indexOf(b.temporada) - ord.indexOf(a.temporada))[0];
+  const pos  = tPos(latest.posicion || '');
+  const nac  = latest.nacionalidad || '—';
+  const age  = latest.edad || '—';
+  const vm   = latest._vm ? formatM(latest._vm) : '—';
+  const clubs = [...new Set(ops.map(d => d.club))];
+  const opsSorted = [...ops].sort((a,b) => ord.indexOf(a.temporada) - ord.indexOf(b.temporada));
+  const revRows = REV_DATA.filter(d => d.jugador === name);
+
+  const opsHTML = `
+    <div class="ppc-section">
+      <div class="ppc-section-title">📋 Historial de operaciones</div>
+      <table class="ppc-table"><thead><tr>
+        <th>Temp.</th><th>Club</th><th>Mov.</th><th>Tipo</th><th>Importe</th><th>VM</th>
+      </tr></thead><tbody>
+        ${opsSorted.map(op => `<tr>
+          <td>${op.temporada||'—'}</td>
+          <td>${op.club||'—'}</td>
+          <td><span class="mov-badge ${op.movimiento}">${op.movimiento === 'alta' ? '⬆ Alta' : '⬇ Baja'}</span></td>
+          <td style="color:var(--text-muted);font-size:0.78rem">${op.tipo_operacion||'—'}</td>
+          <td>${op.importe_original||'—'}</td>
+          <td>${op._vm ? formatM(op._vm) : '—'}</td>
+        </tr>`).join('')}
+      </tbody></table>
+    </div>`;
+
+  let revHTML = '';
+  if (revRows.length) {
+    const rv = revRows[0];
+    const abs = +rv.revalorizacion_abs || 0;
+    const pct = +rv.revalorizacion_pct || 0;
+    revHTML = `
+      <div class="ppc-section">
+        <div class="ppc-section-title">📈 Revalorización</div>
+        <div class="ppc-rev-grid">
+          <div class="ppc-rev-item"><span class="ppc-rev-label">VM llegada</span><span class="ppc-rev-value">${rv.vm_llegada ? formatM(+rv.vm_llegada) : '—'}</span></div>
+          <div class="ppc-rev-item"><span class="ppc-rev-label">VM salida</span><span class="ppc-rev-value">${rv.vm_salida ? formatM(+rv.vm_salida) : '—'}</span></div>
+          <div class="ppc-rev-item"><span class="ppc-rev-label">Revalorización</span><span class="ppc-rev-value ${abs > 0 ? 'positive' : abs < 0 ? 'negative' : ''}">${formatM(abs)}</span></div>
+          <div class="ppc-rev-item"><span class="ppc-rev-label">ROI %</span><span class="ppc-rev-value ${pct > 0 ? 'positive' : pct < 0 ? 'negative' : ''}">${pct > 0 ? '+' : ''}${pct.toFixed(1)}%</span></div>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="player-profile-card">
+      <div class="ppc-header">
+        ${playerAvatar(name, 52)}
+        <div class="ppc-header-info">
+          <h3 class="ppc-name">${name}</h3>
+          <div class="ppc-badges">
+            <span class="ppc-badge pos">${pos}</span>
+            <span class="ppc-badge nac">🌍 ${nac}</span>
+            <span class="ppc-badge age">Edad: ${age}</span>
+            <span class="ppc-badge vm">VM: ${vm}</span>
+          </div>
+          <div class="ppc-clubs-list">Clubes en 2ª:
+            ${clubs.map(c => `<span class="ppc-club-chip">${c}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+      ${opsHTML}${revHTML}
+    </div>`;
+}
+
+/* --- CLUB SEARCH --- */
+function searchClub(query) {
+  const q = norm(query);
+  const clubs = [...new Set(ALL_DATA.map(d => d.club))].filter(Boolean);
+  const matches = clubs.filter(c => norm(c).includes(q));
+  if (!matches.length) return noResults(query);
+  return `
+    <div class="result-header-bar">
+      <span class="result-type-tag club-tag">🏟️ Clubes</span>
+      <span class="result-count">${matches.length} resultado${matches.length !== 1 ? 's' : ''}</span>
+    </div>
+    ${matches.slice(0, 4).map(buildClubCard).join('')}`;
+}
+
+function buildClubCard(clubName) {
+  const ops    = ALL_DATA.filter(d => d.club === clubName);
+  const altas  = ops.filter(d => d.movimiento === 'alta');
+  const bajas  = ops.filter(d => d.movimiento === 'baja');
+  const gasto  = sumBy(altas, 'importe_numerico');
+  const ingreso= sumBy(bajas, 'importe_numerico');
+  const balance= ingreso - gasto;
+  const shield = clubShield(clubName);
+
+  const revOps = REV_DATA.filter(d => d.club === clubName);
+  const totalRev = revOps.reduce((s,d) => s + (+d.revalorizacion_abs || 0), 0);
+  const roiMean  = revOps.length ? revOps.reduce((s,d) => s + (+d.revalorizacion_pct || 0), 0) / revOps.length : null;
+
+  const topJugadores = [...new Set(bajas.filter(d => d.importe_numerico > 0)
+    .sort((a,b) => b.importe_numerico - a.importe_numerico)
+    .map(d => d.jugador))].slice(0, 5);
+
+  const topDevs = revOps.sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0, 5);
+
+  return `
+    <div class="club-result-card">
+      <div class="crc-header">
+        ${shield ? `<img src="${shield}" class="crc-shield" onerror="this.style.display='none'">` : ''}
+        <div>
+          <div class="crc-name">${clubName}</div>
+          <div style="font-size:0.75rem;color:var(--text-muted)">${ops.length} operaciones · ${altas.length} altas · ${bajas.length} bajas</div>
+        </div>
+      </div>
+      <div class="crc-kpis">
+        <div class="crc-kpi"><div class="crc-kpi-value red">${formatM(gasto)}</div><div class="crc-kpi-label">Gasto total</div></div>
+        <div class="crc-kpi"><div class="crc-kpi-value green">${formatM(ingreso)}</div><div class="crc-kpi-label">Ingresos</div></div>
+        <div class="crc-kpi"><div class="crc-kpi-value ${balance >= 0 ? 'green' : 'red'}">${balance >= 0 ? '+' : ''}${formatM(balance)}</div><div class="crc-kpi-label">Balance neto</div></div>
+        <div class="crc-kpi"><div class="crc-kpi-value green">${formatM(totalRev)}</div><div class="crc-kpi-label">Valor generado</div></div>
+        ${roiMean !== null ? `<div class="crc-kpi"><div class="crc-kpi-value ${roiMean >= 0 ? 'green' : 'red'}">${roiMean >= 0 ? '+' : ''}${roiMean.toFixed(0)}%</div><div class="crc-kpi-label">ROI medio</div></div>` : ''}
+      </div>
+      ${topJugadores.length ? `
+        <div class="ppc-section">
+          <div class="ppc-section-title">💰 Mayores traspasos de salida</div>
+          <div class="ppc-clubs-list">${topJugadores.map(j => `<span class="ppc-club-chip">${j}</span>`).join('')}</div>
+        </div>` : ''}
+      ${topDevs.length ? `
+        <div class="ppc-section">
+          <div class="ppc-section-title">📈 Jugadores más revalorizados</div>
+          <table class="ppc-table"><thead><tr><th>Jugador</th><th>Posición</th><th>Revalorización</th><th>ROI %</th></tr></thead>
+          <tbody>${topDevs.map(d => `<tr>
+            <td>${d.jugador}</td>
+            <td style="color:var(--text-muted)">${d.posicion_es || tPos(d.posicion||'')}</td>
+            <td style="color:var(--success);font-weight:700">${formatM(+d.revalorizacion_abs||0)}</td>
+            <td style="color:var(--success);font-weight:700">${(+d.revalorizacion_pct||0).toFixed(0)}%</td>
+          </tr>`).join('')}</tbody></table>
+        </div>` : ''}
+    </div>`;
+}
+
+/* --- SEASON SEARCH --- */
+function searchSeason(query) {
+  const q = query.trim();
+  const data = ALL_DATA.filter(d => d.temporada === q);
+  if (!data.length) return noResults(query);
+
+  const altas  = data.filter(d => d.movimiento === 'alta');
+  const bajas  = data.filter(d => d.movimiento === 'baja');
+  const byClub = groupBy(data, 'club');
+  const topClubs = topN(Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, v.length])), 5);
+  const topFichajes = [...data].filter(d => d.importe_numerico > 0).sort((a,b) => b.importe_numerico - a.importe_numerico).slice(0, 10);
+  const byPos = groupBy(data, 'posicion');
+  const topPos = topN(Object.fromEntries(Object.entries(byPos).map(([k,v]) => [k, v.length])), 6);
+
+  return `
+    <div class="result-header-bar">
+      <span class="result-type-tag season-tag">📅 Temporada</span>
+      <span class="result-count">${data.length} operaciones</span>
+    </div>
+    <div class="season-result-card">
+      <div class="crc-kpis" style="margin-bottom:20px">
+        <div class="crc-kpi"><div class="crc-kpi-value">${data.length}</div><div class="crc-kpi-label">Operaciones</div></div>
+        <div class="crc-kpi"><div class="crc-kpi-value">${altas.length}</div><div class="crc-kpi-label">Altas</div></div>
+        <div class="crc-kpi"><div class="crc-kpi-value">${bajas.length}</div><div class="crc-kpi-label">Bajas</div></div>
+        <div class="crc-kpi"><div class="crc-kpi-value">${formatM(sumBy(data,'importe_numerico'))}</div><div class="crc-kpi-label">Dinero total</div></div>
+        <div class="crc-kpi"><div class="crc-kpi-value">${Object.keys(byClub).length}</div><div class="crc-kpi-label">Clubes activos</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;flex-wrap:wrap">
+        <div>
+          <div class="ppc-section-title" style="margin-bottom:10px">💰 Top fichajes</div>
+          ${topFichajes.map((d,i) => `
+            <div class="result-list-row" style="padding:7px 0;border-bottom:1px solid var(--border)">
+              <span class="rr-pos">${i+1}</span>
+              <span class="rr-name" style="font-size:0.82rem">${d.jugador}</span>
+              <span class="rr-val" style="font-size:0.82rem">${formatM(d.importe_numerico)}</span>
+            </div>`).join('')}
+        </div>
+        <div>
+          <div class="ppc-section-title" style="margin-bottom:10px">⚽ Posiciones más demandadas</div>
+          ${topPos.map(([pos,cnt],i) => `
+            <div class="result-list-row" style="padding:7px 0;border-bottom:1px solid var(--border)">
+              <span class="rr-pos">${i+1}</span>
+              <span class="rr-name" style="font-size:0.82rem">${tPos(pos)}</span>
+              <span class="rr-val" style="font-size:0.82rem">${cnt} ops</span>
+            </div>`).join('')}
+        </div>
+        <div>
+          <div class="ppc-section-title" style="margin-bottom:10px">🏟️ Clubes más activos</div>
+          ${topClubs.map(([club,cnt],i) => `
+            <div class="result-list-row" style="padding:7px 0;border-bottom:1px solid var(--border)">
+              <span class="rr-pos">${i+1}</span>
+              <span class="rr-name" style="font-size:0.82rem">${club}</span>
+              <span class="rr-val" style="font-size:0.82rem">${cnt} ops</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+/* --- POSITION SEARCH --- */
+function searchPosition(query) {
+  const q = norm(query);
+  const posMap = {};
+  Object.entries(POS_ES).forEach(([en, es]) => { posMap[en] = es; posMap[es] = es; });
+  const matchedES = Object.entries(posMap).filter(([k]) => norm(k).includes(q)).map(([,v]) => v);
+  const uniqueES = [...new Set(matchedES)];
+  if (!uniqueES.length) return noResults(query);
+
+  const reverseMap = {};
+  Object.entries(POS_ES).forEach(([en, es]) => { (reverseMap[es] = reverseMap[es] || []).push(en); });
+
+  const out = uniqueES.map(posES => {
+    const posENs = reverseMap[posES] || [];
+    const data = ALL_DATA.filter(d => posENs.includes(d.posicion) || tPos(d.posicion||'') === posES);
+    const byClub = groupBy(data, 'club');
+    const topClubs = topN(Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, v.length])), 8);
+    const revRows = REV_DATA.filter(d => (d.posicion_es || tPos(d.posicion||'')) === posES);
+    const avgVM = data.length ? meanBy(data, '_vm') : 0;
+
+    return `
+      <div class="club-result-card">
+        <div class="crc-header">
+          <div>
+            <div class="crc-name">⚽ ${posES}</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">${data.length} operaciones · VM medio: ${formatM(avgVM)}</div>
+          </div>
+        </div>
+        <div class="crc-kpis">
+          <div class="crc-kpi"><div class="crc-kpi-value">${data.length}</div><div class="crc-kpi-label">Operaciones</div></div>
+          <div class="crc-kpi"><div class="crc-kpi-value">${formatM(avgVM)}</div><div class="crc-kpi-label">VM medio</div></div>
+          <div class="crc-kpi"><div class="crc-kpi-value">${formatM(sumBy(data,'importe_numerico'))}</div><div class="crc-kpi-label">Dinero movido</div></div>
+          <div class="crc-kpi"><div class="crc-kpi-value">${revRows.length > 0 ? (revRows.reduce((s,d) => s + (+d.revalorizacion_pct||0), 0) / revRows.length).toFixed(0) + '%' : '—'}</div><div class="crc-kpi-label">ROI medio</div></div>
+        </div>
+        <div class="ppc-section">
+          <div class="ppc-section-title">🏟️ Clubes con más fichajes en esta posición</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${topClubs.map(([c,n]) => `<span class="ppc-club-chip">${c} (${n})</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  });
+
+  return `
+    <div class="result-header-bar">
+      <span class="result-type-tag pos-tag">⚽ Posición</span>
+    </div>
+    ${out.join('')}`;
+}
+
+/* --- NATIONALITY SEARCH --- */
+function searchNationality(query) {
+  const q = norm(query);
+  const nacs = [...new Set(ALL_DATA.map(d => d.nacionalidad))].filter(Boolean);
+  const matches = nacs.filter(n => norm(n).includes(q));
+  if (!matches.length) return noResults(query);
+
+  const out = matches.slice(0, 3).map(nac => {
+    const data = ALL_DATA.filter(d => d.nacionalidad === nac);
+    const revRows = REV_DATA.filter(d => d.nacionalidad === nac);
+    const topPlayers = [...data].sort((a,b) => b._vm - a._vm).slice(0, 6);
+    const avgROI = revRows.length ? revRows.reduce((s,d) => s + (+d.revalorizacion_pct||0), 0) / revRows.length : null;
+
+    return `
+      <div class="club-result-card">
+        <div class="crc-header">
+          <div>
+            <div class="crc-name">🌍 ${nac}</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">${data.length} operaciones · ${[...new Set(data.map(d=>d.jugador))].length} jugadores únicos</div>
+          </div>
+        </div>
+        <div class="crc-kpis">
+          <div class="crc-kpi"><div class="crc-kpi-value">${[...new Set(data.map(d=>d.jugador))].length}</div><div class="crc-kpi-label">Jugadores</div></div>
+          <div class="crc-kpi"><div class="crc-kpi-value">${formatM(meanBy(data,'_vm'))}</div><div class="crc-kpi-label">VM medio</div></div>
+          <div class="crc-kpi"><div class="crc-kpi-value">${formatM(sumBy(data,'importe_numerico'))}</div><div class="crc-kpi-label">Dinero movido</div></div>
+          ${avgROI !== null ? `<div class="crc-kpi"><div class="crc-kpi-value ${avgROI>=0?'green':'red'}">${avgROI>=0?'+':''}${avgROI.toFixed(0)}%</div><div class="crc-kpi-label">ROI medio</div></div>` : ''}
+        </div>
+        <div class="ppc-section">
+          <div class="ppc-section-title">👤 Jugadores destacados (por VM)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${topPlayers.map(d => `<span class="ppc-club-chip">${d.jugador} · ${formatM(d._vm)}</span>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  });
+
+  return `
+    <div class="result-header-bar">
+      <span class="result-type-tag nac-tag">🌍 Nacionalidad</span>
+      <span class="result-count">${matches.length} resultado${matches.length !== 1 ? 's' : ''}</span>
+    </div>
+    ${out.join('')}`;
+}
+
+function noResults(query) {
+  return `<div class="no-results"><p>Sin resultados para "<strong>${query}</strong>".<br><span style="font-size:0.8rem;color:var(--text-muted)">Prueba con el nombre exacto o cambia el tipo de búsqueda.</span></p></div>`;
+}
+
+/* ============================================================
+   SCOUTGPT — Motor de consultas en lenguaje natural
+   ============================================================ */
+
+let _sgptReady = false;
+const _sgptHistory = [];
+
+function renderScoutGPTTab() {
+  if (_sgptReady) return;
+  _sgptReady = true;
+
+  const input = document.getElementById('scoutgpt-input');
+  const btn   = document.getElementById('scoutgpt-send');
+
+  const send = () => {
+    const q = input.value.trim();
+    if (!q) return;
+    input.value = '';
+    addSgptMessage('user', q);
+    setTimeout(() => {
+      const resp = processScoutQuery(q);
+      addSgptMessage('bot', resp);
+    }, 280);
+  };
+
+  btn.addEventListener('click', send);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+  document.querySelectorAll('.sgpt-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      input.value = chip.textContent.trim();
+      send();
+    });
+  });
+
+  addSgptMessage('bot', `
+    <strong>Hola, soy ScoutGPT 👋</strong><br>
+    Puedo responder preguntas sobre los datos de Segunda División 2021-2026.<br>
+    <span class="muted">Prueba: "¿Qué clubes generan más valor?" o "Top 20 Sub-23 más revalorizados"</span>`);
+}
+
+function addSgptMessage(role, html) {
+  const container = document.getElementById('scoutgpt-messages');
+  if (!container) return;
+
+  if (role === 'user') {
+    const msg = document.createElement('div');
+    msg.className = 'sgpt-msg user';
+    msg.innerHTML = `
+      <div class="sgpt-avatar user">Tú</div>
+      <div class="sgpt-bubble">${html}</div>`;
+    container.appendChild(msg);
+  } else {
+    const typing = document.createElement('div');
+    typing.className = 'sgpt-msg bot';
+    typing.innerHTML = `<div class="sgpt-avatar bot">🤖</div>
+      <div class="sgpt-typing"><span></span><span></span><span></span></div>`;
+    container.appendChild(typing);
+    container.scrollTop = container.scrollHeight;
+    setTimeout(() => {
+      container.removeChild(typing);
+      const msg = document.createElement('div');
+      msg.className = 'sgpt-msg bot';
+      msg.innerHTML = `<div class="sgpt-avatar bot">🤖</div><div class="sgpt-bubble">${html}</div>`;
+      container.appendChild(msg);
+      container.scrollTop = container.scrollHeight;
+    }, 260);
+  }
+  container.scrollTop = container.scrollHeight;
+}
+
+/* --- Query Parser --- */
+function processScoutQuery(raw) {
+  const q = norm(raw);
+
+  // Amount detection (millones)
+  const mMatch = q.match(/m[aá]s de (\d+(?:[.,]\d+)?)\s*(?:millon(?:es)?|m\b)/);
+  const amount  = mMatch ? parseFloat(mMatch[1].replace(',','.')) * 1e6 : null;
+  const kMatch  = !mMatch && q.match(/m[aá]s de (\d+(?:[.,]\d+)?)\s*(?:mil|k\b)/);
+  const amountK = kMatch ? parseFloat(kMatch[1].replace(',','.')) * 1e3 : null;
+  const threshold = amount || amountK || null;
+
+  // Top N
+  const topMatch = q.match(/(?:top|los?|las?)\s+(\d+)/);
+  const topLimit = topMatch ? +topMatch[1] : 20;
+
+  // Club detection
+  const detectedClub = detectClubInQuery(q);
+
+  // Age range detection
+  const ageMatch = q.match(/(\d{1,2})\s*(?:y|a)\s*(?:los\s*)?(\d{1,2})\s*a[nñ]o/);
+  const ageRange = ageMatch ? [+ageMatch[1], +ageMatch[2]].sort((a,b)=>a-b) : null;
+
+  // Position detection
+  const detectedPos = detectPositionInQuery(q);
+
+  // Flags
+  const isVenta    = /vendid|baj[ao]|sal[ei]|traspas.*sal/.test(q);
+  const isCompra   = /compra|fich|alta|contrat|incorpora/.test(q);
+  const isSub23    = /sub.?23|jov[ei]n|menor.*23/.test(q);
+  const isROI      = /\broi\b|retorno|rendimiento/.test(q);
+  const isRev      = /revalori|valor.*subi|creci|valor.*genera/.test(q);
+  const isNac      = /nacional|pa[ií]s/.test(q);
+  const isClubs    = /club|equipo/.test(q);
+  const isJugadors = /jugador|jugadores/.test(q) || !isClubs;
+  const isPosicion = !!detectedPos || /posici[oó]n/.test(q);
+
+  // --- Routing ---
+
+  if (detectedClub && (isVenta || threshold)) return sgptClubVentas(detectedClub, threshold);
+  if (detectedClub && isCompra) return sgptClubCompras(detectedClub, threshold);
+  if (detectedClub) return sgptClubOverview(detectedClub);
+
+  if (isSub23 && isRev) return sgptSub23Revalorizados(topLimit);
+  if (isSub23) return sgptSub23General(topLimit);
+
+  if (isNac && isROI) return sgptNacionalidadesROI(topLimit);
+  if (isNac && isRev) return sgptNacionalidadesRev(topLimit);
+
+  if (isClubs && (isRev || /genera|valor/.test(q))) return sgptClubesValor(topLimit);
+  if (isClubs && /activ|muchas.*oper|m[aá]s.*oper|oper/.test(q)) return sgptClubesActivos(topLimit);
+
+  if (isPosicion && isClubs && /desarroll|mejor/.test(q)) return sgptClubesPorPosicion(detectedPos);
+  if (isPosicion && (isRev || /valor|genera/.test(q))) return sgptPosicionValor();
+  if (isPosicion) return sgptPosicionStats(detectedPos);
+
+  if (threshold && (isVenta || isJugadors)) return sgptJugadoresVendidos(threshold, topLimit);
+
+  if (isJugadors && isRev && ageRange) return sgptJugadoresEdadRev(ageRange, topLimit);
+  if (isJugadors && isRev) return sgptTopJugadoresRev(topLimit);
+  if (isROI) return sgptNacionalidadesROI(topLimit);
+
+  // Fallback: try player name
+  const players = [...new Set(ALL_DATA.map(d => d.jugador))].filter(Boolean);
+  const playerMatch = players.find(p => norm(p).split(' ').some(w => w.length > 3 && q.includes(w)));
+  if (playerMatch) return sgptPlayerInfo(playerMatch);
+
+  return sgptDefault(raw);
+}
+
+function detectClubInQuery(q) {
+  const clubs = [...new Set(ALL_DATA.map(d => d.club))].filter(Boolean);
+  return clubs.find(c => q.includes(norm(c))) || null;
+}
+
+function detectPositionInQuery(q) {
+  const entries = [...Object.entries(POS_ES), ...Object.values(POS_ES).map(v => [v, v])];
+  for (const [en, es] of entries) {
+    if (q.includes(norm(en)) || q.includes(norm(es))) return es;
+  }
+  return null;
+}
+
+/* --- SGPT Handlers --- */
+
+function sgptClubVentas(club, threshold) {
+  let data = ALL_DATA.filter(d => d.club === club && d.movimiento === 'baja' && d.importe_numerico > 0);
+  if (threshold) data = data.filter(d => d.importe_numerico >= threshold);
+  data.sort((a,b) => b.importe_numerico - a.importe_numerico);
+  if (!data.length) return `<strong>${club}</strong> no tiene ventas${threshold ? ` por más de ${formatM(threshold)}` : ''} registradas.`;
+  return `<strong>${club}</strong> — ventas${threshold ? ` superiores a ${formatM(threshold)}` : ''}:<br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Temp.</th><th>Importe</th></tr></thead>
+    <tbody>${data.map((d,i) => `<tr><td>${i+1}</td><td class="bold">${d.jugador}</td><td>${d.temporada}</td><td class="green">${formatM(d.importe_numerico)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function sgptClubCompras(club, threshold) {
+  let data = ALL_DATA.filter(d => d.club === club && d.movimiento === 'alta' && d.importe_numerico > 0);
+  if (threshold) data = data.filter(d => d.importe_numerico >= threshold);
+  data.sort((a,b) => b.importe_numerico - a.importe_numerico);
+  if (!data.length) return `<strong>${club}</strong> no tiene compras${threshold ? ` por más de ${formatM(threshold)}` : ''} registradas.`;
+  return `<strong>${club}</strong> — fichajes${threshold ? ` superiores a ${formatM(threshold)}` : ''}:<br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Temp.</th><th>Importe</th></tr></thead>
+    <tbody>${data.map((d,i) => `<tr><td>${i+1}</td><td class="bold">${d.jugador}</td><td>${d.temporada}</td><td class="red">${formatM(d.importe_numerico)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function sgptClubOverview(club) {
+  const ops    = ALL_DATA.filter(d => d.club === club);
+  const altas  = ops.filter(d => d.movimiento === 'alta');
+  const bajas  = ops.filter(d => d.movimiento === 'baja');
+  const gasto  = sumBy(altas,'importe_numerico');
+  const ingreso= sumBy(bajas,'importe_numerico');
+  const revOps = REV_DATA.filter(d => d.club === club);
+  const totalRev = revOps.reduce((s,d) => s + (+d.revalorizacion_abs||0), 0);
+  return `<strong>${club}</strong><br>
+    ${ops.length} operaciones · ${altas.length} altas · ${bajas.length} bajas<br>
+    💸 Gasto: <span class="red">${formatM(gasto)}</span> ·
+    💰 Ingresos: <span class="green">${formatM(ingreso)}</span> ·
+    ⚖️ Balance: <span class="${ingreso-gasto >= 0 ? 'green' : 'red'}">${formatM(ingreso-gasto)}</span><br>
+    📈 Valor generado en revalorizaciones: <span class="green">${formatM(totalRev)}</span>`;
+}
+
+function sgptSub23Revalorizados(n) {
+  const sub23 = REV_DATA.filter(d => (+d.edad_llegada || 99) < 23)
+    .sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0))
+    .slice(0, n);
+  if (!sub23.length) return 'No hay datos de revalorización Sub-23 disponibles.';
+  return `<strong>Top ${n} Sub-23 más revalorizados:</strong><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>Edad llegada</th><th>Revalorización</th><th>ROI %</th></tr></thead>
+    <tbody>${sub23.map((d,i) => `<tr>
+      <td>${i+1}</td><td class="bold">${d.jugador}</td><td>${d.club}</td>
+      <td style="text-align:center">${d.edad_llegada||'—'}</td>
+      <td class="green">${formatM(+d.revalorizacion_abs||0)}</td>
+      <td class="green">+${(+d.revalorizacion_pct||0).toFixed(0)}%</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptSub23General(n) {
+  const data = ALL_DATA.filter(d => (+d.edad || 99) < 23);
+  const byClub = groupBy(data, 'club');
+  const top = topN(Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, v.length])), Math.min(n, 15));
+  return `<strong>Clubes que más fichan Sub-23:</strong> ${data.length} operaciones con jugadores menores de 23 años.<br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Operaciones Sub-23</th></tr></thead>
+    <tbody>${top.map(([c,n],i) => `<tr><td>${i+1}</td><td class="bold">${c}</td><td>${n}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function sgptNacionalidadesROI(n) {
+  const byNac = groupBy(REV_DATA.filter(d => d.revalorizacion_pct != null), 'nacionalidad');
+  const ranked = Object.entries(byNac)
+    .map(([k,v]) => [k, meanBy(v,'revalorizacion_pct'), v.length])
+    .filter(([,, cnt]) => cnt >= 3)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, n);
+  return `<strong>Nacionalidades con mejor ROI medio</strong> (mín. 3 jugadores):<br>
+    <table><thead><tr><th>#</th><th>Nacionalidad</th><th>ROI medio</th><th>Jugadores</th></tr></thead>
+    <tbody>${ranked.map(([nac, roi, cnt], i) => `<tr>
+      <td>${i+1}</td><td class="bold">${nac}</td>
+      <td class="green">+${roi.toFixed(1)}%</td>
+      <td class="muted">${cnt}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptNacionalidadesRev(n) {
+  const byNac = groupBy(REV_DATA, 'nacionalidad');
+  const ranked = Object.entries(byNac)
+    .map(([k,v]) => [k, v.reduce((s,d) => s + (+d.revalorizacion_abs||0), 0), v.length])
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, n);
+  return `<strong>Nacionalidades por valor total generado:</strong><br>
+    <table><thead><tr><th>#</th><th>Nacionalidad</th><th>Valor generado</th><th>Jugadores</th></tr></thead>
+    <tbody>${ranked.map(([nac, total, cnt], i) => `<tr>
+      <td>${i+1}</td><td class="bold">${nac}</td>
+      <td class="green">${formatM(total)}</td>
+      <td class="muted">${cnt}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptClubesValor(n) {
+  const byClub = groupBy(REV_DATA, 'club');
+  const ranked = Object.entries(byClub)
+    .map(([k,v]) => [k, v.reduce((s,d) => s + (+d.revalorizacion_abs||0), 0), v.length])
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, n);
+  return `<strong>Clubes que más valor generan</strong> (suma revalorización):<br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Valor generado</th><th>Jugadores</th></tr></thead>
+    <tbody>${ranked.map(([club, total, cnt], i) => `<tr>
+      <td>${i+1}</td><td class="bold">${club}</td>
+      <td class="green">${formatM(total)}</td>
+      <td class="muted">${cnt}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptClubesActivos(n) {
+  const byClub = groupBy(ALL_DATA, 'club');
+  const ranked = topN(Object.fromEntries(Object.entries(byClub).map(([k,v]) => [k, v.length])), n);
+  return `<strong>Clubes más activos en el mercado</strong> (total operaciones):<br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Operaciones</th></tr></thead>
+    <tbody>${ranked.map(([club, cnt], i) => `<tr>
+      <td>${i+1}</td><td class="bold">${club}</td><td>${cnt}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptPosicionValor() {
+  const byPos = groupBy(REV_DATA.filter(d => d.posicion_es), 'posicion_es');
+  const ranked = Object.entries(byPos)
+    .map(([k,v]) => [k, v.reduce((s,d) => s + (+d.revalorizacion_abs||0), 0), meanBy(v,'revalorizacion_pct'), v.length])
+    .sort((a,b) => b[1] - a[1]);
+  return `<strong>Posiciones por valor total generado:</strong><br>
+    <table><thead><tr><th>Posición</th><th>Valor total</th><th>ROI medio</th><th>Jugadores</th></tr></thead>
+    <tbody>${ranked.map(([pos, total, roi, cnt]) => `<tr>
+      <td class="bold">${pos}</td>
+      <td class="green">${formatM(total)}</td>
+      <td class="${roi>=0?'green':'red'}">${roi>=0?'+':''}${roi.toFixed(0)}%</td>
+      <td class="muted">${cnt}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptPosicionStats(posES) {
+  if (!posES) return sgptPosicionValor();
+  const data = ALL_DATA.filter(d => tPos(d.posicion||'') === posES);
+  const revRows = REV_DATA.filter(d => (d.posicion_es || tPos(d.posicion||'')) === posES);
+  return `<strong>Posición: ${posES}</strong><br>
+    ${data.length} operaciones · VM medio: ${formatM(meanBy(data,'_vm'))} ·
+    ROI medio: ${revRows.length ? (revRows.reduce((s,d)=>s+(+d.revalorizacion_pct||0),0)/revRows.length).toFixed(0)+'%' : '—'}`;
+}
+
+function sgptClubesPorPosicion(posES) {
+  if (!posES) return 'Especifica la posición (Ej: "¿Qué clubes desarrollan mejor delanteros?")';
+  const revRows = REV_DATA.filter(d => (d.posicion_es || tPos(d.posicion||'')) === posES);
+  const byClub = groupBy(revRows, 'club');
+  const ranked = Object.entries(byClub)
+    .map(([k,v]) => [k, v.reduce((s,d) => s + (+d.revalorizacion_abs||0), 0), v.length])
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, 15);
+  return `<strong>Clubes que mejor desarrollan: ${posES}</strong><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Valor generado</th><th>Jugadores</th></tr></thead>
+    <tbody>${ranked.map(([club, total, cnt], i) => `<tr>
+      <td>${i+1}</td><td class="bold">${club}</td>
+      <td class="green">${formatM(total)}</td><td class="muted">${cnt}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptJugadoresVendidos(threshold, n) {
+  const data = ALL_DATA.filter(d => d.movimiento === 'baja' && d.importe_numerico >= threshold)
+    .sort((a,b) => b.importe_numerico - a.importe_numerico)
+    .slice(0, n);
+  if (!data.length) return `No hay jugadores vendidos por más de ${formatM(threshold)}.`;
+  return `<strong>Jugadores vendidos por más de ${formatM(threshold)}:</strong> ${data.length} registros<br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>Temp.</th><th>Importe</th></tr></thead>
+    <tbody>${data.map((d,i) => `<tr>
+      <td>${i+1}</td><td class="bold">${d.jugador}</td><td>${d.club}</td>
+      <td>${d.temporada}</td><td class="green">${formatM(d.importe_numerico)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptJugadoresEdadRev(ageRange, n) {
+  const [minAge, maxAge] = ageRange;
+  const data = REV_DATA.filter(d => {
+    const a = +d.edad_llegada;
+    return a >= minAge && a <= maxAge;
+  }).sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0, n);
+  if (!data.length) return `No hay datos para ese rango de edad.`;
+  return `<strong>Jugadores revalorizados entre ${minAge} y ${maxAge} años:</strong><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>Edad</th><th>Revalorización</th><th>ROI %</th></tr></thead>
+    <tbody>${data.map((d,i) => `<tr>
+      <td>${i+1}</td><td class="bold">${d.jugador}</td><td>${d.club}</td>
+      <td style="text-align:center">${d.edad_llegada}</td>
+      <td class="green">${formatM(+d.revalorizacion_abs||0)}</td>
+      <td class="green">+${(+d.revalorizacion_pct||0).toFixed(0)}%</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptTopJugadoresRev(n) {
+  const data = [...REV_DATA].sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0)).slice(0, n);
+  return `<strong>Top ${n} jugadores más revalorizados:</strong><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>Posición</th><th>Revalorización</th><th>ROI %</th></tr></thead>
+    <tbody>${data.map((d,i) => `<tr>
+      <td>${i+1}</td><td class="bold">${d.jugador}</td><td>${d.club}</td>
+      <td class="muted">${d.posicion_es||tPos(d.posicion||'')}</td>
+      <td class="green">${formatM(+d.revalorizacion_abs||0)}</td>
+      <td class="green">+${(+d.revalorizacion_pct||0).toFixed(0)}%</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptPlayerInfo(name) {
+  const ops = ALL_DATA.filter(d => d.jugador === name);
+  const rev = REV_DATA.find(d => d.jugador === name);
+  const latest = ops.sort((a,b) => ['2021-22','2022-23','2023-24','2024-25','2025-26'].indexOf(b.temporada) - ['2021-22','2022-23','2023-24','2024-25','2025-26'].indexOf(a.temporada))[0];
+  let out = `<strong>${name}</strong> · ${tPos(latest?.posicion||'')} · ${latest?.nacionalidad||'—'}<br>`;
+  out += ops.map(op => `${op.temporada} — ${op.club} (${op.movimiento}) ${op.importe_original ? '· '+op.importe_original : ''}`).join('<br>');
+  if (rev) out += `<br>📈 Revalorización: <span class="green">${formatM(+rev.revalorizacion_abs||0)}</span> (${(+rev.revalorizacion_pct||0).toFixed(0)}%)`;
+  return out;
+}
+
+function sgptDefault(raw) {
+  return `No he encontrado una respuesta directa para "<em>${raw}</em>".<br>
+    <span class="muted">Prueba con preguntas como:<br>
+    · "¿Qué jugadores ha vendido el Eibar por más de 2 millones?"<br>
+    · "Top 20 Sub-23 más revalorizados"<br>
+    · "¿Qué clubes generan más valor?"<br>
+    · "¿Qué nacionalidades tienen mejor ROI?"</span>`;
 }
 
 /* ===================== INIT ===================== */
