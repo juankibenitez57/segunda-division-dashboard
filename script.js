@@ -2111,8 +2111,17 @@ function noResults(query) {
    SCOUTGPT — Motor de consultas en lenguaje natural
    ============================================================ */
 
-let _sgptReady = false;
-const _sgptHistory = [];
+const PROXY_URL = 'http://localhost:5050';
+let _sgptReady  = false;
+let _proxyOk    = false;
+
+async function checkProxy() {
+  try {
+    const r = await fetch(`${PROXY_URL}/status`, { signal: AbortSignal.timeout(1500) });
+    _proxyOk = r.ok;
+  } catch { _proxyOk = false; }
+  return _proxyOk;
+}
 
 function renderScoutGPTTab() {
   if (_sgptReady) return;
@@ -2121,15 +2130,24 @@ function renderScoutGPTTab() {
   const input = document.getElementById('scoutgpt-input');
   const btn   = document.getElementById('scoutgpt-send');
 
-  const send = () => {
+  const send = async () => {
     const q = input.value.trim();
     if (!q) return;
     input.value = '';
     addSgptMessage('user', q);
-    setTimeout(() => {
-      const resp = processScoutQuery(q);
-      addSgptMessage('bot', resp);
-    }, 280);
+
+    const isLive = isLiveQuery(q);
+    if (isLive && _proxyOk) {
+      addSgptTyping();
+      const html = await processLiveQuery(q);
+      removeTyping();
+      addSgptMessage('bot', html);
+    } else {
+      setTimeout(() => {
+        const resp = processScoutQuery(q);
+        addSgptMessage('bot', resp);
+      }, 280);
+    }
   };
 
   btn.addEventListener('click', send);
@@ -2142,11 +2160,135 @@ function renderScoutGPTTab() {
     });
   });
 
-  addSgptMessage('bot', `
-    <strong>Hola, soy ScoutGPT 👋</strong><br>
-    Puedo responder preguntas sobre los datos de Segunda División 2021-2026.<br>
-    <span class="muted">Prueba: "¿Qué clubes generan más valor?" o "Top 20 Sub-23 más revalorizados"</span>`);
+  // Comprobar proxy en background y mostrar bienvenida
+  checkProxy().then(ok => {
+    const proxyNote = ok
+      ? `<span style="color:var(--success);font-weight:600">🌐 Proxy activo</span> — puedo buscar cualquier jugador en Transfermarkt en tiempo real.`
+      : `<span class="muted">💡 Tip: ejecuta <code>python3 scoutgpt_proxy.py</code> para buscar en Transfermarkt en tiempo real.</span>`;
+    addSgptMessage('bot', `
+      <strong>Hola, soy ScoutGPT 👋</strong><br>
+      Respondo preguntas sobre Segunda División 2021-2026 usando los datos del proyecto.<br>
+      ${proxyNote}`);
+  });
 }
+
+/* --- Typing indicator helpers --- */
+function addSgptTyping() {
+  const c = document.getElementById('scoutgpt-messages');
+  if (!c) return;
+  const el = document.createElement('div');
+  el.className = 'sgpt-msg bot sgpt-typing-row';
+  el.innerHTML = `<div class="sgpt-avatar bot">🤖</div>
+    <div class="sgpt-typing"><span></span><span></span><span></span></div>`;
+  c.appendChild(el);
+  c.scrollTop = c.scrollHeight;
+}
+function removeTyping() {
+  document.querySelectorAll('.sgpt-typing-row').forEach(el => el.remove());
+}
+
+/* --- Live query detection --- */
+function isLiveQuery(raw) {
+  const q = norm(raw);
+  const liveKw = /busca|encuentra|dime.*valor|valor actual|cuanto vale|cuánto vale|transfermarkt|en vivo|tiempo real|valor de mercado de|quien es|quién es/;
+  if (liveKw.test(q)) return true;
+  // Jugador que NO está en nuestro dataset → buscar en TM
+  if (/\bjugador\b/.test(q)) return false;
+  const players = new Set(ALL_DATA.map(d => norm(d.jugador)));
+  const words   = raw.trim().split(/\s+/).filter(w => w.length > 3);
+  const hasDataPlayer = words.some(w => [...players].some(p => p.includes(norm(w))));
+  if (!hasDataPlayer && words.length <= 4) return true;  // probablemente un nombre propio no en dataset
+  return false;
+}
+
+/* --- Live query handler (calls proxy) --- */
+async function processLiveQuery(raw) {
+  const q   = norm(raw);
+  const badge = `<span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);
+    padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;margin-left:6px">
+    🌐 Transfermarkt</span>`;
+
+  try {
+    // 1. Detectar si pide valor de un jugador ya en nuestro dataset por ID
+    const idMatch = matchLocalPlayerForProxy(raw);
+    if (idMatch) {
+      const r = await fetch(`${PROXY_URL}/player/${idMatch.id}/value`);
+      const d = await r.json();
+      if (d.market_value) {
+        return `<strong>${idMatch.name}</strong>${badge}<br>
+          Valor actual: <span style="color:var(--success);font-weight:800;font-size:1.1rem">${fmtMv(d.market_value)}</span><br>
+          Club: ${d.club || '—'} · Actualizado: ${d.date || '—'}`;
+      }
+    }
+
+    // 2. Búsqueda libre en TM
+    const searchTerm = extractSearchTerm(raw);
+    const r2 = await fetch(`${PROXY_URL}/search/player?q=${encodeURIComponent(searchTerm)}`);
+    const d2 = await r2.json();
+
+    if (!d2.players || !d2.players.length) {
+      return `No se encontraron resultados en Transfermarkt para "<strong>${searchTerm}</strong>".${badge}`;
+    }
+
+    const rows = d2.players.map((p, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td class="bold">${p.name}</td>
+        <td class="muted">${p.position || '—'}</td>
+        <td class="muted">${p.age || '—'}</td>
+        <td class="muted">${p.nationality || '—'}</td>
+        <td>${p.club || '—'}</td>
+        <td class="green">${p.mv_display || '—'}</td>
+      </tr>`).join('');
+
+    return `Resultados en Transfermarkt para "<strong>${searchTerm}</strong>"${badge}<br>
+      <table>
+        <thead><tr><th>#</th><th>Jugador</th><th>Posición</th><th>Edad</th><th>Nac.</th><th>Club actual</th><th>VM</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+
+  } catch (e) {
+    _proxyOk = false;
+    return `No se pudo conectar con el proxy (${e.message}). Asegúrate de que <code>python3 scoutgpt_proxy.py</code> está corriendo.<br>
+      <span class="muted">Respondiendo con datos locales…</span><br><br>` + processScoutQuery(raw);
+  }
+}
+
+function matchLocalPlayerForProxy(raw) {
+  if (typeof Papa === 'undefined') return null;
+  // Buscar en jugador_ids si está cargado
+  if (window._jugadorIds) {
+    const q = norm(raw);
+    const match = window._jugadorIds.find(r => norm(r.jugador).split(' ').some(w => w.length > 3 && q.includes(w)));
+    return match ? { id: match.spieler_id, name: match.jugador } : null;
+  }
+  return null;
+}
+
+function extractSearchTerm(raw) {
+  // Quita stopwords de pregunta para quedarse con el nombre/término
+  return raw
+    .replace(/busca|encuentra|dime|cuánto vale|cuanto vale|valor de mercado de|quién es|quien es|información de|datos de/gi, '')
+    .replace(/en transfermarkt|tiempo real|valor actual|ahora/gi, '')
+    .replace(/[¿?¡!]/g, '')
+    .trim();
+}
+
+function fmtMv(n) {
+  if (!n) return '—';
+  if (n >= 1e6) return `€${(n / 1e6).toFixed(2).replace('.00', '')}M`;
+  if (n >= 1e3) return `€${(n / 1e3).toFixed(0)}k`;
+  return `€${n}`;
+}
+
+/* --- Carga opcional de jugador_ids.csv para match por ID --- */
+(function loadJugadorIds() {
+  Papa.parse('data/final/jugador_ids.csv', {
+    header: true, download: true,
+    complete: r => { window._jugadorIds = r.data.filter(d => d.jugador && d.spieler_id); },
+    error: () => {}
+  });
+})();
 
 function addSgptMessage(role, html) {
   const container = document.getElementById('scoutgpt-messages');
@@ -2249,7 +2391,14 @@ function processScoutQuery(raw) {
 
 function detectClubInQuery(q) {
   const clubs = [...new Set(ALL_DATA.map(d => d.club))].filter(Boolean);
-  return clubs.find(c => q.includes(norm(c))) || null;
+  // Intento 1: nombre completo normalizado en la query
+  const exact = clubs.find(c => q.includes(norm(c)));
+  if (exact) return exact;
+  // Intento 2: cualquier palabra del club (≥4 chars) aparece en la query
+  return clubs.find(c => {
+    const words = norm(c).split(/\s+/).filter(w => w.length >= 4);
+    return words.some(w => q.includes(w));
+  }) || null;
 }
 
 function detectPositionInQuery(q) {
