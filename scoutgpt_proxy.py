@@ -20,15 +20,11 @@ from urllib.parse import quote
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, request
+from groq import Groq as GroqClient
 
-try:
-    from groq import Groq as GroqClient
-    _groq_available = True
-except ImportError:
-    _groq_available = False
+_groq_available = True
 
 # ── Config ────────────────────────────────────────────────────────────────────
-import os
 PORT    = int(os.environ.get("PORT", 5050))
 BASE_TM = "https://www.transfermarkt.com"
 
