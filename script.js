@@ -2387,6 +2387,7 @@ function noResults(query) {
    ============================================================ */
 
 let _sgptReady = false;
+let _aiEnabled = false;   // true cuando el proxy confirma que Groq está activo
 
 function renderScoutGPTTab() {
   if (_sgptReady) return;
@@ -2400,15 +2401,19 @@ function renderScoutGPTTab() {
     if (!q) return;
     input.value = '';
     addSgptMessage('user', q);
+    addSgptTyping();
 
-    if (isLiveQuery(q)) {
-      addSgptTyping();
-      const html = await processLiveQuery(q);
-      removeTyping();
-      addSgptMessage('bot', html);
+    let html;
+    if (_aiEnabled && !isDirectTMQuery(q)) {
+      html = await processWithAI(q);
+    } else if (isDirectTMQuery(q)) {
+      html = await processLiveQuery(q);
     } else {
-      setTimeout(() => addSgptMessage('bot', processScoutQuery(q)), 280);
+      await new Promise(r => setTimeout(r, 260));
+      html = processScoutQuery(q);
     }
+    removeTyping();
+    addSgptMessage('bot', html);
   };
 
   btn.addEventListener('click', send);
@@ -2417,10 +2422,21 @@ function renderScoutGPTTab() {
     chip.addEventListener('click', () => { input.value = chip.textContent.trim(); send(); });
   });
 
-  addSgptMessage('bot', `
-    <strong>Hola, soy ScoutGPT 👋</strong><br>
-    Respondo preguntas sobre Segunda División 2021-2026.<br>
-    <span class="muted">También puedo buscar <strong>cualquier jugador del mundo</strong> en Transfermarkt en tiempo real. 🌐</span>`);
+  // Comprobar estado del proxy y si tiene IA
+  fetch(`${RENDER_PROXY}/status`, { signal: AbortSignal.timeout(5000) })
+    .then(r => r.json())
+    .then(d => {
+      _aiEnabled = d.ai === true;
+      const aiNote = _aiEnabled
+        ? `<span style="color:var(--success);font-weight:600">🤖 IA activa</span> — respondo con inteligencia artificial sobre los datos de Segunda División.`
+        : `Respondo sobre Segunda División 2021-2026. <span class="muted">(IA no configurada — usando motor de reglas)</span>`;
+      addSgptMessage('bot', `<strong>Hola, soy ScoutGPT 👋</strong><br>${aiNote}<br>
+        <span class="muted">También puedo buscar cualquier jugador en Transfermarkt. 🌐</span>`);
+    })
+    .catch(() => {
+      addSgptMessage('bot', `<strong>Hola, soy ScoutGPT 👋</strong><br>
+        Respondo preguntas sobre Segunda División 2021-2026.`);
+    });
 }
 
 /* --- Typing indicator helpers --- */
@@ -2438,18 +2454,144 @@ function removeTyping() {
   document.querySelectorAll('.sgpt-typing-row').forEach(el => el.remove());
 }
 
-/* --- Live query detection --- */
-function isLiveQuery(raw) {
+/* --- Detecta si la pregunta es explícitamente para TM (buscar jugador externo) --- */
+function isDirectTMQuery(raw) {
   const q = norm(raw);
-  const liveKw = /busca|encuentra|dime.*valor|valor actual|cuanto vale|cuánto vale|transfermarkt|en vivo|tiempo real|valor de mercado de|quien es|quién es/;
-  if (liveKw.test(q)) return true;
-  // Jugador que NO está en nuestro dataset → buscar en TM
-  if (/\bjugador\b/.test(q)) return false;
-  const players = new Set(ALL_DATA.map(d => norm(d.jugador)));
-  const words   = raw.trim().split(/\s+/).filter(w => w.length > 3);
-  const hasDataPlayer = words.some(w => [...players].some(p => p.includes(norm(w))));
-  if (!hasDataPlayer && words.length <= 4) return true;  // probablemente un nombre propio no en dataset
+  // Palabras clave de búsqueda en TM
+  if (/busca|encuentra|valor actual|cuanto vale|cuánto vale|transfermarkt|quien es|quién es/.test(q)) return true;
+  // Palabras que claramente son del dataset local → NO ir a TM
+  const localKw = /sub.?23|revalori|temporada|ranking|top|gasto|invirti|vendi|fich|traspas|posici|naciona|roi|segunda|division|club|equipo|balance|importe/;
+  if (localKw.test(q)) return false;
+  // Consulta muy corta con palabras capitalizadas no en el dataset → nombre propio para TM
+  const words = raw.trim().split(/\s+/).filter(w => w.length > 3);
+  if (words.length <= 3 && words.every(w => /^[A-ZÁÉÍÓÚÑÜ]/.test(w))) {
+    const players = new Set(ALL_DATA.map(d => norm(d.jugador)));
+    const inDataset = words.some(w => [...players].some(p => p.includes(norm(w))));
+    return !inDataset;  // si no está en dataset → buscarlo en TM
+  }
   return false;
+}
+
+/* --- Procesa consulta con IA (Groq) --- */
+async function processWithAI(question) {
+  const context = buildQueryContext(question);
+  try {
+    const r = await fetch(`${RENDER_PROXY}/ask`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, context }),
+      signal: AbortSignal.timeout(30000),
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+
+    const rawAnswer = d.answer || '';
+    const html      = formatAIResponse(rawAnswer);
+    const photos    = await buildPhotoChips(rawAnswer);
+    return (photos ? photos + '<br>' : '') + html;
+  } catch (e) {
+    // Fallback al motor de reglas
+    return processScoutQuery(question) +
+      `<br><span class="muted" style="font-size:0.75rem">⚠ IA no disponible: ${e.message}</span>`;
+  }
+}
+
+/* --- Construye el contexto de datos para la IA --- */
+function buildQueryContext(question) {
+  const q = norm(question);
+  const MAX = 80;
+
+  // Sub-23 revalorizados
+  if (/sub.?23/.test(q) && /revalori|valor/.test(q)) {
+    const rows = REV_DATA.filter(d => (+d.edad_llegada || 99) < 23)
+      .sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0))
+      .slice(0, MAX);
+    return 'Sub-23 más revalorizados en Segunda División:\n' +
+      rows.map(d => `${d.jugador}|${d.club}|edad:${d.edad_llegada}|VM entrada:${formatM(+d.vm_llegada||0)}|VM salida:${formatM(+d.vm_salida||0)}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
+  }
+
+  // Clubes por valor generado
+  if (/club|equipo/.test(q) && /valor|revalori|generar/.test(q)) {
+    const byClub = groupBy(REV_DATA, 'club');
+    const rows = Object.entries(byClub)
+      .map(([c,v]) => [c, v.reduce((s,d)=>s+(+d.revalorizacion_abs||0),0), v.length, v.reduce((s,d)=>s+(+d.revalorizacion_pct||0),0)/v.length])
+      .sort((a,b) => b[1]-a[1]).slice(0, MAX);
+    return 'Clubes por valor generado:\n' +
+      rows.map(([c,t,n,r]) => `${c}|valor_total:${formatM(t)}|jugadores:${n}|ROI_medio:${r.toFixed(0)}%`).join('\n');
+  }
+
+  // Temporada específica
+  const detectedSeason = detectSeasonInQuery(q);
+  if (detectedSeason) {
+    const data = ALL_DATA.filter(d => d.temporada === detectedSeason).slice(0, MAX);
+    const resumen = `Temporada ${detectedSeason}: ${data.length} ops, dinero:${formatM(sumBy(data,'importe_numerico'))}`;
+    const rows = [...data].filter(d=>d.importe_numerico>0).sort((a,b)=>b.importe_numerico-a.importe_numerico).slice(0,30);
+    return resumen + '\nTop fichajes:\n' + rows.map(d=>`${d.jugador}|${d.club}|${d.movimiento}|${formatM(d.importe_numerico)}`).join('\n');
+  }
+
+  // Club específico
+  const club = detectClubInQuery(q);
+  if (club) {
+    const data = ALL_DATA.filter(d => d.club === club).slice(0, MAX);
+    return `Datos de ${club}:\n` + data.map(d=>`${d.temporada}|${d.jugador}|${d.movimiento}|${d.tipo_operacion}|${formatM(d.importe_numerico||0)}`).join('\n');
+  }
+
+  // ROI / nacionalidades
+  if (/roi|nacional|pa[ií]s/.test(q)) {
+    const byNac = groupBy(REV_DATA.filter(d=>d.revalorizacion_pct!=null), 'nacionalidad');
+    const rows = Object.entries(byNac)
+      .map(([n,v])=>[n, v.reduce((s,d)=>s+(+d.revalorizacion_pct||0),0)/v.length, v.length])
+      .filter(([,, cnt])=>cnt>=3).sort((a,b)=>b[1]-a[1]).slice(0,30);
+    return 'ROI medio por nacionalidad:\n' + rows.map(([n,r,c])=>`${n}|ROI:${r.toFixed(0)}%|jugadores:${c}`).join('\n');
+  }
+
+  // Posición
+  const pos = detectPositionInQuery(q);
+  if (pos) {
+    const rows = REV_DATA.filter(d=>(d.posicion_es||tPos(d.posicion||''))===pos).slice(0,MAX);
+    return `Stats para posición ${pos}:\n` + rows.map(d=>`${d.jugador}|${d.club}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
+  }
+
+  // General — top revalorizados
+  const topRev = [...REV_DATA].sort((a,b)=>(+b.revalorizacion_abs||0)-(+a.revalorizacion_abs||0)).slice(0,MAX);
+  return `Resumen dataset: ${ALL_DATA.length} operaciones, ${REV_DATA.length} revalorizaciones, 5 temporadas (2021-26)\n` +
+    'Top revalorizados:\n' + topRev.map(d=>`${d.jugador}|${d.club}|${d.posicion_es||''}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
+}
+
+/* --- Convierte respuesta markdown de la IA a HTML --- */
+function formatAIResponse(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^(\d+)\.\s/gm, '<br><span style="color:var(--text-muted);font-size:0.75rem">$1.</span> ')
+    .replace(/^[-•]\s/gm, '<br>• ')
+    .replace(/\n\n+/g, '<br><br>')
+    .replace(/\n/g, '<br>')
+    .replace(/^<br>/, '');
+}
+
+/* --- Genera chips con foto para jugadores mencionados en la respuesta --- */
+async function buildPhotoChips(text) {
+  if (!window._jugadorIds) return '';
+  const mentioned = window._jugadorIds.filter(r =>
+    text.includes(r.jugador) || text.includes(r.jugador.split(' ')[0])
+  ).slice(0, 6);
+  if (!mentioned.length) return '';
+
+  const chips = await Promise.all(mentioned.map(async r => {
+    let photoHtml = playerAvatar(r.jugador, 36);
+    try {
+      const resp = await fetch(`${RENDER_PROXY}/player-photo/${r.spieler_id}`, { signal: AbortSignal.timeout(5000) });
+      if (resp.ok) {
+        const d = await resp.json();
+        if (d.url) photoHtml = playerPhoto(r.jugador, d.url, 36);
+      }
+    } catch { /* usa avatar */ }
+    return `<span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg);
+      border:1px solid var(--border);border-radius:20px;padding:3px 10px 3px 3px;
+      font-size:0.78rem;font-weight:600">${photoHtml} ${r.jugador}</span>`;
+  }));
+  return `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${chips.join('')}</div>`;
 }
 
 /* --- Live query handler (usa CORS proxy, sin instalación) --- */

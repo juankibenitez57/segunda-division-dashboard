@@ -10,6 +10,7 @@ Uso:
 El servidor arranca en http://localhost:5050
 Déjalo corriendo mientras usas el dashboard.
 """
+import os
 import random
 import re
 import time
@@ -19,6 +20,12 @@ from urllib.parse import quote
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, request
+
+try:
+    from groq import Groq as GroqClient
+    _groq_available = True
+except ImportError:
+    _groq_available = False
 
 # ── Config ────────────────────────────────────────────────────────────────────
 import os
@@ -251,9 +258,55 @@ def parse_player_profile(soup: BeautifulSoup, pid: str) -> dict:
 
 # ── Rutas API ─────────────────────────────────────────────────────────────────
 
+SYSTEM_PROMPT = """Eres ScoutGPT, asistente experto en análisis de mercado de fútbol de la Segunda División española (temporadas 2021-22 a 2025-26).
+Tienes acceso a datos reales de fichajes, traspasos, cesiones y revalorizaciones de jugadores.
+Responde SIEMPRE en español, de forma concisa y útil para un analista de scouting profesional.
+Cuando hagas rankings o listas, usa formato: 1. **Nombre** — dato clave.
+Si los datos no permiten responder la pregunta con precisión, dilo claramente.
+Máximo 40 líneas."""
+
+
+@app.route("/ask", methods=["POST", "OPTIONS"])
+def ask():
+    if request.method == "OPTIONS":
+        return "", 204
+
+    groq_key = os.environ.get("GROQ_API_KEY", "")
+    if not groq_key or not _groq_available:
+        return jsonify({"error": "GROQ_API_KEY no configurada en el servidor"}), 503
+
+    body     = request.get_json(force=True) or {}
+    question = body.get("question", "").strip()
+    context  = body.get("context", "").strip()
+
+    if not question:
+        return jsonify({"error": "Pregunta vacía"}), 400
+
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user",   "content": f"DATOS RELEVANTES:\n{context}\n\nPREGUNTA: {question}"},
+    ]
+
+    try:
+        client   = GroqClient(api_key=groq_key)
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            max_tokens=1200,
+            temperature=0.2,
+        )
+        answer = response.choices[0].message.content
+        logger.info(f"Groq → {len(answer)} chars para: {question[:60]}")
+        return jsonify({"answer": answer})
+    except Exception as e:
+        logger.error(f"Groq error: {e}")
+        return jsonify({"error": str(e)}), 503
+
+
 @app.route("/status")
 def status():
-    return jsonify({"ok": True, "source": "transfermarkt", "version": "1.1"})
+    groq_ready = bool(os.environ.get("GROQ_API_KEY")) and _groq_available
+    return jsonify({"ok": True, "source": "transfermarkt", "version": "2.0", "ai": groq_ready})
 
 
 _photo_cache: dict[str, str] = {}   # spieler_id → photo URL
