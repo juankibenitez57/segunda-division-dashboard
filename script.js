@@ -1799,7 +1799,7 @@ const TM_BASE = 'https://www.transfermarkt.com';
 
 // URL del proxy desplegado en Render (funciona para todos los usuarios)
 // Cuando tengas la URL de Render, actualiza esta constante:
-const RENDER_PROXY = 'https://betis-scoutgpt-proxy.onrender.com';
+const RENDER_PROXY = 'https://segunda-division-dashboard.onrender.com';
 
 async function tmFetch(url) {
   // 1. Intentar con el proxy propio de Render (más fiable, sin bloqueos)
