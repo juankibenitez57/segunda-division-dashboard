@@ -1772,17 +1772,109 @@ function norm(s) {
   return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 }
 
-function executeSearch(query, type) {
+async function executeSearch(query, type) {
+  if (!query.trim()) return;
   const results = document.getElementById('buscador-results');
   const t = type === 'auto' ? detectSearchType(query) : type;
+
+  let html = '';
   switch (t) {
-    case 'jugador':      results.innerHTML = searchPlayer(query); break;
-    case 'club':         results.innerHTML = searchClub(query); break;
-    case 'temporada':    results.innerHTML = searchSeason(query); break;
-    case 'posicion':     results.innerHTML = searchPosition(query); break;
-    case 'nacionalidad': results.innerHTML = searchNationality(query); break;
-    default:             results.innerHTML = searchPlayer(query);
+    case 'club':         html = searchClub(query); break;
+    case 'temporada':    html = searchSeason(query); break;
+    case 'posicion':     html = searchPosition(query); break;
+    case 'nacionalidad': html = searchNationality(query); break;
+    default:             html = searchPlayer(query);
   }
+
+  // Si no hay resultados locales → intentar Transfermarkt
+  if (html.includes('no-results') || html.includes('Sin resultados')) {
+    await searchWithTM(query, results);
+  } else {
+    results.innerHTML = html;
+  }
+}
+
+async function searchWithTM(query, container) {
+  // Primero comprueba si el proxy está activo
+  let proxyUp = _proxyOk;
+  if (!proxyUp) {
+    proxyUp = await checkProxy();
+  }
+
+  if (!proxyUp) {
+    container.innerHTML = noResults(query) +
+      `<div class="no-results" style="margin-top:8px;border-color:var(--primary)">
+        <p style="color:var(--primary-dark)">
+          🌐 <strong>¿Buscas fuera de la Segunda División?</strong><br>
+          <span style="font-size:0.82rem;color:var(--text-muted)">
+            Ejecuta <code style="background:var(--bg);padding:2px 6px;border-radius:4px">python3 scoutgpt_proxy.py</code>
+            para buscar cualquier jugador en Transfermarkt en tiempo real.
+          </span>
+        </p>
+      </div>`;
+    return;
+  }
+
+  // Proxy activo → buscar en TM con loading
+  container.innerHTML = `
+    <div class="no-results">
+      <p style="color:var(--text-muted)">
+        <span style="display:inline-flex;gap:6px;align-items:center">
+          <span class="sgpt-typing" style="display:inline-flex"><span></span><span></span><span></span></span>
+          Buscando <strong>${query}</strong> en Transfermarkt…
+        </span>
+      </p>
+    </div>`;
+
+  try {
+    const r   = await fetch(`${PROXY_URL}/search/player?q=${encodeURIComponent(query)}`);
+    const d   = await r.json();
+    const tmBadge = `<span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);
+      padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700">🌐 Transfermarkt</span>`;
+
+    if (!d.players || !d.players.length) {
+      container.innerHTML = `<div class="no-results"><p>Sin resultados para "<strong>${query}</strong>" ni en el dataset ni en Transfermarkt.</p></div>`;
+      return;
+    }
+
+    const cards = d.players.map(p => buildTMPlayerCard(p)).join('');
+    container.innerHTML = `
+      <div class="result-header-bar">
+        <span class="result-type-tag player-tag">👤 Jugadores</span>
+        ${tmBadge}
+        <span class="result-count">${d.players.length} resultado${d.players.length !== 1 ? 's' : ''}</span>
+      </div>
+      ${cards}`;
+  } catch (e) {
+    container.innerHTML = noResults(query);
+  }
+}
+
+function buildTMPlayerCard(p) {
+  const mv = p.market_value
+    ? `<span class="ppc-badge vm">VM: ${fmtMv(p.market_value)}</span>` : '';
+  return `
+    <div class="player-profile-card">
+      <div class="ppc-header">
+        ${playerAvatar(p.name, 52)}
+        <div class="ppc-header-info">
+          <h3 class="ppc-name">${p.name}</h3>
+          <div class="ppc-badges">
+            ${p.position ? `<span class="ppc-badge pos">${p.position}</span>` : ''}
+            ${p.nationality ? `<span class="ppc-badge nac">🌍 ${p.nationality}</span>` : ''}
+            ${p.age ? `<span class="ppc-badge age">Edad: ${p.age}</span>` : ''}
+            ${mv}
+          </div>
+          ${p.club ? `<div class="ppc-clubs-list">Club actual: <span class="ppc-club-chip">${p.club}</span></div>` : ''}
+        </div>
+      </div>
+      <div style="font-size:0.75rem;color:var(--text-muted);padding:4px 0 0">
+        <a href="${p.profile_url}" target="_blank"
+           style="color:var(--primary);text-decoration:none;font-weight:600">
+          Ver perfil completo en Transfermarkt ↗
+        </a>
+      </div>
+    </div>`;
 }
 
 function detectSearchType(query) {
