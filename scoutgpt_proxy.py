@@ -256,6 +256,44 @@ def status():
     return jsonify({"ok": True, "source": "transfermarkt", "version": "1.1"})
 
 
+_photo_cache: dict[str, str] = {}   # spieler_id → photo URL
+
+@app.route("/player-photo/<pid>")
+def player_photo_url(pid: str):
+    """
+    Devuelve la URL de la foto de un jugador de TM.
+    Busca en el HTML del perfil la etiqueta og:image o la primera imagen
+    del jugador. Cachea el resultado para no repetir peticiones.
+    """
+    if pid in _photo_cache:
+        return jsonify({"url": _photo_cache[pid]})
+
+    url  = f"{BASE_TM}/x/profil/spieler/{pid}"
+    soup = _fetch_html(url)
+    photo_url = None
+
+    if soup:
+        # 1. og:image (más fiable)
+        og = soup.find("meta", property="og:image")
+        if og and og.get("content"):
+            photo_url = og["content"]
+        # 2. img con clase data-main-header-img
+        if not photo_url:
+            img = soup.find("img", {"class": re.compile(r"data-main|tm-foto|main-foto")})
+            if img:
+                photo_url = img.get("src") or img.get("data-src")
+        # 3. Cualquier portrait URL en la página
+        if not photo_url:
+            m = re.search(r'(https://img\.a\.transfermarkt\.technology/portrait/[^"\']+\.jpg[^"\']*)', str(soup))
+            if m:
+                photo_url = m.group(1)
+
+    if photo_url:
+        _photo_cache[pid] = photo_url
+        return jsonify({"url": photo_url})
+    return jsonify({"url": None}), 404
+
+
 @app.route("/tm")
 def tm_relay():
     """

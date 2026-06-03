@@ -1862,14 +1862,20 @@ function parseTMSearchHTML(html) {
       const name = (nameLink.title || nameLink.textContent).trim();
       if (!name || name.length < 2) continue;
 
+      // Foto: extraer src de la img en td[0] o td[1]
+      let photoUrl = null;
+      for (const td of tds.slice(0, 3)) {
+        const img = td.querySelector('img[src*="portrait"]');
+        if (img) { photoUrl = img.src || img.getAttribute('src'); break; }
+      }
+
       // Columnas reales de TM (verificadas contra HTML real):
-      // td[3] = club, td[4] = posición abrev, td[6] = edad, td[7] = bandera, td[8] = VM
+      // td[3]=club, td[4]=posición abrev, td[6]=edad, td[7]=bandera, td[8]=VM
       const club    = tds[3]?.textContent.trim() || '';
       const pos     = tds[4]?.textContent.trim() || '';
       const age     = tds[6]?.textContent.trim() || '';
       const natImg  = tds[7]?.querySelector('img');
       const nat     = natImg?.title || natImg?.alt || '';
-      // VM: buscar td con class rechts hauptlink o el antepenúltimo
       const mvCell  = tds.find(td => td.classList.contains('rechts') && td.classList.contains('hauptlink'))
                    || tds[tds.length - 2];
       const mvText  = mvCell?.textContent.trim() || '';
@@ -1877,6 +1883,7 @@ function parseTMSearchHTML(html) {
 
       players.push({
         id: pid, name,
+        photo: photoUrl,
         position: pos,
         age,
         nationality: nat,
@@ -1932,13 +1939,38 @@ async function searchWithTM(query, container) {
   }
 }
 
+function playerPhoto(name, photoUrl, size = 60) {
+  if (photoUrl) {
+    return `<img src="${photoUrl}" alt="${name}"
+      style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;
+             border:2px solid var(--border);flex-shrink:0;background:var(--bg)"
+      onerror="this.replaceWith(Object.assign(document.createElement('div'), {innerHTML: '${playerAvatar(name, size).replace(/'/g, "\\'")}'.replace(/onerror[^>]*/g,'')}))">`;
+  }
+  return playerAvatar(name, size);
+}
+
+async function playerPhotoFromProxy(name, spielerId, size = 60) {
+  if (!spielerId) return playerAvatar(name, size);
+  try {
+    const r = await fetch(`${RENDER_PROXY}/player-photo/${spielerId}`, { signal: AbortSignal.timeout(8000) });
+    if (r.ok) {
+      const d = await r.json();
+      if (d.url) return playerPhoto(name, d.url, size);
+    }
+  } catch { /* fallback */ }
+  return playerAvatar(name, size);
+}
+
 function buildTMPlayerCard(p) {
   const mv = p.market_value
     ? `<span class="ppc-badge vm">VM: ${fmtMv(p.market_value)}</span>` : '';
+  const photoHtml = p.photo
+    ? playerPhoto(p.name, p.photo, 60)
+    : playerAvatar(p.name, 60);
   return `
     <div class="player-profile-card">
       <div class="ppc-header">
-        ${playerAvatar(p.name, 52)}
+        ${photoHtml}
         <div class="ppc-header-info">
           <h3 class="ppc-name">${p.name}</h3>
           <div class="ppc-badges">
@@ -2035,10 +2067,25 @@ function buildPlayerCard(name) {
       </div>`;
   }
 
+  // Buscar spieler_id del jugador para cargar foto
+  const idEntry  = window._jugadorIds?.find(r => r.jugador === name);
+  const spielerId = idEntry?.spieler_id || null;
+  const photoId  = `photo-${name.replace(/\s+/g,'_')}`;
+
+  // Foto: inicialmente avatar, se sustituye en background si hay ID
+  if (spielerId) {
+    setTimeout(async () => {
+      const el = document.getElementById(photoId);
+      if (!el) return;
+      const html = await playerPhotoFromProxy(name, spielerId, 60);
+      el.outerHTML = html;
+    }, 0);
+  }
+
   return `
     <div class="player-profile-card">
       <div class="ppc-header">
-        ${playerAvatar(name, 52)}
+        <div id="${photoId}">${playerAvatar(name, 60)}</div>
         <div class="ppc-header-info">
           <h3 class="ppc-name">${name}</h3>
           <div class="ppc-badges">
