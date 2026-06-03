@@ -2468,22 +2468,43 @@ function processScoutQuery(raw) {
   // Position detection
   const detectedPos = detectPositionInQuery(q);
 
+  // Temporada dentro de la query: "23-24", "2023-24", "la 22-23"…
+  const detectedSeason = detectSeasonInQuery(q);
+
   // Flags
-  const isVenta    = /vendid|baj[ao]|sal[ei]|traspas.*sal/.test(q);
-  const isCompra   = /compra|fich|alta|contrat|incorpora/.test(q);
+  const isVenta    = /vendid|baj[ao]|sal[ei]|traspas.*sal|ingres/.test(q);
+  const isCompra   = /compra|fich|alta|contrat|incorpora|adquiri/.test(q);
+  const isGasto    = /gast[oó]|gastaron|invirti[oó]|desembolso|desembolsaron|spend/.test(q);
   const isSub23    = /sub.?23|jov[ei]n|menor.*23/.test(q);
   const isROI      = /\broi\b|retorno|rendimiento/.test(q);
   const isRev      = /revalori|valor.*subi|creci|valor.*genera/.test(q);
   const isNac      = /nacional|pa[ií]s/.test(q);
-  const isClubs    = /club|equipo/.test(q);
+  const isClubs    = /club|equipo|equipos|clubes/.test(q);
   const isJugadors = /jugador|jugadores/.test(q) || !isClubs;
   const isPosicion = !!detectedPos || /posici[oó]n/.test(q);
+  const isMasCaro  = /m[aá]s caro|fichaje caro|traspaso caro|mayor importe/.test(q);
+  const isActivo   = /activ|operacion|movimiento|m[aá]s.*fich/.test(q);
+  const isRanking  = /ranking|top|m[aá]s|mayor|mejor/.test(q);
 
   // --- Routing ---
 
+  // Club + temporada
+  if (detectedClub && detectedSeason) return sgptClubEnTemporada(detectedClub, detectedSeason);
+
+  // Temporada sola + intención
+  if (detectedSeason && (isGasto || isCompra || isRanking) && !isVenta) return sgptTopGastadoresSeason(detectedSeason, topLimit);
+  if (detectedSeason && isVenta) return sgptTopVendedoresSeason(detectedSeason, topLimit);
+  if (detectedSeason && isActivo) return sgptTopActivosSeason(detectedSeason, topLimit);
+  if (detectedSeason && isMasCaro) return sgptTopFichajesSeason(detectedSeason, topLimit);
+  if (detectedSeason) return sgptResumenTemporada(detectedSeason);
+
+  // Club solo
   if (detectedClub && (isVenta || threshold)) return sgptClubVentas(detectedClub, threshold);
-  if (detectedClub && isCompra) return sgptClubCompras(detectedClub, threshold);
+  if (detectedClub && (isCompra || isGasto)) return sgptClubCompras(detectedClub, threshold);
   if (detectedClub) return sgptClubOverview(detectedClub);
+
+  // Gasto / compras globales sin club ni temporada
+  if (isClubs && (isGasto || isCompra) && isRanking) return sgptTopGastadoresSeason(null, topLimit);
 
   if (isSub23 && isRev) return sgptSub23Revalorizados(topLimit);
   if (isSub23) return sgptSub23General(topLimit);
@@ -2492,7 +2513,7 @@ function processScoutQuery(raw) {
   if (isNac && isRev) return sgptNacionalidadesRev(topLimit);
 
   if (isClubs && (isRev || /genera|valor/.test(q))) return sgptClubesValor(topLimit);
-  if (isClubs && /activ|muchas.*oper|m[aá]s.*oper|oper/.test(q)) return sgptClubesActivos(topLimit);
+  if (isClubs && isActivo) return sgptClubesActivos(topLimit);
 
   if (isPosicion && isClubs && /desarroll|mejor/.test(q)) return sgptClubesPorPosicion(detectedPos);
   if (isPosicion && (isRev || /valor|genera/.test(q))) return sgptPosicionValor();
@@ -2504,12 +2525,127 @@ function processScoutQuery(raw) {
   if (isJugadors && isRev) return sgptTopJugadoresRev(topLimit);
   if (isROI) return sgptNacionalidadesROI(topLimit);
 
-  // Fallback: try player name
+  // Fallback: nombre propio → jugador
   const players = [...new Set(ALL_DATA.map(d => d.jugador))].filter(Boolean);
   const playerMatch = players.find(p => norm(p).split(' ').some(w => w.length > 3 && q.includes(w)));
   if (playerMatch) return sgptPlayerInfo(playerMatch);
 
   return sgptDefault(raw);
+}
+
+function detectSeasonInQuery(q) {
+  // "2023-24", "23-24", "2023/24", "23/24"
+  const full = q.match(/\b(202[1-5])[/-](\d{2})\b/);
+  if (full) return `${full[1]}-${full[2]}`;
+  const short = q.match(/\b(2[1-5])[/-](\d{2})\b/);
+  if (short) return `20${short[1]}-${short[2]}`;
+  // "temporada 23" solo → mapear a temporada completa
+  const single = q.match(/temporada\s+(202[1-5])\b/);
+  if (single) {
+    const y = +single[1];
+    return `${y}-${String(y + 1).slice(2)}`;
+  }
+  return null;
+}
+
+/* --- Handlers de temporada --- */
+function sgptTopGastadoresSeason(season, n) {
+  const data  = season ? ALL_DATA.filter(d => d.temporada === season && d.movimiento === 'alta') : ALL_DATA.filter(d => d.movimiento === 'alta');
+  const label = season ? `temporada ${season}` : 'todas las temporadas';
+  const byClub = groupBy(data, 'club');
+  const ranked = Object.entries(byClub)
+    .map(([k, v]) => [k, sumBy(v, 'importe_numerico'), v.length])
+    .sort((a, b) => b[1] - a[1]).slice(0, n);
+  if (!ranked.length) return `Sin datos${season ? ` para ${season}` : ''}.`;
+  return `<strong>Clubes que más gastaron — ${label}:</strong><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Gasto</th><th>Altas</th></tr></thead>
+    <tbody>${ranked.map(([c, g, ops], i) => `<tr>
+      <td>${i+1}</td><td class="bold">${c}</td>
+      <td class="red">${formatM(g)}</td><td class="muted">${ops}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptTopVendedoresSeason(season, n) {
+  const data  = season ? ALL_DATA.filter(d => d.temporada === season && d.movimiento === 'baja') : ALL_DATA.filter(d => d.movimiento === 'baja');
+  const label = season ? `temporada ${season}` : 'todas las temporadas';
+  const byClub = groupBy(data, 'club');
+  const ranked = Object.entries(byClub)
+    .map(([k, v]) => [k, sumBy(v, 'importe_numerico'), v.length])
+    .sort((a, b) => b[1] - a[1]).slice(0, n);
+  if (!ranked.length) return `Sin datos${season ? ` para ${season}` : ''}.`;
+  return `<strong>Clubes que más ingresaron — ${label}:</strong><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Ingresos</th><th>Bajas</th></tr></thead>
+    <tbody>${ranked.map(([c, g, ops], i) => `<tr>
+      <td>${i+1}</td><td class="bold">${c}</td>
+      <td class="green">${formatM(g)}</td><td class="muted">${ops}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptTopActivosSeason(season, n) {
+  const data   = season ? ALL_DATA.filter(d => d.temporada === season) : ALL_DATA;
+  const label  = season ? `temporada ${season}` : 'todas las temporadas';
+  const byClub = groupBy(data, 'club');
+  const ranked = Object.entries(byClub)
+    .map(([k, v]) => [k, v.length, v.filter(d => d.movimiento === 'alta').length, v.filter(d => d.movimiento === 'baja').length])
+    .sort((a, b) => b[1] - a[1]).slice(0, n);
+  return `<strong>Equipos más activos — ${label}:</strong><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Total ops</th><th>Altas</th><th>Bajas</th></tr></thead>
+    <tbody>${ranked.map(([c, t, a, b], i) => `<tr>
+      <td>${i+1}</td><td class="bold">${c}</td><td>${t}</td>
+      <td class="green">${a}</td><td class="red">${b}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptTopFichajesSeason(season, n) {
+  const data = (season ? ALL_DATA.filter(d => d.temporada === season) : ALL_DATA)
+    .filter(d => d.importe_numerico > 0)
+    .sort((a, b) => b.importe_numerico - a.importe_numerico)
+    .slice(0, n);
+  const label = season ? `temporada ${season}` : 'historial completo';
+  if (!data.length) return `Sin traspasos con importe registrado${season ? ` en ${season}` : ''}.`;
+  return `<strong>Fichajes más caros — ${label}:</strong><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>Tipo</th><th>Importe</th></tr></thead>
+    <tbody>${data.map((d, i) => `<tr>
+      <td>${i+1}</td><td class="bold">${d.jugador}</td><td>${d.club}</td>
+      <td class="muted">${d.movimiento === 'alta' ? '⬆ Alta' : '⬇ Baja'}</td>
+      <td class="green">${formatM(d.importe_numerico)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptResumenTemporada(season) {
+  const data   = ALL_DATA.filter(d => d.temporada === season);
+  if (!data.length) return `No hay datos para la temporada <strong>${season}</strong>.`;
+  const altas  = data.filter(d => d.movimiento === 'alta');
+  const bajas  = data.filter(d => d.movimiento === 'baja');
+  const byClub = groupBy(data, 'club');
+  const topClub = Object.entries(byClub).sort((a,b) => b[1].length - a[1].length)[0];
+  const topFich = [...data].filter(d=>d.importe_numerico>0).sort((a,b)=>b.importe_numerico-a.importe_numerico)[0];
+  return `<strong>Resumen temporada ${season}:</strong><br>
+    📊 ${data.length} operaciones · ${altas.length} altas · ${bajas.length} bajas<br>
+    💰 Dinero total: <span class="green">${formatM(sumBy(data,'importe_numerico'))}</span><br>
+    🏟️ Equipo más activo: <span class="bold">${topClub?.[0] || '—'}</span> (${topClub?.[1].length || 0} ops)<br>
+    ${topFich ? `💎 Fichaje más caro: <span class="bold">${topFich.jugador}</span> · ${topFich.club} · <span class="green">${formatM(topFich.importe_numerico)}</span>` : ''}`;
+}
+
+function sgptClubEnTemporada(club, season) {
+  const data   = ALL_DATA.filter(d => d.club === club && d.temporada === season);
+  if (!data.length) return `No hay datos para <strong>${club}</strong> en la temporada <strong>${season}</strong>.`;
+  const altas  = data.filter(d => d.movimiento === 'alta');
+  const bajas  = data.filter(d => d.movimiento === 'baja');
+  const gasto  = sumBy(altas, 'importe_numerico');
+  const ingreso= sumBy(bajas, 'importe_numerico');
+  return `<strong>${club} — Temporada ${season}:</strong><br>
+    ${data.length} operaciones · ${altas.length} altas · ${bajas.length} bajas<br>
+    💸 Gasto: <span class="red">${formatM(gasto)}</span> ·
+    💰 Ingresos: <span class="green">${formatM(ingreso)}</span> ·
+    ⚖️ Balance: <span class="${ingreso-gasto>=0?'green':'red'}">${formatM(ingreso-gasto)}</span><br>
+    <table><thead><tr><th>Jugador</th><th>Mov.</th><th>Tipo</th><th>Importe</th></tr></thead>
+    <tbody>${[...data].sort((a,b)=>b.importe_numerico-a.importe_numerico).map(d=>`<tr>
+      <td class="bold">${d.jugador}</td>
+      <td><span class="mov-badge ${d.movimiento}">${d.movimiento==='alta'?'⬆ Alta':'⬇ Baja'}</span></td>
+      <td class="muted">${d.tipo_operacion||'—'}</td>
+      <td>${d.importe_numerico>0?formatM(d.importe_numerico):'—'}</td>
+    </tr>`).join('')}</tbody></table>`;
 }
 
 function detectClubInQuery(q) {
