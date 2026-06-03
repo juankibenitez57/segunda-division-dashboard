@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
 
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=13">
 </head>
 <body>
 
@@ -46,6 +46,8 @@
         <span class="nav-text">Sub-23</span>
       </a>
     </li>
+    <li><a href="#" class="nav-link" data-tab="tab-buscador"><span class="nav-icon">🔎</span><span class="nav-text">Buscador</span></a></li>
+    <li><a href="#" class="nav-link" data-tab="tab-scoutgpt"><span class="nav-icon">🤖</span><span class="nav-text">ScoutGPT</span></a></li>
     <li><a href="#" class="nav-link" data-tab="tab-bbdd"><span class="nav-icon">🗄️</span><span class="nav-text">Base de Datos</span></a></li>
   </ul>
 </nav>
@@ -569,6 +571,78 @@
     </div>
   </div>
 
+  <!-- ===================== TAB: BUSCADOR ===================== -->
+  <div id="tab-buscador" class="tab-content">
+    <div class="section-header">
+      <h2 class="section-title">🔎 Buscador Inteligente</h2>
+      <p class="section-subtitle">Busca jugadores, clubes, temporadas, posiciones o nacionalidades</p>
+    </div>
+
+    <div class="search-hero">
+      <div class="search-bar-wrapper">
+        <input type="text" id="buscador-input" class="search-input" placeholder="Ej: Raúl Moro · SD Eibar · 2023-24 · Delantero · España…">
+        <button id="buscador-btn" class="search-btn">Buscar</button>
+      </div>
+      <div class="search-pills">
+        <span class="search-pill active" data-type="auto">Auto</span>
+        <span class="search-pill" data-type="jugador">👤 Jugador</span>
+        <span class="search-pill" data-type="club">🏟️ Club</span>
+        <span class="search-pill" data-type="temporada">📅 Temporada</span>
+        <span class="search-pill" data-type="posicion">⚽ Posición</span>
+        <span class="search-pill" data-type="nacionalidad">🌍 Nacionalidad</span>
+      </div>
+    </div>
+
+    <div id="buscador-results" class="buscador-results">
+      <div class="search-suggestions">
+        <p class="suggestions-title">Sugerencias rápidas</p>
+        <div class="suggestion-chips">
+          <span class="suggestion-chip" data-query="Raúl Moro">Raúl Moro</span>
+          <span class="suggestion-chip" data-query="Sergio Arribas">Sergio Arribas</span>
+          <span class="suggestion-chip" data-query="SD Eibar">SD Eibar</span>
+          <span class="suggestion-chip" data-query="CD Mirandés">CD Mirandés</span>
+          <span class="suggestion-chip" data-query="Levante UD">Levante UD</span>
+          <span class="suggestion-chip" data-query="2023-24">2023-24</span>
+          <span class="suggestion-chip" data-query="Delantero">Delantero</span>
+          <span class="suggestion-chip" data-query="España">España</span>
+          <span class="suggestion-chip" data-query="Brasil">Brasil</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TAB: SCOUTGPT ===================== -->
+  <div id="tab-scoutgpt" class="tab-content">
+    <div class="scoutgpt-layout">
+      <div class="scoutgpt-header">
+        <div class="scoutgpt-logo-circle">🤖</div>
+        <div>
+          <h2 class="scoutgpt-title">ScoutGPT</h2>
+          <p class="scoutgpt-subtitle">Asistente inteligente — Datos Segunda División 2021-2026</p>
+        </div>
+      </div>
+
+      <div id="scoutgpt-messages" class="scoutgpt-messages"></div>
+
+      <div class="scoutgpt-input-area">
+        <div class="sgpt-suggestions-bar" id="sgpt-suggestions">
+          <span class="sgpt-chip">¿Qué clubes generan más valor?</span>
+          <span class="sgpt-chip">Top 20 Sub-23 más revalorizados</span>
+          <span class="sgpt-chip">¿Qué jugadores ha vendido el Eibar por más de 2M?</span>
+          <span class="sgpt-chip">¿Qué posición genera más valor?</span>
+          <span class="sgpt-chip">¿Qué nacionalidades tienen mejor ROI?</span>
+          <span class="sgpt-chip">Jugadores vendidos por más de 5 millones</span>
+        </div>
+        <div class="sgpt-input-row">
+          <input type="text" id="scoutgpt-input" class="sgpt-input" placeholder="Haz una pregunta sobre los datos de Segunda División…">
+          <button id="scoutgpt-send" class="sgpt-send-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== TAB 8: BASE DE DATOS ===================== -->
   <div id="tab-bbdd" class="tab-content">
     <div class="chart-card full-width">
@@ -607,6 +681,6 @@
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="script.js?v=9"></script>
+<script src="script.js?v=21"></script>
 </body>
 </html>
