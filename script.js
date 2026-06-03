@@ -483,9 +483,10 @@ function renderInicioTab() {
     document.getElementById('hl-club-activo').textContent = `${topClub[0]} — ${fmt(topClub[1])} ops`;
   }
 
-  // Top revalorized
-  if (REV_DATA.length) {
-    const topRev = [...REV_DATA].sort((a, b) => (b.revalorizacion_pct||0) - (a.revalorizacion_pct||0))[0];
+  // Top revalorized — excluir jugadores de Primera/ligas mayores
+  const revSegunda = REV_DATA.filter(d => d._origen === 'segunda' || d._origen === 'desconocido');
+  if (revSegunda.length) {
+    const topRev = [...revSegunda].sort((a, b) => (b.revalorizacion_pct||0) - (a.revalorizacion_pct||0))[0];
     if (topRev) {
       const pct = +topRev.revalorizacion_pct;
       document.getElementById('hl-top-rev').textContent =
