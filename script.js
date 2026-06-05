@@ -2439,6 +2439,7 @@ function renderScoutGPTTab() {
 
   // Precargar el master para consultas de desarrollo/entrenadores
   loadMasterData(() => {});
+  loadLoanModelData(() => {});
 
   const input = document.getElementById('scoutgpt-input');
   const btn   = document.getElementById('scoutgpt-send');
@@ -2451,7 +2452,10 @@ function renderScoutGPTTab() {
     addSgptTyping();
 
     let html;
-    if (_aiEnabled && !isDirectTMQuery(q)) {
+    if (isLoanDestinationQuery(norm(q))) {
+      await new Promise(resolve => loadLoanModelData(resolve));
+      html = processScoutQuery(q);
+    } else if (_aiEnabled && !isDirectTMQuery(q)) {
       html = await processWithAI(q);
     } else if (isDirectTMQuery(q)) {
       html = await processLiveQuery(q);
@@ -2734,8 +2738,17 @@ function processScoutQuery(raw) {
   const isMasCaro  = /m[aá]s caro|fichaje caro|traspaso caro|mayor importe/.test(q);
   const isActivo   = /activ|operacion|movimiento|m[aá]s.*fich/.test(q);
   const isRanking  = /ranking|top|m[aá]s|mayor|mejor/.test(q);
+  const isLoanDestination = isLoanDestinationQuery(q);
 
   // --- Routing ---
+
+  // Modelo explicable de destinos de cesión para jugadores del Betis Deportivo
+  if (isLoanDestination) {
+    const betisPlayer = detectBetisPlayerInQuery(q);
+    if (betisPlayer) return sgptLoanDestinationsForPlayer(betisPlayer.jugador, topLimit);
+    if (detectedPos) return sgptLoanDestinationsForPosition(detectedPos, topLimit);
+    return sgptLoanDestinationsOverview(topLimit);
+  }
 
   // Club + temporada
   if (detectedClub && detectedSeason) return sgptClubEnTemporada(detectedClub, detectedSeason);
@@ -3379,6 +3392,8 @@ function renderWyTablaResumen(data) {
    ============================================================ */
 
 let MASTER_DATA = [];
+let LOAN_MODEL_DATA = [];
+let BETIS_PLAYERS_DATA = [];
 
 function loadMasterData(callback) {
   if (MASTER_DATA.length) { callback(MASTER_DATA); return; }
@@ -3389,6 +3404,34 @@ function loadMasterData(callback) {
       callback(MASTER_DATA);
     },
     error: () => { callback([]); }
+  });
+}
+
+function loadLoanModelData(callback) {
+  if (LOAN_MODEL_DATA.length && BETIS_PLAYERS_DATA.length) { callback(LOAN_MODEL_DATA); return; }
+
+  let pending = 2;
+  const done = () => {
+    pending -= 1;
+    if (pending === 0) callback(LOAN_MODEL_DATA);
+  };
+
+  Papa.parse('data/final/betis_loan_destination_model.csv', {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => {
+      LOAN_MODEL_DATA = r.data.filter(d => d.jugador && d.club_destino);
+      done();
+    },
+    error: () => { LOAN_MODEL_DATA = []; done(); }
+  });
+
+  Papa.parse('data/final/betis_deportivo_players.csv', {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => {
+      BETIS_PLAYERS_DATA = r.data.filter(d => d.jugador);
+      done();
+    },
+    error: () => { BETIS_PLAYERS_DATA = []; done(); }
   });
 }
 
@@ -3415,6 +3458,105 @@ function devPosMatch(row, pos) {
   const p = normDevPos(row.posicion_normalizada || row.posicion_es || tPos(row.posicion || ''));
   if (pos === 'Mediocentro') return p === 'Mediocentro' || p === 'Centrocampista';
   return p === pos;
+}
+
+function isLoanDestinationQuery(q) {
+  return /destin|cesi[oó]n|ceder|cedido|prestam|d[oó]nde|mejor.*club|mejor.*equipo|encaje/.test(q);
+}
+
+function detectBetisPlayerInQuery(q) {
+  if (!BETIS_PLAYERS_DATA.length) return null;
+  const exact = BETIS_PLAYERS_DATA.find(p => q.includes(norm(p.jugador)));
+  if (exact) return exact;
+  return BETIS_PLAYERS_DATA.find(p => {
+    const words = norm(p.jugador).split(/\s+/).filter(w => w.length >= 4);
+    return words.length && words.some(w => q.includes(w));
+  }) || null;
+}
+
+function loanRowsForPlayer(playerName) {
+  return LOAN_MODEL_DATA
+    .filter(d => norm(d.jugador) === norm(playerName))
+    .sort((a, b) => num(a.ranking_destino) - num(b.ranking_destino));
+}
+
+function sgptLoanDestinationsForPlayer(playerName, n) {
+  if (!LOAN_MODEL_DATA.length) {
+    return 'El modelo de destinos de cesión todavía se está cargando. Vuelve a lanzar la pregunta en unos segundos.';
+  }
+  const rows = loanRowsForPlayer(playerName).slice(0, n);
+  if (!rows.length) return `No encuentro destinos calculados para <strong>${playerName}</strong>.`;
+
+  const first = rows[0];
+  return `<strong>Mejores destinos por evidencia histórica para ${first.jugador}</strong><br>
+    <span class="muted">Modelo explicable: minutos reales Sub-23, jugadores utilizados, posición, entrenador, producción y valor. No es una recomendación automática cerrada.</span><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score</th><th>Evidencia</th><th>Min Sub-23</th><th>Jug.</th><th>Razones</th></tr></thead>
+    <tbody>${rows.map(d => `<tr>
+      <td>${num(d.ranking_destino)}</td>
+      <td class="bold">${d.club_destino}</td>
+      <td>${d.entrenador_principal || '—'}</td>
+      <td class="green">${num(d.score_evidencia).toFixed(2)}</td>
+      <td>${d.nivel_evidencia || '—'}</td>
+      <td>${fmt(num(d.minutos_sub23_destino))}</td>
+      <td>${num(d.jugadores_sub23_destino)}</td>
+      <td class="muted">${d.razones || '—'}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptLoanDestinationsForPosition(pos, n) {
+  if (!LOAN_MODEL_DATA.length) {
+    return 'El modelo de destinos de cesión todavía se está cargando. Vuelve a lanzar la pregunta en unos segundos.';
+  }
+  const rows = LOAN_MODEL_DATA
+    .filter(d => devPosMatch({ posicion_normalizada: d.posicion_jugador }, pos))
+    .sort((a, b) => num(b.score_evidencia) - num(a.score_evidencia));
+
+  const seen = new Set();
+  const unique = rows.filter(d => {
+    const key = `${d.club_destino}|${d.posicion_destino}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, n);
+
+  if (!unique.length) return `No encuentro destinos calculados para la posición <strong>${pos}</strong>.`;
+  return `<strong>Destinos con más evidencia para ${pos}</strong><br>
+    <span class="muted">Ranking por oportunidades históricas Sub-23 en esa posición.</span><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score</th><th>Evidencia</th><th>Min Sub-23</th><th>Jug.</th><th>Goles+xG</th></tr></thead>
+    <tbody>${unique.map((d, i) => `<tr>
+      <td>${i + 1}</td>
+      <td class="bold">${d.club_destino}</td>
+      <td>${d.entrenador_principal || '—'}</td>
+      <td class="green">${num(d.score_evidencia).toFixed(2)}</td>
+      <td>${d.nivel_evidencia || '—'}</td>
+      <td>${fmt(num(d.minutos_sub23_destino))}</td>
+      <td>${num(d.jugadores_sub23_destino)}</td>
+      <td>${num(d.goles_sub23_destino).toFixed(0)} + ${num(d.xg_sub23_destino).toFixed(2)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptLoanDestinationsOverview(n) {
+  if (!LOAN_MODEL_DATA.length) {
+    return 'El modelo de destinos de cesión todavía se está cargando. Vuelve a lanzar la pregunta en unos segundos.';
+  }
+  const seen = new Set();
+  const rows = [...LOAN_MODEL_DATA]
+    .sort((a, b) => num(b.score_evidencia) - num(a.score_evidencia))
+    .filter(d => {
+      const key = `${d.club_destino}|${d.posicion_destino}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, n);
+  return `<strong>Destinos con más evidencia histórica para cesiones Sub-23</strong><br>
+    <span class="muted">Pregunta por un jugador concreto, por ejemplo: “mejores destinos para Pablo Garcia”.</span><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Posición</th><th>Entrenador</th><th>Score</th><th>Min Sub-23</th><th>Jug.</th></tr></thead>
+    <tbody>${rows.map((d, i) => `<tr>
+      <td>${i + 1}</td><td class="bold">${d.club_destino}</td><td>${d.posicion_destino}</td>
+      <td>${d.entrenador_principal || '—'}</td><td class="green">${num(d.score_evidencia).toFixed(2)}</td>
+      <td>${fmt(num(d.minutos_sub23_destino))}</td><td>${num(d.jugadores_sub23_destino)}</td>
+    </tr>`).join('')}</tbody></table>`;
 }
 
 function devBarH(id, entries, color, fmtFn) {
@@ -3634,6 +3776,25 @@ function buildQueryContext(question) {
   const M = MASTER_DATA;
   const isSub23 = d => d.es_sub23 === true || d.es_sub23 === 'True' || (+d.edad > 0 && +d.edad < 23);
   const posMatch = (d, kw) => devPosMatch(d, POSITION_QUERY_ALIASES[kw] || kw);
+
+  // Modelo de destinos de cesión Betis Deportivo
+  if (LOAN_MODEL_DATA.length && isLoanDestinationQuery(q)) {
+    const player = detectBetisPlayerInQuery(q);
+    if (player) {
+      const rows = loanRowsForPlayer(player.jugador).slice(0, 15);
+      return `Modelo de destinos para ${player.jugador}. Es evidencia histórica, no recomendación automática:\n` +
+        rows.map(d => `${d.ranking_destino}|${d.club_destino}|${d.posicion_destino}|entrenador:${d.entrenador_principal||''}|score:${d.score_evidencia}|evidencia:${d.nivel_evidencia}|min_sub23:${d.minutos_sub23_destino}|jug_sub23:${d.jugadores_sub23_destino}|goles:${d.goles_sub23_destino}|xg:${d.xg_sub23_destino}|razones:${d.razones||''}`).join('\n');
+    }
+    const pos = detectPositionInQuery(q);
+    if (pos) {
+      const rows = LOAN_MODEL_DATA
+        .filter(d => devPosMatch({ posicion_normalizada: d.posicion_jugador }, pos))
+        .sort((a, b) => num(b.score_evidencia) - num(a.score_evidencia))
+        .slice(0, 25);
+      return `Modelo de destinos para posición ${pos}. Ranking por evidencia histórica Sub-23:\n` +
+        rows.map(d => `${d.club_destino}|${d.posicion_destino}|entrenador:${d.entrenador_principal||''}|score:${d.score_evidencia}|min_sub23:${d.minutos_sub23_destino}|jug_sub23:${d.jugadores_sub23_destino}|goles:${d.goles_sub23_destino}|xg:${d.xg_sub23_destino}`).join('\n');
+    }
+  }
 
   // Entrenador que desarrolla mejor una posición concreta
   if (M.length && /entrenador/.test(q) && /(delant|extrem|central|lateral|medio|portero|centrocampista)/.test(q)) {

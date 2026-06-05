@@ -1,0 +1,42 @@
+﻿jugador,equipo,posicion_original,posicion_primaria,posicion_normalizada,edad,valor_mercado,vencimiento_contrato,partidos_jugados,minutos_jugados,goles,xg,goles_por_90,xg_por_90,pais_nacimiento,pasaporte,pie,altura,peso,en_prestamo,es_sub23
+Pablo Garcia,Real Betis,"RW, CF",RW,Extremo,19,0,2029-06-30,9,839,7,5.97,0.75,0.64,Spain,Spain,izquierdo,0,0,no,True
+I. Amores,Real Betis B,RW,RW,Extremo,20,0,,3,166,0,0.13,0.0,0.07,Spain,Spain,unknown,0,0,no,True
+M. Hamdoune,Real Betis B,"LCB, CB",LCB,Central,21,0,2029-06-30,14,1079,0,0.02,0.0,0.0,Morocco,Morocco,izquierdo,0,0,no,True
+Adrian Martin,Real Betis B,"RCMF, DMF",RCMF,Centrocampista,19,0,,2,52,0,0.14,0.0,0.24,Spain,Spain,derecho,0,0,no,True
+V. Răfăilă,Real Betis B,GK,GK,Portero,21,0,2026-06-30,1,106,0,0.0,0.0,0.0,Romania,Romania,izquierdo,197,86,si,True
+Antonio Toral,Real Betis B,"LW, LAMF, LWF",LW,Extremo,22,0,,13,468,0,0.28,0.0,0.05,Spain,Spain,derecho,170,0,no,True
+D. Traoré,Real Betis B,"AMF, RCMF",AMF,Mediapunta,19,0,2026-06-30,5,108,0,0.01,0.0,0.01,France,"France, Senegal",derecho,188,77,si,True
+Y. Koré,Real Betis B,"RCB, RB",RCB,Central,21,1000000,2027-06-30,11,779,1,0.8,0.12,0.09,France,"France, Côte d'Ivoire",derecho,187,75,si,True
+Marcos Solís,Real Betis B,RB,RB,Lateral,20,0,,3,129,0,0.0,0.0,0.0,Spain,Spain,derecho,0,0,no,True
+M. Mensah,Real Betis B,"RDMF, RCMF, LDMF",RDMF,Mediocentro,22,0,2026-06-30,16,1209,0,0.42,0.0,0.03,Ghana,Ghana,derecho,168,70,no,True
+Ismael Barea,Real Betis B,"RDMF, RCMF",RDMF,Mediocentro,20,0,2028-06-30,5,395,0,0.09,0.0,0.02,Spain,Spain,derecho,0,0,no,True
+Carlos Reina,Real Betis B,"CF, LCMF, AMF",CF,Delantero,21,0,2026-06-30,25,1653,6,5.51,0.33,0.3,Spain,Spain,derecho,176,68,no,True
+M. Kamara Rodriguez,Real Betis B,"RW, LCB, RAMF",RW,Extremo,22,0,,4,71,1,0.25,1.27,0.32,Netherlands,Netherlands,,0,0,no,True
+Yanis Senhadji,Real Betis B,"CF, RW",CF,Delantero,21,0,2028-06-30,12,194,0,0.55,0.0,0.26,Spain,"Spain, Algeria",derecho,184,75,no,True
+Ginés Sorroche,Real Betis B,"RCMF, AMF",RCMF,Centrocampista,22,0,2026-06-30,28,1124,1,0.74,0.08,0.06,Spain,Spain,derecho,180,71,no,True
+Jorge Luis,Real Betis B,CF,CF,Delantero,20,0,,18,739,0,0.97,0.0,0.12,Spain,Spain,,0,0,no,True
+F. Embalo Muñoz,Real Betis B,"RCB, RB",RCB,Central,20,0,,14,824,0,0.54,0.0,0.06,Spain,Spain,unknown,0,0,no,True
+K. Sosu,Real Betis B,"RAMF, RW, RWF",RAMF,RAMF,20,0,,17,903,2,2.5,0.2,0.25,Ghana,Ghana,unknown,0,0,no,True
+G. Bouare Samake,Real Betis B,"DMF, LDMF",DMF,Mediocentro,21,0,2027-06-30,30,2783,2,1.54,0.06,0.05,Spain,Spain,,184,74,no,True
+José Morante,Real Betis B,"RW, RAMF, LW",RW,Extremo,18,0,2027-06-30,31,2248,6,4.49,0.24,0.18,Spain,Spain,unknown,0,0,no,True
+Manu González,Real Betis B,GK,GK,Portero,19,0,2028-06-30,32,3308,0,0.0,0.0,0.0,Spain,Spain,derecho,0,0,no,True
+Jorge Oreiro,Real Betis B,RCB,RCB,Central,20,0,,26,2346,0,1.24,0.0,0.05,Spain,Spain,,0,0,no,True
+German García,Real Betis B,GK,GK,Portero,22,0,2026-06-30,5,525,0,0.0,0.0,0.0,Spain,Spain,derecho,0,0,no,True
+Pablo Busto,Real Betis B,RB,RB,Lateral,20,0,2027-06-30,15,896,0,0.11,0.0,0.01,Spain,Spain,derecho,180,69,no,True
+R. Marina,Real Betis B,CF,CF,Delantero,19,0,,32,2339,7,9.73,0.27,0.37,Spain,Spain,derecho,188,0,no,True
+D. Bladi,Real Betis B,LB,LB,Lateral,21,0,2027-06-30,30,2313,1,0.78,0.04,0.03,France,France,unknown,0,0,no,True
+E. Zidane,Real Betis B,"LCB, RCB",LCB,Central,20,0,,17,1666,0,0.6,0.0,0.03,France,"France, Spain",izquierdo,194,79,no,True
+Òscar Masqué,Real Betis B,RB,RB,Lateral,19,0,,17,1361,1,0.44,0.07,0.03,Spain,Spain,,0,0,no,True
+Dani Pérez,Real Betis B,"LCMF, RCMF, AMF",LCMF,Centrocampista,20,0,2026-06-30,23,2090,0,0.64,0.0,0.03,Spain,Spain,derecho,173,64,no,True
+Aitor Gismera,Real Betis B,"DMF, LDMF, RDMF",DMF,Mediocentro,22,0,2027-06-30,23,1558,0,0.06,0.0,0.0,Spain,Spain,derecho,182,76,no,True
+Ian Forns,Real Betis B,"LB, RB",LB,Lateral,22,0,2029-06-30,25,2379,0,1.05,0.0,0.04,Spain,Spain,izquierdo,0,0,no,True
+Borja Alonso,Real Betis B,"LW, LAMF",LW,Extremo,22,0,,32,2608,7,5.78,0.24,0.2,Spain,Spain,ambidiestro,176,70,no,True
+Ruben De Sa Abreu,Real Betis B,"RB, RW",RB,Lateral,18,0,,9,355,0,0.02,0.0,0.01,Spain,Spain,unknown,0,0,no,True
+R. Oya Mesa,Real Betis B,"RW, LB",RW,Extremo,18,0,,5,105,0,0.01,0.0,0.01,Spain,Spain,unknown,0,0,no,True
+C. De Roa García,Real Betis B,"LB, RB",LB,Lateral,18,0,,4,117,0,0.0,0.0,0.0,Spain,Spain,izquierdo,0,0,no,True
+Mario Navarro,Real Betis B,RB,RB,Lateral,17,0,,1,27,0,0.0,0.0,0.0,Spain,Spain,unknown,0,0,no,True
+Antonio González,Real Betis B,"LW, RW",LW,Extremo,18,0,,3,99,0,0.0,0.0,0.0,Spain,Spain,unknown,0,0,no,True
+Emmanuel,Real Betis B,LCB,LCB,Central,19,0,,11,951,1,0.3,0.09,0.03,Spain,Spain,unknown,0,0,no,True
+M. Romero,Real Betis B,"DMF, RCMF",DMF,Mediocentro,18,0,,1,40,0,0.09,0.0,0.2,Spain,Spain,unknown,0,0,no,True
+R. Gomez,Real Betis B,"RCMF, LCMF, RW",RCMF,Centrocampista,19,0,,3,159,0,0.02,0.0,0.01,Spain,Spain,unknown,0,0,no,True
+Iván Corralejo,Real Betis B,"RCMF, LCMF",RCMF,Centrocampista,19,0,2028-06-30,18,1345,2,1.87,0.13,0.13,Spain,Spain,derecho,170,62,no,True
