@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
 
-  <link rel="stylesheet" href="styles.css?v=13">
+  <link rel="stylesheet" href="styles.css?v=14">
 </head>
 <body>
 
@@ -48,6 +48,7 @@
     </li>
     <li><a href="#" class="nav-link" data-tab="tab-buscador"><span class="nav-icon">🔎</span><span class="nav-text">Buscador</span></a></li>
     <li><a href="#" class="nav-link" data-tab="tab-scoutgpt"><span class="nav-icon">🤖</span><span class="nav-text">ScoutGPT</span></a></li>
+    <li><a href="#" class="nav-link" data-tab="tab-desarrollo"><span class="nav-icon">🌱</span><span class="nav-text">Desarrollo Talento</span></a></li>
     <li><a href="#" class="nav-link" data-tab="tab-bbdd"><span class="nav-icon">🗄️</span><span class="nav-text">Base de Datos</span></a></li>
   </ul>
 </nav>
@@ -643,6 +644,56 @@
     </div>
   </div>
 
+  <!-- ===================== TAB: DESARROLLO DE TALENTO ===================== -->
+  <div id="tab-desarrollo" class="tab-content">
+    <div class="section-header">
+      <h2 class="section-title">🌱 Desarrollo de Talento</h2>
+      <p class="section-subtitle">Dataset maestro unificado — Base para análisis de decisiones de desarrollo</p>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="dev-kpis" style="margin-bottom:24px"></div>
+
+    <!-- Aviso fuente de datos -->
+    <div id="dev-data-notice" style="background:rgba(0,154,68,0.06);border:1px solid rgba(0,154,68,0.2);
+      border-radius:10px;padding:12px 18px;margin-bottom:24px;font-size:0.82rem;color:var(--text-muted)">
+      📋 <strong>Fase 1 — Datos TM + Entrenadores.</strong>
+      Los campos de estadísticas (partidos, minutos, goles, asistencias) se poblarán al importar exportaciones Wyscout en <code>data/wyscout/</code> y ejecutar <code>python3 build_master.py</code>.
+    </div>
+
+    <!-- Gráficos en grid -->
+    <div class="charts-grid-2">
+      <div class="chart-card">
+        <div class="chart-title">Distribución de edades</div>
+        <div id="chart-dev-edad" class="chart-container"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Distribución por posición</div>
+        <div id="chart-dev-posicion" class="chart-container chart-tall"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Jugadores Sub-23 vs Senior</div>
+        <div id="chart-dev-sub23" class="chart-container"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Entrenadores con más registros</div>
+        <div id="chart-dev-entrenadores" class="chart-container chart-tall"></div>
+      </div>
+    </div>
+
+    <!-- Tipos de operación -->
+    <div class="chart-card full-width" style="margin-top:0">
+      <div class="chart-title">Distribución por tipo de operación</div>
+      <div id="chart-dev-tipos" class="chart-container"></div>
+    </div>
+
+    <!-- Estado del master -->
+    <div class="chart-card full-width">
+      <div class="chart-title">Estado del dataset maestro por temporada</div>
+      <div id="dev-table-temporadas" style="overflow-x:auto"></div>
+    </div>
+  </div>
+
   <!-- ===================== TAB 8: BASE DE DATOS ===================== -->
   <div id="tab-bbdd" class="tab-content">
     <div class="chart-card full-width">
@@ -681,6 +732,6 @@
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="script.js?v=21"></script>
+<script src="script.js?v=22"></script>
 </body>
 </html>
