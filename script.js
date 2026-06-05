@@ -116,6 +116,11 @@ function formatM(n) {
   if (n >= 1e3) return `€${(n / 1e3).toFixed(0)}k`;
   return n > 0 ? `€${n}` : '-';
 }
+function formatDeltaM(n) {
+  const v = +n || 0;
+  if (v === 0) return '-';
+  return `${v > 0 ? '+' : '-'}${formatM(Math.abs(v))}`;
+}
 function fmt(n) { return new Intl.NumberFormat('es-ES').format(Math.round(n)); }
 
 const BASE_LAYOUT = {
@@ -128,17 +133,58 @@ const BASE_LAYOUT = {
   legend: { bgcolor: 'rgba(0,0,0,0)', font: { size: 10 } }
 };
 
-function layout(overrides) {
-  return Object.assign({}, BASE_LAYOUT, overrides,
+function isCategoricalAxisValue(v) {
+  return v !== null && v !== undefined && v !== '' && typeof v !== 'number' && isNaN(+v);
+}
+
+function axisCategoriesFromTraces(data, axisKey) {
+  const seen = new Set();
+  const categories = [];
+  data.forEach(trace => {
+    const values = Array.isArray(trace[axisKey]) ? trace[axisKey] : [];
+    values.forEach(v => {
+      if (isCategoricalAxisValue(v) && !seen.has(v)) {
+        seen.add(v);
+        categories.push(v);
+      }
+    });
+  });
+  return categories;
+}
+
+function layout(overrides = {}, data = []) {
+  const next = Object.assign({}, BASE_LAYOUT, overrides,
     overrides.xaxis ? { xaxis: Object.assign({}, BASE_LAYOUT.xaxis, overrides.xaxis) } : {},
     overrides.yaxis ? { yaxis: Object.assign({}, BASE_LAYOUT.yaxis, overrides.yaxis) } : {}
   );
+
+  const hasHorizontalBar = data.some(trace => trace.type === 'bar' && trace.orientation === 'h');
+  if (hasHorizontalBar && !(next.yaxis && next.yaxis.categoryorder)) {
+    const yCategories = axisCategoriesFromTraces(data, 'y');
+    if (yCategories.length) {
+      next.yaxis = Object.assign({}, next.yaxis, {
+        categoryorder: 'array',
+        categoryarray: yCategories,
+      });
+    }
+  }
+
+  const xCategories = axisCategoriesFromTraces(data, 'x');
+  const hasNumericX = data.some(trace => Array.isArray(trace.x) && trace.x.some(v => typeof v === 'number' || (!isNaN(+v) && v !== '')));
+  if (xCategories.length && !hasNumericX && !(next.xaxis && next.xaxis.categoryorder)) {
+    next.xaxis = Object.assign({}, next.xaxis, {
+      categoryorder: 'array',
+      categoryarray: xCategories,
+    });
+  }
+
+  return next;
 }
 
 function plot(id, data, layoutOverrides, config = {}) {
   try {
     Plotly.purge(id);
-    Plotly.newPlot(id, data, layout(layoutOverrides), Object.assign({ responsive: true, displayModeBar: false }, config));
+    Plotly.newPlot(id, data, layout(layoutOverrides, data), Object.assign({ responsive: true, displayModeBar: false }, config));
   } catch(e) { console.warn('plot error', id, e); }
 }
 
@@ -2453,17 +2499,25 @@ function renderScoutGPTTab() {
     addSgptTyping();
 
     let html;
-    if (isDecisionModelQuery(norm(q))) {
+    const qn = norm(q);
+    if (isDecisionModelQuery(qn)) {
       await new Promise(resolve => loadLoanModelData(resolve));
       await new Promise(resolve => loadDecisionModelData(resolve));
       html = processScoutQuery(q);
-    } else if (_aiEnabled && !isDirectTMQuery(q)) {
-      html = await processWithAI(q);
-    } else if (isDirectTMQuery(q)) {
-      html = await processLiveQuery(q);
     } else {
-      await new Promise(r => setTimeout(r, 260));
-      html = processScoutQuery(q);
+      await new Promise(resolve => loadLoanModelData(resolve));
+      await new Promise(resolve => loadDecisionModelData(resolve));
+      const betisPlayer = detectBetisPlayerInQuery(qn);
+      if (betisPlayer) {
+        html = processScoutQuery(q);
+      } else if (_aiEnabled && !isDirectTMQuery(q)) {
+        html = await processWithAI(q);
+      } else if (isDirectTMQuery(q)) {
+        html = await processLiveQuery(q);
+      } else {
+        await new Promise(r => setTimeout(r, 260));
+        html = processScoutQuery(q);
+      }
     }
     removeTyping();
     addSgptMessage('bot', html);
@@ -2816,6 +2870,12 @@ function processScoutQuery(raw) {
   if (isJugadors && isRev && ageRange) return sgptJugadoresEdadRev(ageRange, topLimit);
   if (isJugadors && isRev) return sgptTopJugadoresRev(topLimit);
   if (isROI) return sgptNacionalidadesROI(topLimit);
+
+  // Fallback: jugador de la carpeta Betis Deportivo → informe de decisión local
+  const betisPlayerFallback = detectBetisPlayerInQuery(q);
+  if (betisPlayerFallback && RF_PLAYER_RECOMMENDATIONS.length) {
+    return sgptDecisionForBetisPlayer(betisPlayerFallback.jugador);
+  }
 
   // Fallback: nombre propio → jugador
   const players = [...new Set(ALL_DATA.map(d => d.jugador))].filter(Boolean);
@@ -3246,11 +3306,31 @@ function sgptTopJugadoresRev(n) {
 function sgptPlayerInfo(name) {
   const ops = ALL_DATA.filter(d => d.jugador === name);
   const rev = REV_DATA.find(d => d.jugador === name);
-  const latest = ops.sort((a,b) => ['2021-22','2022-23','2023-24','2024-25','2025-26'].indexOf(b.temporada) - ['2021-22','2022-23','2023-24','2024-25','2025-26'].indexOf(a.temporada))[0];
-  let out = `<strong>${name}</strong> · ${tPos(latest?.posicion||'')} · ${latest?.nacionalidad||'—'}<br>`;
-  out += ops.map(op => `${op.temporada} — ${op.club} (${op.movimiento}) ${op.importe_original ? '· '+op.importe_original : ''}`).join('<br>');
-  if (rev) out += `<br>📈 Revalorización: <span class="green">${formatM(+rev.revalorizacion_abs||0)}</span> (${(+rev.revalorizacion_pct||0).toFixed(0)}%)`;
-  return out;
+  if (!ops.length) return `No encuentro operaciones para <strong>${name}</strong>.`;
+
+  const order = ['2021-22','2022-23','2023-24','2024-25','2025-26'];
+  const sortedOps = [...ops].sort((a,b) => order.indexOf(b.temporada) - order.indexOf(a.temporada));
+  const latest = sortedOps[0];
+  const totalImporte = sumBy(ops, 'importe_numerico');
+  const clubes = [...new Set(ops.map(d => d.club).filter(Boolean))];
+
+  return `<strong>${name}</strong><br>
+    <span class="muted">${tPos(latest?.posicion || '') || '—'} · ${latest?.nacionalidad || '—'} · último club registrado: ${latest?.club || '—'}</span>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Operaciones</span><br><strong>${ops.length}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Clubes</span><br><strong>${clubes.length}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Importe total</span><br><strong>${formatM(totalImporte)}</strong></div>
+      ${rev ? `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Revalorización</span><br><strong class="${(+rev.revalorizacion_abs||0) >= 0 ? 'green' : 'red'}">${formatDeltaM(+rev.revalorizacion_abs || 0)} · ${(+rev.revalorizacion_pct || 0).toFixed(0)}%</strong></div>` : ''}
+    </div>
+    <table><thead><tr><th>Temp.</th><th>Club</th><th>Movimiento</th><th>Tipo</th><th>Importe</th></tr></thead>
+    <tbody>${sortedOps.slice(0, 8).map(op => `<tr>
+      <td>${op.temporada || '—'}</td>
+      <td class="bold">${op.club || '—'}</td>
+      <td>${op.movimiento || '—'}</td>
+      <td class="muted">${prettyTipo(op.tipo_operacion || op.movimiento)}</td>
+      <td>${op.importe_numerico ? formatM(op.importe_numerico) : (op.importe_original || '—')}</td>
+    </tr>`).join('')}</tbody></table>
+    ${sortedOps.length > 8 ? `<span class="muted">Mostrando las 8 operaciones más recientes.</span>` : ''}`;
 }
 
 function sgptDefault(raw) {
@@ -3562,6 +3642,20 @@ function pct(v) {
   return `${Math.round(num(v) * 100)}%`;
 }
 
+// Traduce tipos de suceso crudos a etiquetas legibles para el usuario
+function prettyTipo(t) {
+  const map = {
+    'sub23_wyscout': 'Promoción / plantilla',
+    'cesion': 'Cesión',
+    'traspaso': 'Traspaso',
+    'libre': 'Fichaje libre',
+    'retorno_cesion': 'Retorno de cesión',
+    'otro': 'Continuidad',
+    'plantilla_wyscout': 'Promoción / plantilla',
+  };
+  return map[String(t || '').toLowerCase()] || (t || '—');
+}
+
 // Detecta el club destino mencionado en la pregunta (de los destinos del jugador)
 function detectDestinationClubInQuery(q, betisPlayer) {
   // Universo de clubes destino reales (Segunda 2025-26)
@@ -3651,68 +3745,63 @@ function sgptDecisionForBetisPlayer(playerName) {
     return 'El modelo RF de decisiones todavía se está cargando. Vuelve a lanzar la pregunta en unos segundos.';
   }
   const summary = rfSummaryForPlayer(playerName);
-  const rows = rfRowsForPlayer(playerName).slice(0, 8);
+  const rows = rfRowsForPlayer(playerName).slice(0, 3);
   const similar = RF_SIMILAR_EVENTS
     .filter(d => norm(d.jugador_betis) === norm(playerName))
     .sort((a, b) => num(a.ranking_similar) - num(b.ranking_similar))
-    .slice(0, 6);
+    .slice(0, 3);
 
   if (!summary) return `No encuentro recomendación RF para <strong>${playerName}</strong>.`;
 
-  // Bloque de decisión con operation_success_score (formato solicitado)
   const dec = BETIS_DECISIONS.find(d => norm(d.jugador) === norm(playerName));
-  let decisionBlock = '';
-  if (dec) {
-    const prob = num(dec.probabilidad_exito);
-    const probColor = prob >= 55 ? 'var(--success)' : prob >= 35 ? 'var(--warning)' : 'var(--danger)';
-    decisionBlock = `
-    <div style="margin:10px 0;padding:14px;border:2px solid var(--primary);border-radius:10px;background:var(--primary-light)">
-      <div style="font-size:1.05rem;font-weight:800;color:var(--primary-dark);margin-bottom:6px">
-        🎯 Operación recomendada: ${dec.operacion_recomendada}
-      </div>
-      <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px">
-        <div><span class="muted">Probabilidad de éxito</span><br><strong style="font-size:1.2rem;color:${probColor}">${prob.toFixed(0)}/100</strong></div>
-        <div><span class="muted">Revalorización esperada</span><br><strong style="font-size:1.1rem" class="green">${dec.revalorizacion_esperada || '—'}</strong></div>
-      </div>
-      ${dec.clubes_ideales ? `<div style="margin-top:6px"><strong>🏟️ Clubes ideales:</strong> ${dec.clubes_ideales}</div>` : ''}
-      ${dec.entrenadores_ideales ? `<div style="margin-top:4px"><strong>👔 Entrenadores ideales:</strong> ${dec.entrenadores_ideales}</div>` : ''}
-      ${dec.casos_similares ? `<div style="margin-top:4px"><strong>📋 Casos similares:</strong> ${dec.casos_similares}</div>` : ''}
-      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:6px">
-        ${dec.justificacion || ''}
-      </div>
-    </div>`;
-  }
+  const operacion = dec?.operacion_recomendada || summary.operacion_sugerida || 'Evaluar';
+  const prob = dec ? num(dec.probabilidad_exito) : num(summary.score_destino_medio_top5);
+  const probColor = prob >= 55 ? 'var(--success)' : prob >= 35 ? 'var(--warning)' : 'var(--danger)';
+  const revalText = dec?.revalorizacion_esperada || formatDeltaM(num(summary.revalorizacion_esperada_media_top5));
+  const justificacion = dec?.justificacion || summary.razonamiento || '';
+  const clubesText = dec?.clubes_ideales || summary.clubes_ideales || '';
+  const entrenadoresText = dec?.entrenadores_ideales || summary.entrenadores_ideales || '';
 
-  return `<strong>Modelo de decisión para ${summary.jugador}</strong><br>
-    <span class="muted">operation_success_score (RF) + evidencia histórica: cesiones, traspasos, Sub23 Wyscout, revalorización, demanda club-posición, entrenadores y casos similares.</span><br>
-    ${decisionBlock}
-    <div style="margin:10px 0;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
-      <strong>Operación sugerida:</strong> ${summary.operacion_sugerida || '—'} ·
-      <strong>Confianza:</strong> ${summary.confianza_modelo || '—'} ·
-      <strong>Revalorización esperada top5:</strong> <span class="green">${formatM(num(summary.revalorizacion_esperada_media_top5))}</span> ·
-      <strong>Prob. revalorización positiva:</strong> ${pct(summary.prob_revalorizacion_positiva_media_top5)}<br>
-      <span class="muted">${summary.razonamiento || ''}</span>
+  const destinoCards = rows.map(d => `
+    <div style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+        <strong>${d.ranking_destino_rf}. ${d.club}</strong>
+        <span class="green" style="font-weight:800">${num(d.score_destino_rf).toFixed(1)}</span>
+      </div>
+      <div class="muted" style="font-size:0.78rem;margin-top:2px">${d.entrenador || 'Entrenador no identificado'}</div>
+      <div style="font-size:0.8rem;margin-top:6px">
+        Reval. ${formatDeltaM(num(d.rf_revalorizacion_esperada))} · Prob + ${pct(d.rf_prob_revalorizacion_positiva)} · Demanda ${num(d.demand_score).toFixed(0)}/100
+      </div>
+    </div>`).join('');
+
+  const similarCards = similar.map(d => `
+    <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <strong>${d.jugador_historico}</strong> · ${d.club}<br>
+      <span class="muted">${prettyTipo(d.tipo_suceso)} · ${num(d.edad).toFixed(0)} años · ${fmt(num(d.minutos))} min · similitud ${num(d.similaridad_score).toFixed(1)}</span>
+    </div>`).join('');
+
+  return `<strong>${summary.jugador}</strong> · ${summary.posicion || '—'} · ${num(summary.edad).toFixed(0)} años<br>
+    <div style="margin:10px 0;padding:14px;border:2px solid var(--primary);border-radius:10px;background:var(--primary-light)">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
+        <div>
+          <div class="muted" style="font-size:0.78rem">Operación recomendada</div>
+          <div style="font-size:1.15rem;font-weight:900;color:var(--primary-dark)">${operacion}</div>
+        </div>
+        <div>
+          <div class="muted" style="font-size:0.78rem">Score / confianza</div>
+          <div style="font-size:1.15rem;font-weight:900;color:${probColor}">${prob.toFixed(0)}/100</div>
+        </div>
+        <div>
+          <div class="muted" style="font-size:0.78rem">Revalorización esperada</div>
+          <div style="font-size:1.05rem;font-weight:900" class="green">${revalText}</div>
+        </div>
+      </div>
+      ${justificacion ? `<div style="margin-top:10px;font-size:0.84rem;color:var(--text-muted);line-height:1.5">${justificacion}</div>` : ''}
     </div>
-    ${rows.length ? `<strong>Clubes y entrenadores ideales:</strong><br>
-    <table><thead><tr><th>#</th><th>Club</th><th>Entren. Sub-23 (hist.)</th><th>Score RF</th><th>Reval. esp.</th><th>Prob +</th><th>Demanda</th><th>Razonamiento</th></tr></thead>
-    <tbody>${rows.map(d => `<tr>
-      <td>${num(d.ranking_destino_rf)}</td>
-      <td class="bold">${d.club}</td>
-      <td>${d.entrenador || '—'}</td>
-      <td class="green">${num(d.score_destino_rf).toFixed(2)}</td>
-      <td>${formatM(num(d.rf_revalorizacion_esperada))}</td>
-      <td>${pct(d.rf_prob_revalorizacion_positiva)}</td>
-      <td>${num(d.demand_score).toFixed(1)}</td>
-      <td class="muted">${d.razonamiento_rf || '—'}</td>
-    </tr>`).join('')}</tbody></table>` : ''}
-    ${similar.length ? `<br><strong>Sucesos históricos similares:</strong><br>
-    <table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>Tipo</th><th>Edad</th><th>Min</th><th>Goles</th><th>Rev.</th><th>Similitud</th></tr></thead>
-    <tbody>${similar.map(d => `<tr>
-      <td>${num(d.ranking_similar)}</td><td class="bold">${d.jugador_historico}</td><td>${d.club}</td>
-      <td>${d.tipo_suceso}</td><td>${num(d.edad).toFixed(0)}</td><td>${fmt(num(d.minutos))}</td>
-      <td>${num(d.goles).toFixed(0)}</td><td>${num(d.revalorizacion) ? formatM(num(d.revalorizacion)) : '—'}</td>
-      <td>${num(d.similaridad_score).toFixed(1)}</td>
-    </tr>`).join('')}</tbody></table>` : ''}`;
+    ${clubesText ? `<div style="margin-bottom:6px"><strong>Clubes ideales:</strong> <span class="muted">${clubesText}</span></div>` : ''}
+    ${entrenadoresText ? `<div style="margin-bottom:10px"><strong>Entrenadores ideales:</strong> <span class="muted">${entrenadoresText}</span></div>` : ''}
+    ${destinoCards ? `<strong>Top destinos calculados</strong><div style="display:grid;gap:8px;margin:8px 0 12px">${destinoCards}</div>` : ''}
+    ${similarCards ? `<strong>Casos históricos parecidos</strong><div style="display:grid;gap:8px;margin-top:8px">${similarCards}</div>` : ''}`;
 }
 
 function sgptDecisionForPosition(pos, n) {
@@ -4063,7 +4152,7 @@ function buildQueryContext(question) {
         `Destinos:\n` +
         rows.map(d => `${d.ranking_destino_rf}|${d.club}|entrenador:${d.entrenador||''}|score_rf:${d.score_destino_rf}|reval_esperada:${d.rf_revalorizacion_esperada}|prob_rev_pos:${d.rf_prob_revalorizacion_positiva}|demanda:${d.demand_score}|razon:${d.razonamiento_rf||''}`).join('\n') +
         `\nSucesos similares:\n` +
-        similar.map(d => `${d.ranking_similar}|${d.jugador_historico}|${d.club}|${d.tipo_suceso}|edad:${d.edad}|min:${d.minutos}|goles:${d.goles}|rev:${d.revalorizacion}|sim:${d.similaridad_score}`).join('\n');
+        similar.map(d => `${d.ranking_similar}|${d.jugador_historico}|${d.club}|${prettyTipo(d.tipo_suceso)}|edad:${d.edad}|min:${d.minutos}|goles:${d.goles}|rev:${d.revalorizacion}|sim:${d.similaridad_score}`).join('\n');
     }
   }
 
