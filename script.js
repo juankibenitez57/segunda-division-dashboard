@@ -2745,6 +2745,17 @@ function processScoutQuery(raw) {
 
   // --- Routing ---
 
+  // Evaluación DIRIGIDA: jugador Betis + club destino concreto + operación
+  // Ej: "¿sería buena la cesión de Rodrigo Marina al Ceuta?" / "¿vender a Morante al Andorra?"
+  if ((isDecisionModel || isLoanDestination) && RF_DESTINATION_RECOMMENDATIONS.length) {
+    const betisPlayer = detectBetisPlayerInQuery(q);
+    const destClub = detectDestinationClubInQuery(q, betisPlayer);
+    if (betisPlayer && destClub) {
+      const operacion = /vend|traspas|vent/.test(q) ? 'venta' : 'cesion';
+      return sgptEvaluateMove(betisPlayer.jugador, destClub, operacion);
+    }
+  }
+
   // Modelo RF para decision/operacion recomendada de jugadores Betis Deportivo
   if (isDecisionModel) {
     const betisPlayer = detectBetisPlayerInQuery(q);
@@ -3518,7 +3529,7 @@ function isLoanDestinationQuery(q) {
 }
 
 function isDecisionModelQuery(q) {
-  return /recomend|operaci[oó]n|decision|decidir|salida|ceder|cesi[oó]n|destin|renovar|recompra|porcentaje|modelo|random|forest|ideal|encaje/.test(q);
+  return /recomend|operaci[oó]n|decision|decidir|salida|ceder|cesi[oó]n|destin|renovar|recompra|porcentaje|modelo|random|forest|ideal|encaje|vend(er)?|traspas|vent[a]?|interes/.test(q);
 }
 
 function detectBetisPlayerInQuery(q) {
@@ -3549,6 +3560,90 @@ function rfSummaryForPlayer(playerName) {
 
 function pct(v) {
   return `${Math.round(num(v) * 100)}%`;
+}
+
+// Detecta el club destino mencionado en la pregunta (de los destinos del jugador)
+function detectDestinationClubInQuery(q, betisPlayer) {
+  // Universo de clubes destino reales (Segunda 2025-26)
+  const clubs = [...new Set(RF_DESTINATION_RECOMMENDATIONS.map(d => d.club))].filter(Boolean);
+  // Intento 1: nombre completo
+  let hit = clubs.find(c => q.includes(norm(c)));
+  if (hit) return hit;
+  // Intento 2: por palabra significativa del nombre (Ceuta, Andorra, Eibar…)
+  return clubs.find(c => {
+    const words = norm(c).split(/\s+/).filter(w => w.length >= 4 &&
+      !['real','club','deportivo','union','balompie'].includes(w));
+    return words.some(w => q.includes(w));
+  }) || null;
+}
+
+// Evalúa una operación concreta jugador → club y la justifica con un veredicto
+function sgptEvaluateMove(playerName, clubName, operacion) {
+  const row = RF_DESTINATION_RECOMMENDATIONS.find(
+    d => norm(d.jugador) === norm(playerName) && norm(d.club) === norm(clubName));
+  const summary = rfSummaryForPlayer(playerName);
+
+  if (!row) {
+    return `<strong>${playerName} → ${clubName}</strong><br>
+      <span class="muted">No tengo evidencia de desarrollo de <strong>${clubName}</strong> para la posición de ${playerName},
+      o ese club no milita en Segunda 2025-26. Pregúntame por sus destinos ideales para ver alternativas con evidencia.</span>`;
+  }
+
+  // Señales clave
+  const score = num(row.score_destino_rf);          // 0-100 ranking destino RF
+  const demand = num(row.demand_score);              // 0-100 necesidad del club
+  const revEsp = num(row.rf_revalorizacion_esperada);
+  const probPos = num(row.rf_prob_revalorizacion_positiva);
+  const minSub23 = num(row.minutos_sub23_destino);
+  const jugSub23 = num(row.jugadores_sub23_destino);
+  const nivel = row.nivel_evidencia || '—';
+  const ranking = num(row.ranking_destino_rf);
+
+  // ¿Es de los mejores destinos del jugador? (ranking dentro de su top)
+  const allDest = rfRowsForPlayer(playerName);
+  const total = allDest.length;
+  const mejorTop = ranking > 0 && ranking <= Math.max(3, Math.ceil(total * 0.25));
+
+  // Veredicto basado en evidencia
+  let veredicto, color, emoji;
+  if (score >= 55 && demand >= 40 && minSub23 >= 1500) {
+    veredicto = 'SÍ, buena opción'; color = 'var(--success)'; emoji = '✅';
+  } else if (score >= 40 && (demand >= 35 || minSub23 >= 1500)) {
+    veredicto = 'Opción razonable, con matices'; color = 'var(--warning)'; emoji = '🟡';
+  } else {
+    veredicto = 'Poco recomendable'; color = 'var(--danger)'; emoji = '🔻';
+  }
+
+  // Justificación
+  const just = [];
+  just.push(minSub23 >= 1500
+    ? `${clubName} ha dado <strong>${fmt(minSub23)} min</strong> a Sub-23 en esa posición (${jugSub23} jugadores): desarrolla el perfil.`
+    : `${clubName} ha dado solo <strong>${fmt(minSub23)} min</strong> a Sub-23 en esa posición: poca evidencia de que dé minutos.`);
+  just.push(demand >= 40
+    ? `Demanda del club en la posición <strong>alta</strong> (${demand.toFixed(0)}/100): probablemente necesita el perfil.`
+    : `Demanda del club <strong>baja</strong> (${demand.toFixed(0)}/100): puede que no busque ese perfil ahora.`);
+  if (revEsp !== 0) just.push(`Revalorización esperada por el modelo: <span class="green">${formatM(revEsp)}</span> (prob. positiva ${pct(probPos)}).`);
+  just.push(mejorTop
+    ? `Es de los <strong>mejores destinos</strong> calculados para ${playerName} (ranking ${ranking}/${total}).`
+    : `No está entre los destinos óptimos de ${playerName} (ranking ${ranking}/${total}); hay opciones mejores.`);
+
+  const opLabel = operacion === 'venta' ? 'VENTA' : 'CESIÓN';
+
+  return `<strong>¿${opLabel} de ${playerName} al ${clubName}?</strong>
+    <span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;margin-left:6px">🤖 Evidencia histórica</span><br>
+    <div style="margin:10px 0;padding:14px;border:2px solid ${color};border-radius:10px;background:var(--bg)">
+      <div style="font-size:1.05rem;font-weight:800;color:${color};margin-bottom:8px">${emoji} ${veredicto}</div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px;font-size:0.85rem">
+        <div><span class="muted">Score destino</span><br><strong>${score.toFixed(1)}/100</strong></div>
+        <div><span class="muted">Demanda club</span><br><strong>${demand.toFixed(0)}/100</strong></div>
+        <div><span class="muted">Nivel evidencia</span><br><strong>${nivel}</strong></div>
+        <div><span class="muted">Reval. esperada</span><br><strong class="green">${formatM(revEsp)}</strong></div>
+      </div>
+      <ul style="margin:6px 0 0;padding-left:18px;font-size:0.85rem;line-height:1.6">
+        ${just.map(j => `<li>${j}</li>`).join('')}
+      </ul>
+    </div>
+    ${summary ? `<span class="muted">Operación que el modelo sugiere de forma global para ${playerName}: <strong>${summary.operacion_sugerida || '—'}</strong>. Pregúntame "destinos de ${playerName}" para ver el ranking completo.</span>` : ''}`;
 }
 
 function sgptDecisionForBetisPlayer(playerName) {
@@ -3599,7 +3694,7 @@ function sgptDecisionForBetisPlayer(playerName) {
       <span class="muted">${summary.razonamiento || ''}</span>
     </div>
     ${rows.length ? `<strong>Clubes y entrenadores ideales:</strong><br>
-    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score RF</th><th>Reval. esp.</th><th>Prob +</th><th>Demanda</th><th>Razonamiento</th></tr></thead>
+    <table><thead><tr><th>#</th><th>Club</th><th>Entren. Sub-23 (hist.)</th><th>Score RF</th><th>Reval. esp.</th><th>Prob +</th><th>Demanda</th><th>Razonamiento</th></tr></thead>
     <tbody>${rows.map(d => `<tr>
       <td>${num(d.ranking_destino_rf)}</td>
       <td class="bold">${d.club}</td>
@@ -3666,7 +3761,7 @@ function sgptLoanDestinationsForPlayer(playerName, n) {
   const first = rows[0];
   return `<strong>Mejores destinos por evidencia histórica para ${first.jugador}</strong><br>
     <span class="muted">Modelo explicable: minutos reales Sub-23, jugadores utilizados, posición, entrenador, producción y valor. No es una recomendación automática cerrada.</span><br>
-    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score</th><th>Evidencia</th><th>Min Sub-23</th><th>Jug.</th><th>Razones</th></tr></thead>
+    <table><thead><tr><th>#</th><th>Club</th><th>Entren. Sub-23 (hist.)</th><th>Score</th><th>Evidencia</th><th>Min Sub-23</th><th>Jug.</th><th>Razones</th></tr></thead>
     <tbody>${rows.map(d => `<tr>
       <td>${num(d.ranking_destino)}</td>
       <td class="bold">${d.club_destino}</td>
@@ -3698,7 +3793,7 @@ function sgptLoanDestinationsForPosition(pos, n) {
   if (!unique.length) return `No encuentro destinos calculados para la posición <strong>${pos}</strong>.`;
   return `<strong>Destinos con más evidencia para ${pos}</strong><br>
     <span class="muted">Ranking por oportunidades históricas Sub-23 en esa posición.</span><br>
-    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score</th><th>Evidencia</th><th>Min Sub-23</th><th>Jug.</th><th>Goles+xG</th></tr></thead>
+    <table><thead><tr><th>#</th><th>Club</th><th>Entren. Sub-23 (hist.)</th><th>Score</th><th>Evidencia</th><th>Min Sub-23</th><th>Jug.</th><th>Goles+xG</th></tr></thead>
     <tbody>${unique.map((d, i) => `<tr>
       <td>${i + 1}</td>
       <td class="bold">${d.club_destino}</td>
@@ -3727,7 +3822,7 @@ function sgptLoanDestinationsOverview(n) {
     .slice(0, n);
   return `<strong>Destinos con más evidencia histórica para cesiones Sub-23</strong><br>
     <span class="muted">Pregunta por un jugador concreto, por ejemplo: “mejores destinos para Pablo Garcia”.</span><br>
-    <table><thead><tr><th>#</th><th>Club</th><th>Posición</th><th>Entrenador</th><th>Score</th><th>Min Sub-23</th><th>Jug.</th></tr></thead>
+    <table><thead><tr><th>#</th><th>Club</th><th>Posición</th><th>Entren. Sub-23 (hist.)</th><th>Score</th><th>Min Sub-23</th><th>Jug.</th></tr></thead>
     <tbody>${rows.map((d, i) => `<tr>
       <td>${i + 1}</td><td class="bold">${d.club_destino}</td><td>${d.posicion_destino}</td>
       <td>${d.entrenador_principal || '—'}</td><td class="green">${num(d.score_evidencia).toFixed(2)}</td>

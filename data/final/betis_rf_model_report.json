@@ -279,7 +279,7 @@
   "historical_events_rows": 1963,
   "club_position_demand_rows": 264,
   "betis_players_rows": 41,
-  "destination_recommendation_rows": 480,
+  "destination_recommendation_rows": 471,
   "similar_events_rows": 410,
   "note": "Modelo Random Forest explicable basado en historicos disponibles; las predicciones son evidencia de apoyo, no decision automatica."
 }

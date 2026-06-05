@@ -71,6 +71,22 @@ for canonical, aliases in CLUB_ALIASES.items():
 
 _ALL_CANONICALS = list(CLUB_ALIASES.keys())
 
+# Clubes que militan en Segunda División en la temporada vigente (2025-26).
+# Solo estos son destinos válidos de cesión/venta dentro de la categoría.
+# Actualizar cada temporada con los 22 equipos de LaLiga Hypermotion.
+SEGUNDA_2025_26 = {
+    "AD Ceuta FC", "Albacete Balompié", "Burgos CF", "CD Castellón", "CD Leganés",
+    "CD Mirandés", "Cultural Leonesa", "Cádiz CF", "Córdoba CF", "Deportivo de La Coruña",
+    "FC Andorra", "Granada CF", "Málaga CF", "Racing Santander", "Real Sociedad B",
+    "Real Valladolid CF", "Real Zaragoza", "SD Eibar", "SD Huesca", "Sporting Gijón",
+    "UD Almería", "UD Las Palmas",
+}
+
+
+def is_segunda_actual(club: str) -> bool:
+    """True si el club milita en Segunda División 2025-26."""
+    return normalize_club(club) in SEGUNDA_2025_26
+
 
 def normalize_club(name: str) -> str:
     """

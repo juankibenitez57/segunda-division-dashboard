@@ -23,11 +23,11 @@
     "goles_actuales": 7,
     "operacion_recomendada": "MANTENER",
     "probabilidad_exito": 65.8,
-    "revalorizacion_esperada": "€497k",
-    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (80) | FC Andorra (70) | Levante UD (68)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Julián Calero",
+    "revalorizacion_esperada": "€716k",
+    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (81) | FC Andorra (72) | Real Valladolid CF (65)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Javi López (Burgos CF, 100) | Ilyas Chaira (CD Mirandés, 100)",
-    "justificacion": "Borja Alonso (Extremo, 22 años, 2608' esta temporada). Recomendación MANTENER: rinde en el filial, score 66/100. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €497k."
+    "justificacion": "Borja Alonso (Extremo, 22 años, 2608' esta temporada). Recomendación MANTENER: rinde en el filial, score 66/100. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €716k."
   },
   {
     "jugador": "José Morante",
@@ -39,8 +39,8 @@
     "operacion_recomendada": "MANTENER",
     "probabilidad_exito": 60.8,
     "revalorizacion_esperada": "€1.1M",
-    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (80) | FC Andorra (70) | Levante UD (68)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Julián Calero",
+    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (81) | FC Andorra (72) | Real Valladolid CF (65)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
     "casos_similares": "Dani Fernández (CD Tenerife, 21) | I. Álvarez (Cádiz CF, 9) | Paco Cortés (Cultural Leonesa, 4)",
     "justificacion": "José Morante (Extremo, 18 años, 2248' esta temporada). Recomendación MANTENER: rinde en el filial, score 61/100. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Dani Fernández, I. Álvarez, Paco Cortés. Revalorización esperada (modelo): €1.1M."
   },
@@ -53,11 +53,11 @@
     "goles_actuales": 6,
     "operacion_recomendada": "MANTENER",
     "probabilidad_exito": 60.0,
-    "revalorizacion_esperada": "€696k",
+    "revalorizacion_esperada": "€680k",
     "clubes_ideales": "Málaga CF (78) | Granada CF (73) | Cádiz CF (71) | CD Leganés (65) | Real Valladolid CF (63)",
     "entrenadores_ideales": "Fran Escribá | Pako Ayestarán | Borja Jiménez | Diego Cocca",
     "casos_similares": "Raúl García (CD Mirandés, 100) | Fabri (Levante UD, 100) | Iker Losada (Racing Ferrol, 100)",
-    "justificacion": "Carlos Reina (Delantero, 21 años, 1653' esta temporada). Recomendación MANTENER: rinde en el filial, score 60/100. Mejor destino: Málaga CF (desarrollo 100, demanda 94, uso jóvenes coach 0). Casos similares: Raúl García, Fabri, Iker Losada. Revalorización esperada (modelo): €696k."
+    "justificacion": "Carlos Reina (Delantero, 21 años, 1653' esta temporada). Recomendación MANTENER: rinde en el filial, score 60/100. Mejor destino: Málaga CF (desarrollo 100, demanda 94, uso jóvenes coach 0). Casos similares: Raúl García, Fabri, Iker Losada. Revalorización esperada (modelo): €680k."
   },
   {
     "jugador": "G. Bouare Samake",
@@ -69,8 +69,8 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 56.7,
     "revalorizacion_esperada": "€192k",
-    "clubes_ideales": "Sporting Gijón (63) | UD Almería (54) | CD Mirandés (49) | SD Eibar (49) | Deportivo de La Coruña (48)",
-    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Gaizka Garitano | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (63) | UD Almería (56) | SD Eibar (51) | CD Mirandés (50) | Deportivo de La Coruña (49)",
+    "entrenadores_ideales": "Rubén Albés | Gaizka Garitano | Míchel Alonso | Óscar Gilsanz",
     "casos_similares": "Antonio Moyano (AD Alcorcón, 100) | Anderson Arroyo (CD Mirandés, 100) | Imanol García De Albéniz (CD Mirandés, 100)",
     "justificacion": "G. Bouare Samake (Mediocentro, 21 años, 2783' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 57/100. Mejor destino: Sporting Gijón (desarrollo 100, demanda 0, uso jóvenes coach 66). Casos similares: Antonio Moyano, Anderson Arroyo, Imanol García De Albéniz. Revalorización esperada (modelo): €192k."
   },
@@ -84,7 +84,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 55.0,
     "revalorizacion_esperada": "€262k",
-    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (80) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
+    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (79) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
     "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
     "casos_similares": "Anderson Arroyo (CD Mirandés, 100) | Imanol García De Albéniz (CD Mirandés, 100) | Juan María Alcedo (Albacete Balompié, 100)",
     "justificacion": "D. Bladi (Lateral, 21 años, 2313' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 55/100. Mejor destino: Albacete Balompié (desarrollo 100, demanda 92, uso jóvenes coach 66). Casos similares: Anderson Arroyo, Imanol García De Albéniz, Juan María Alcedo. Revalorización esperada (modelo): €262k."
@@ -99,7 +99,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 51.5,
     "revalorizacion_esperada": "€250k",
-    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (70) | Sporting Gijón (68) | Deportivo de La Coruña (66)",
+    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (69) | Sporting Gijón (69) | Deportivo de La Coruña (66)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Diego Cocca | Rubén Albés | Óscar Gilsanz",
     "casos_similares": "David López (Elche CF, 79) | Y. Saidu (Real Zaragoza, 56) | David Torres (Real Valladolid CF, 50)",
     "justificacion": "Jorge Oreiro (Central, 20 años, 2346' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 52/100. Mejor destino: CD Leganés (desarrollo 100, demanda 78, uso jóvenes coach 41). Casos similares: David López, Y. Saidu, David Torres. Revalorización esperada (modelo): €250k."
@@ -114,7 +114,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 50.5,
     "revalorizacion_esperada": "€235k",
-    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (80) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
+    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (79) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
     "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
     "casos_similares": "Abel Bretones (Real Oviedo, 100) | Ignasi Vilarrasa (SD Huesca, 100) | Cristian Gutiérrez (SD Eibar, 100)",
     "justificacion": "Ian Forns (Lateral, 22 años, 2379' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Mejor destino: Albacete Balompié (desarrollo 100, demanda 92, uso jóvenes coach 66). Casos similares: Abel Bretones, Ignasi Vilarrasa, Cristian Gutiérrez. Revalorización esperada (modelo): €235k."
@@ -128,11 +128,11 @@
     "goles_actuales": 7,
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 50.2,
-    "revalorizacion_esperada": "€742k",
-    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (80) | FC Andorra (70) | Levante UD (68)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Julián Calero",
+    "revalorizacion_esperada": "€985k",
+    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (81) | FC Andorra (72) | Real Valladolid CF (65)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
     "casos_similares": "Giuliano Simeone (Real Zaragoza, 100) | Rubén López (Deportivo de La Coruña, 100) | Adrián Liso (Real Zaragoza, 100)",
-    "justificacion": "Pablo Garcia (Extremo, 19 años, 839' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Giuliano Simeone, Rubén López, Adrián Liso. Revalorización esperada (modelo): €742k."
+    "justificacion": "Pablo Garcia (Extremo, 19 años, 839' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Giuliano Simeone, Rubén López, Adrián Liso. Revalorización esperada (modelo): €985k."
   },
   {
     "jugador": "Dani Pérez",
@@ -144,7 +144,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 46.0,
     "revalorizacion_esperada": "€233k",
-    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (73) | SD Eibar (69)",
+    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (75) | SD Eibar (70)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
     "casos_similares": "Rafel Bauzà (CD Mirandés, 74) | Izan Merino (Málaga CF, 67) | T. Helguera (CD Mirandés, 63)",
     "justificacion": "Dani Pérez (Centrocampista, 20 años, 2090' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Mejor destino: Sporting Gijón (desarrollo 96, demanda 93, uso jóvenes coach 66). Casos similares: Rafel Bauzà, Izan Merino, T. Helguera. Revalorización esperada (modelo): €233k."
@@ -157,12 +157,12 @@
     "minutos_actuales": 3308,
     "goles_actuales": 0,
     "operacion_recomendada": "CEDER",
-    "probabilidad_exito": 45.2,
-    "revalorizacion_esperada": "€157k",
-    "clubes_ideales": "Levante UD (73) | Cádiz CF (54) | FC Andorra (48) | Real Valladolid CF (46) | Córdoba CF (35)",
-    "entrenadores_ideales": "Julián Calero | Pako Ayestarán | Paulo Pezzolano",
+    "probabilidad_exito": 44.2,
+    "revalorizacion_esperada": "€106k",
+    "clubes_ideales": "Cádiz CF (76) | FC Andorra (69) | Real Valladolid CF (65) | Córdoba CF (56) | Granada CF (38)",
+    "entrenadores_ideales": "Pako Ayestarán | Paulo Pezzolano",
     "casos_similares": "Áron Yaakobishvili (FC Andorra, 51) | Dani Martín (SD Huesca, 10) | L. Gómez (Racing Santander, 3)",
-    "justificacion": "Manu González (Portero, 19 años, 3308' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 45/100. Mejor destino: Levante UD (desarrollo 100, demanda 34, uso jóvenes coach 64). Casos similares: Áron Yaakobishvili, Dani Martín, L. Gómez. Revalorización esperada (modelo): €157k."
+    "justificacion": "Manu González (Portero, 19 años, 3308' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 44/100. Mejor destino: Cádiz CF (desarrollo 96, demanda 26, uso jóvenes coach 100). Casos similares: Áron Yaakobishvili, Dani Martín, L. Gómez. Revalorización esperada (modelo): €106k."
   },
   {
     "jugador": "K. Sosu",
@@ -189,7 +189,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 43.6,
     "revalorizacion_esperada": "€238k",
-    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (70) | Sporting Gijón (68) | Deportivo de La Coruña (66)",
+    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (69) | Sporting Gijón (69) | Deportivo de La Coruña (66)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Diego Cocca | Rubén Albés | Óscar Gilsanz",
     "casos_similares": "David López (Elche CF, 79) | Y. Saidu (Real Zaragoza, 56) | David Torres (Real Valladolid CF, 50)",
     "justificacion": "E. Zidane (Central, 20 años, 1666' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 44/100. Mejor destino: CD Leganés (desarrollo 100, demanda 78, uso jóvenes coach 41). Casos similares: David López, Y. Saidu, David Torres. Revalorización esperada (modelo): €238k."
@@ -204,7 +204,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 42.7,
     "revalorizacion_esperada": "€250k",
-    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (73) | SD Eibar (69)",
+    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (75) | SD Eibar (70)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
     "casos_similares": "A. Martin Luis (CD Mirandés, 50) | Beñat Turrientes (Real Sociedad B, 46) | Manu Rodríguez (Sporting Gijón, 41)",
     "justificacion": "Iván Corralejo (Centrocampista, 19 años, 1345' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 43/100. Mejor destino: Sporting Gijón (desarrollo 96, demanda 93, uso jóvenes coach 66). Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €250k."
@@ -218,11 +218,11 @@
     "goles_actuales": 1,
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 38.3,
-    "revalorizacion_esperada": "€200k",
-    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (73) | SD Eibar (69)",
+    "revalorizacion_esperada": "€148k",
+    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (75) | SD Eibar (70)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
     "casos_similares": "Marc Aguado (FC Andorra, 100) | Rubén Quintanilla (Burgos CF, 100) | Jon Gorrotxategi (CD Mirandés, 100)",
-    "justificacion": "Ginés Sorroche (Centrocampista, 22 años, 1124' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 38/100. Mejor destino: Sporting Gijón (desarrollo 96, demanda 93, uso jóvenes coach 66). Casos similares: Marc Aguado, Rubén Quintanilla, Jon Gorrotxategi. Revalorización esperada (modelo): €200k."
+    "justificacion": "Ginés Sorroche (Centrocampista, 22 años, 1124' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 38/100. Mejor destino: Sporting Gijón (desarrollo 96, demanda 93, uso jóvenes coach 66). Casos similares: Marc Aguado, Rubén Quintanilla, Jon Gorrotxategi. Revalorización esperada (modelo): €148k."
   },
   {
     "jugador": "Òscar Masqué",
@@ -233,11 +233,11 @@
     "goles_actuales": 1,
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 37.9,
-    "revalorizacion_esperada": "€294k",
-    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (80) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
+    "revalorizacion_esperada": "€321k",
+    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (79) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
     "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
     "casos_similares": "Álex Valle (Levante UD, 100) | Jonathan Gómez (CD Mirandés, 96) | J. Salinas (Racing Santander, 69)",
-    "justificacion": "Òscar Masqué (Lateral, 19 años, 1361' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 38/100. Mejor destino: Albacete Balompié (desarrollo 100, demanda 92, uso jóvenes coach 66). Casos similares: Álex Valle, Jonathan Gómez, J. Salinas. Revalorización esperada (modelo): €294k."
+    "justificacion": "Òscar Masqué (Lateral, 19 años, 1361' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 38/100. Mejor destino: Albacete Balompié (desarrollo 100, demanda 92, uso jóvenes coach 66). Casos similares: Álex Valle, Jonathan Gómez, J. Salinas. Revalorización esperada (modelo): €321k."
   },
   {
     "jugador": "Y. Koré",
@@ -249,7 +249,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 36.1,
     "revalorizacion_esperada": "€100k",
-    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (70) | Sporting Gijón (68) | Deportivo de La Coruña (66)",
+    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (69) | Sporting Gijón (69) | Deportivo de La Coruña (66)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Diego Cocca | Rubén Albés | Óscar Gilsanz",
     "casos_similares": "José Copete (SD Ponferradina, 100) | Loïc Williams (CD Tenerife, 100) | David López (Burgos CF, 100)",
     "justificacion": "Y. Koré (Central, 21 años, 779' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 36/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: CD Leganés (desarrollo 100, demanda 78, uso jóvenes coach 41). Casos similares: José Copete, Loïc Williams, David López. Revalorización esperada (modelo): €100k."
@@ -263,11 +263,11 @@
     "goles_actuales": 1,
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 35.0,
-    "revalorizacion_esperada": "€468k",
-    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (80) | FC Andorra (70) | Levante UD (68)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Julián Calero",
+    "revalorizacion_esperada": "€688k",
+    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (81) | FC Andorra (72) | Real Valladolid CF (65)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Javi López (Burgos CF, 100) | Ilyas Chaira (CD Mirandés, 100)",
-    "justificacion": "M. Kamara Rodriguez (Extremo, 22 años, 71' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 35/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €468k."
+    "justificacion": "M. Kamara Rodriguez (Extremo, 22 años, 71' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 35/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €688k."
   },
   {
     "jugador": "Emmanuel",
@@ -279,7 +279,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 34.8,
     "revalorizacion_esperada": "€322k",
-    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (70) | Sporting Gijón (68) | Deportivo de La Coruña (66)",
+    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (69) | Sporting Gijón (69) | Deportivo de La Coruña (66)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Diego Cocca | Rubén Albés | Óscar Gilsanz",
     "casos_similares": "Marc Pubill (Levante UD, 50) | Mamadou Mbacke (Villarreal CF B, 46) | Iker Córdoba (CD Mirandés, 38)",
     "justificacion": "Emmanuel (Central, 19 años, 951' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 35/100. Mejor destino: CD Leganés (desarrollo 100, demanda 78, uso jóvenes coach 41). Casos similares: Marc Pubill, Mamadou Mbacke, Iker Córdoba. Revalorización esperada (modelo): €322k."
@@ -294,25 +294,10 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 32.8,
     "revalorizacion_esperada": "€122k",
-    "clubes_ideales": "Sporting Gijón (63) | UD Almería (54) | CD Mirandés (49) | SD Eibar (49) | Deportivo de La Coruña (48)",
-    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Gaizka Garitano | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (63) | UD Almería (56) | SD Eibar (51) | CD Mirandés (50) | Deportivo de La Coruña (49)",
+    "entrenadores_ideales": "Rubén Albés | Gaizka Garitano | Míchel Alonso | Óscar Gilsanz",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Marc Aguado (FC Andorra, 100) | Abel Bretones (Real Oviedo, 100)",
     "justificacion": "Aitor Gismera (Mediocentro, 22 años, 1558' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 33/100. Mejor destino: Sporting Gijón (desarrollo 100, demanda 0, uso jóvenes coach 66). Casos similares: Jonathan Dubasin, Marc Aguado, Abel Bretones. Revalorización esperada (modelo): €122k."
-  },
-  {
-    "jugador": "German García",
-    "posicion": "Portero",
-    "edad": 22,
-    "es_sub23": true,
-    "minutos_actuales": 525,
-    "goles_actuales": 0,
-    "operacion_recomendada": "CEDER",
-    "probabilidad_exito": 30.3,
-    "revalorizacion_esperada": "€65k",
-    "clubes_ideales": "Levante UD (73) | Cádiz CF (54) | FC Andorra (48) | Real Valladolid CF (46) | Córdoba CF (35)",
-    "entrenadores_ideales": "Julián Calero | Pako Ayestarán | Paulo Pezzolano",
-    "casos_similares": "Leo Román (Real Oviedo, 100) | Victor Aznar (Cádiz CF, 67) | Ramón Vila (Córdoba CF, 52)",
-    "justificacion": "German García (Portero, 22 años, 525' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 30/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Levante UD (desarrollo 100, demanda 34, uso jóvenes coach 64). Casos similares: Leo Román, Victor Aznar, Ramón Vila. Revalorización esperada (modelo): €65k."
   },
   {
     "jugador": "Jorge Luis",
@@ -339,7 +324,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 30.0,
     "revalorizacion_esperada": "€236k",
-    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (70) | Sporting Gijón (68) | Deportivo de La Coruña (66)",
+    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (69) | Sporting Gijón (69) | Deportivo de La Coruña (66)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Diego Cocca | Rubén Albés | Óscar Gilsanz",
     "casos_similares": "David López (Elche CF, 79) | Y. Saidu (Real Zaragoza, 56) | David Torres (Real Valladolid CF, 50)",
     "justificacion": "F. Embalo Muñoz (Central, 20 años, 824' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 30/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: CD Leganés (desarrollo 100, demanda 78, uso jóvenes coach 41). Casos similares: David López, Y. Saidu, David Torres. Revalorización esperada (modelo): €236k."
@@ -354,25 +339,10 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 30.0,
     "revalorizacion_esperada": "€119k",
-    "clubes_ideales": "Sporting Gijón (63) | UD Almería (54) | CD Mirandés (49) | SD Eibar (49) | Deportivo de La Coruña (48)",
-    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Gaizka Garitano | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (63) | UD Almería (56) | SD Eibar (51) | CD Mirandés (50) | Deportivo de La Coruña (49)",
+    "entrenadores_ideales": "Rubén Albés | Gaizka Garitano | Míchel Alonso | Óscar Gilsanz",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Marc Aguado (FC Andorra, 100) | Abel Bretones (Real Oviedo, 100)",
     "justificacion": "M. Mensah (Mediocentro, 22 años, 1209' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 30/100. Mejor destino: Sporting Gijón (desarrollo 100, demanda 0, uso jóvenes coach 66). Casos similares: Jonathan Dubasin, Marc Aguado, Abel Bretones. Revalorización esperada (modelo): €119k."
-  },
-  {
-    "jugador": "V. Răfăilă",
-    "posicion": "Portero",
-    "edad": 21,
-    "es_sub23": true,
-    "minutos_actuales": 106,
-    "goles_actuales": 0,
-    "operacion_recomendada": "CEDER",
-    "probabilidad_exito": 29.9,
-    "revalorizacion_esperada": "€73k",
-    "clubes_ideales": "Levante UD (73) | Cádiz CF (54) | FC Andorra (48) | Real Valladolid CF (46) | Córdoba CF (35)",
-    "entrenadores_ideales": "Julián Calero | Pako Ayestarán | Paulo Pezzolano",
-    "casos_similares": "Pablo Campos (Levante UD, 100) | Ramón Juan (CD Mirandés, 79) | Antal Yaakobishvili (FC Andorra, 51)",
-    "justificacion": "V. Răfăilă (Portero, 21 años, 106' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 30/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Levante UD (desarrollo 100, demanda 34, uso jóvenes coach 64). Casos similares: Pablo Campos, Ramón Juan, Antal Yaakobishvili. Revalorización esperada (modelo): €73k."
   },
   {
     "jugador": "M. Hamdoune",
@@ -384,7 +354,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 28.7,
     "revalorizacion_esperada": "€226k",
-    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (70) | Sporting Gijón (68) | Deportivo de La Coruña (66)",
+    "clubes_ideales": "CD Leganés (82) | Cádiz CF (75) | Real Valladolid CF (69) | Sporting Gijón (69) | Deportivo de La Coruña (66)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Diego Cocca | Rubén Albés | Óscar Gilsanz",
     "casos_similares": "José Copete (SD Ponferradina, 100) | Loïc Williams (CD Tenerife, 100) | David López (Burgos CF, 100)",
     "justificacion": "M. Hamdoune (Central, 21 años, 1079' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 29/100. Mejor destino: CD Leganés (desarrollo 100, demanda 78, uso jóvenes coach 41). Casos similares: José Copete, Loïc Williams, David López. Revalorización esperada (modelo): €226k."
@@ -399,7 +369,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 28.5,
     "revalorizacion_esperada": "€244k",
-    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (80) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
+    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (79) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
     "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
     "casos_similares": "Marcos Luna (Real Zaragoza, 100) | Oscar Naasei (Granada CF, 69) | Roger Hinojo (Cultural Leonesa, 68)",
     "justificacion": "Pablo Busto (Lateral, 20 años, 896' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 28/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (desarrollo 100, demanda 92, uso jóvenes coach 66). Casos similares: Marcos Luna, Oscar Naasei, Roger Hinojo. Revalorización esperada (modelo): €244k."
@@ -413,11 +383,11 @@
     "goles_actuales": 0,
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 27.9,
-    "revalorizacion_esperada": "€238k",
-    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (73) | SD Eibar (69)",
+    "revalorizacion_esperada": "€185k",
+    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (75) | SD Eibar (70)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
     "casos_similares": "A. Martin Luis (CD Mirandés, 50) | Beñat Turrientes (Real Sociedad B, 46) | Manu Rodríguez (Sporting Gijón, 41)",
-    "justificacion": "R. Gomez (Centrocampista, 19 años, 159' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 28/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (desarrollo 96, demanda 93, uso jóvenes coach 66). Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €238k."
+    "justificacion": "R. Gomez (Centrocampista, 19 años, 159' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 28/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (desarrollo 96, demanda 93, uso jóvenes coach 66). Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €185k."
   },
   {
     "jugador": "Adrian Martin",
@@ -429,7 +399,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 27.6,
     "revalorizacion_esperada": "€240k",
-    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (73) | SD Eibar (69)",
+    "clubes_ideales": "Sporting Gijón (89) | CD Mirandés (83) | Racing Santander (79) | UD Almería (75) | SD Eibar (70)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
     "casos_similares": "A. Martin Luis (CD Mirandés, 50) | Beñat Turrientes (Real Sociedad B, 46) | Manu Rodríguez (Sporting Gijón, 41)",
     "justificacion": "Adrian Martin (Centrocampista, 19 años, 52' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 28/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (desarrollo 96, demanda 93, uso jóvenes coach 66). Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €240k."
@@ -444,10 +414,25 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 26.7,
     "revalorizacion_esperada": "€237k",
-    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (80) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
+    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (79) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
     "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
     "casos_similares": "Marcos Luna (Real Zaragoza, 100) | Oscar Naasei (Granada CF, 69) | Roger Hinojo (Cultural Leonesa, 68)",
     "justificacion": "Marcos Solís (Lateral, 20 años, 129' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 27/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (desarrollo 100, demanda 92, uso jóvenes coach 66). Casos similares: Marcos Luna, Oscar Naasei, Roger Hinojo. Revalorización esperada (modelo): €237k."
+  },
+  {
+    "jugador": "German García",
+    "posicion": "Portero",
+    "edad": 22,
+    "es_sub23": true,
+    "minutos_actuales": 525,
+    "goles_actuales": 0,
+    "operacion_recomendada": "CEDER",
+    "probabilidad_exito": 26.7,
+    "revalorizacion_esperada": "€10k",
+    "clubes_ideales": "Cádiz CF (76) | FC Andorra (69) | Real Valladolid CF (65) | Córdoba CF (56) | Granada CF (38)",
+    "entrenadores_ideales": "Pako Ayestarán | Paulo Pezzolano",
+    "casos_similares": "Leo Román (Real Oviedo, 100) | Victor Aznar (Cádiz CF, 67) | Ramón Vila (Córdoba CF, 52)",
+    "justificacion": "German García (Portero, 22 años, 525' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 27/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 96, demanda 26, uso jóvenes coach 100). Casos similares: Leo Román, Victor Aznar, Ramón Vila. Revalorización esperada (modelo): €10k."
   },
   {
     "jugador": "Antonio Toral",
@@ -458,11 +443,11 @@
     "goles_actuales": 0,
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 26.5,
-    "revalorizacion_esperada": "€416k",
-    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (80) | FC Andorra (70) | Levante UD (68)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Julián Calero",
+    "revalorizacion_esperada": "€643k",
+    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (81) | FC Andorra (72) | Real Valladolid CF (65)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Javi López (Burgos CF, 100) | Ilyas Chaira (CD Mirandés, 100)",
-    "justificacion": "Antonio Toral (Extremo, 22 años, 468' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €416k."
+    "justificacion": "Antonio Toral (Extremo, 22 años, 468' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €643k."
   },
   {
     "jugador": "C. De Roa García",
@@ -474,10 +459,25 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 26.4,
     "revalorizacion_esperada": "€739k",
-    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (80) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
+    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (79) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
     "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
     "casos_similares": "Juanlu Sánchez (CD Mirandés, 62) | Diego Sánchez (Sporting Gijón, 39) | Álex Valle (FC Andorra, 16)",
     "justificacion": "C. De Roa García (Lateral, 18 años, 117' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (desarrollo 100, demanda 92, uso jóvenes coach 66). Casos similares: Juanlu Sánchez, Diego Sánchez, Álex Valle. Revalorización esperada (modelo): €739k."
+  },
+  {
+    "jugador": "V. Răfăilă",
+    "posicion": "Portero",
+    "edad": 21,
+    "es_sub23": true,
+    "minutos_actuales": 106,
+    "goles_actuales": 0,
+    "operacion_recomendada": "CEDER",
+    "probabilidad_exito": 26.4,
+    "revalorizacion_esperada": "€16k",
+    "clubes_ideales": "Cádiz CF (76) | FC Andorra (69) | Real Valladolid CF (65) | Córdoba CF (56) | Granada CF (38)",
+    "entrenadores_ideales": "Pako Ayestarán | Paulo Pezzolano",
+    "casos_similares": "Pablo Campos (Levante UD, 100) | Ramón Juan (CD Mirandés, 79) | Antal Yaakobishvili (FC Andorra, 51)",
+    "justificacion": "V. Răfăilă (Portero, 21 años, 106' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 96, demanda 26, uso jóvenes coach 100). Casos similares: Pablo Campos, Ramón Juan, Antal Yaakobishvili. Revalorización esperada (modelo): €16k."
   },
   {
     "jugador": "Mario Navarro",
@@ -489,7 +489,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 26.3,
     "revalorizacion_esperada": "€739k",
-    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (80) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
+    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (79) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
     "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
     "casos_similares": "Carlos Jimenez (Levante UD, 1) | Juanlu Sánchez (CD Mirandés, 62) | Diego Sánchez (Sporting Gijón, 39)",
     "justificacion": "Mario Navarro (Lateral, 17 años, 27' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (desarrollo 100, demanda 92, uso jóvenes coach 66). Casos similares: Carlos Jimenez, Juanlu Sánchez, Diego Sánchez. Revalorización esperada (modelo): €739k."
@@ -504,8 +504,8 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 26.3,
     "revalorizacion_esperada": "€1.1M",
-    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (80) | FC Andorra (70) | Levante UD (68)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Julián Calero",
+    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (81) | FC Andorra (72) | Real Valladolid CF (65)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
     "casos_similares": "Dani Fernández (CD Tenerife, 21) | I. Álvarez (Cádiz CF, 9) | Paco Cortés (Cultural Leonesa, 4)",
     "justificacion": "Antonio González (Extremo, 18 años, 99' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Dani Fernández, I. Álvarez, Paco Cortés. Revalorización esperada (modelo): €1.1M."
   },
@@ -519,8 +519,8 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 26.2,
     "revalorizacion_esperada": "€1.1M",
-    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (80) | FC Andorra (70) | Levante UD (68)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Julián Calero",
+    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (81) | FC Andorra (72) | Real Valladolid CF (65)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
     "casos_similares": "Dani Fernández (CD Tenerife, 21) | I. Álvarez (Cádiz CF, 9) | Paco Cortés (Cultural Leonesa, 4)",
     "justificacion": "R. Oya Mesa (Extremo, 18 años, 105' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Dani Fernández, I. Álvarez, Paco Cortés. Revalorización esperada (modelo): €1.1M."
   },
@@ -534,7 +534,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 26.1,
     "revalorizacion_esperada": "€742k",
-    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (80) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
+    "clubes_ideales": "Albacete Balompié (91) | Cádiz CF (79) | Real Zaragoza (60) | SD Eibar (59) | UD Almería (59)",
     "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
     "casos_similares": "Juanlu Sánchez (CD Mirandés, 62) | Diego Sánchez (Sporting Gijón, 39) | Álex Valle (FC Andorra, 16)",
     "justificacion": "Ruben De Sa Abreu (Lateral, 18 años, 355' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (desarrollo 100, demanda 92, uso jóvenes coach 66). Casos similares: Juanlu Sánchez, Diego Sánchez, Álex Valle. Revalorización esperada (modelo): €742k."
@@ -548,11 +548,11 @@
     "goles_actuales": 0,
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 25.8,
-    "revalorizacion_esperada": "€607k",
+    "revalorizacion_esperada": "€588k",
     "clubes_ideales": "Málaga CF (78) | Granada CF (73) | Cádiz CF (71) | CD Leganés (65) | Real Valladolid CF (63)",
     "entrenadores_ideales": "Fran Escribá | Pako Ayestarán | Borja Jiménez | Diego Cocca",
     "casos_similares": "Raúl García (CD Mirandés, 100) | Fabri (Levante UD, 100) | Iker Losada (Racing Ferrol, 100)",
-    "justificacion": "Yanis Senhadji (Delantero, 21 años, 194' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Málaga CF (desarrollo 100, demanda 94, uso jóvenes coach 0). Casos similares: Raúl García, Fabri, Iker Losada. Revalorización esperada (modelo): €607k."
+    "justificacion": "Yanis Senhadji (Delantero, 21 años, 194' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 26/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Málaga CF (desarrollo 100, demanda 94, uso jóvenes coach 0). Casos similares: Raúl García, Fabri, Iker Losada. Revalorización esperada (modelo): €588k."
   },
   {
     "jugador": "D. Traoré",
@@ -564,7 +564,7 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 25.0,
     "revalorizacion_esperada": "€117k",
-    "clubes_ideales": "Sporting Gijón (77) | Racing Santander (74) | CD Mirandés (73) | SD Eibar (71) | Cádiz CF (70)",
+    "clubes_ideales": "Sporting Gijón (77) | Racing Santander (74) | CD Mirandés (73) | SD Eibar (73) | Cádiz CF (70)",
     "entrenadores_ideales": "Rubén Albés | Íñigo Vélez | Míchel Alonso | Gaizka Garitano | Pako Ayestarán",
     "casos_similares": "Mateusz Bogusz (UD Ibiza, 58) | Gorka Gorosabel (Real Sociedad B, 54) | Aingeru Olabarrieta (FC Andorra, 39)",
     "justificacion": "D. Traoré (Mediapunta, 19 años, 108' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 25/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (desarrollo 97, demanda 50, uso jóvenes coach 66). Casos similares: Mateusz Bogusz, Gorka Gorosabel, Aingeru Olabarrieta. Revalorización esperada (modelo): €117k."
@@ -578,11 +578,11 @@
     "goles_actuales": 0,
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 24.7,
-    "revalorizacion_esperada": "€493k",
-    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (80) | FC Andorra (70) | Levante UD (68)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Julián Calero",
+    "revalorizacion_esperada": "€706k",
+    "clubes_ideales": "Cádiz CF (94) | Sporting Gijón (82) | Deportivo de La Coruña (81) | FC Andorra (72) | Real Valladolid CF (65)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
     "casos_similares": "Bryan Zaragoza (Granada CF, 100) | Gabri Martínez (CD Mirandés, 100) | Raúl Moro (Real Valladolid CF, 100)",
-    "justificacion": "I. Amores (Extremo, 20 años, 166' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 25/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Bryan Zaragoza, Gabri Martínez, Raúl Moro. Revalorización esperada (modelo): €493k."
+    "justificacion": "I. Amores (Extremo, 20 años, 166' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 25/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (desarrollo 100, demanda 80, uso jóvenes coach 100). Casos similares: Bryan Zaragoza, Gabri Martínez, Raúl Moro. Revalorización esperada (modelo): €706k."
   },
   {
     "jugador": "Ismael Barea",
@@ -594,8 +594,8 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 23.6,
     "revalorizacion_esperada": "€146k",
-    "clubes_ideales": "Sporting Gijón (63) | UD Almería (54) | CD Mirandés (49) | SD Eibar (49) | Deportivo de La Coruña (48)",
-    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Gaizka Garitano | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (63) | UD Almería (56) | SD Eibar (51) | CD Mirandés (50) | Deportivo de La Coruña (49)",
+    "entrenadores_ideales": "Rubén Albés | Gaizka Garitano | Míchel Alonso | Óscar Gilsanz",
     "casos_similares": "Bryan Zaragoza (Granada CF, 100) | Álvaro Aceves (CD Eldense, 100) | Gabri Martínez (CD Mirandés, 100)",
     "justificacion": "Ismael Barea (Mediocentro, 20 años, 395' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 24/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (desarrollo 100, demanda 0, uso jóvenes coach 66). Casos similares: Bryan Zaragoza, Álvaro Aceves, Gabri Martínez. Revalorización esperada (modelo): €146k."
   },
@@ -609,8 +609,8 @@
     "operacion_recomendada": "CEDER",
     "probabilidad_exito": 23.6,
     "revalorizacion_esperada": "€756k",
-    "clubes_ideales": "Sporting Gijón (63) | UD Almería (54) | CD Mirandés (49) | SD Eibar (49) | Deportivo de La Coruña (48)",
-    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Gaizka Garitano | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (63) | UD Almería (56) | SD Eibar (51) | CD Mirandés (50) | Deportivo de La Coruña (49)",
+    "entrenadores_ideales": "Rubén Albés | Gaizka Garitano | Míchel Alonso | Óscar Gilsanz",
     "casos_similares": "Jeremy Arévalo (Racing Santander, 100) | Gonzalo Petit (CD Mirandés, 100) | Jon Karrikaburu (Real Sociedad B, 86)",
     "justificacion": "M. Romero (Mediocentro, 18 años, 40' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 24/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (desarrollo 100, demanda 0, uso jóvenes coach 66). Casos similares: Jeremy Arévalo, Gonzalo Petit, Jon Karrikaburu. Revalorización esperada (modelo): €756k."
   }

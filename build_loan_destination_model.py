@@ -20,7 +20,7 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
-from src.normalizer import normalize_club, normalize_development_position, normalize_player_name
+from src.normalizer import normalize_club, normalize_development_position, normalize_player_name, SEGUNDA_2025_26
 
 ROOT = Path(__file__).parent
 DATA_FINAL = ROOT / "data" / "final"
@@ -186,6 +186,8 @@ def build_model(players: pd.DataFrame, evidence: pd.DataFrame, coaches: pd.DataF
 
         candidate_positions = [pos] + DESTINATION_POSITION_FALLBACKS.get(pos, [])
         candidates = evidence[evidence["posicion"].isin(candidate_positions)].copy()
+        # Solo clubes que militan en Segunda 2025-26 (destinos válidos en categoría)
+        candidates = candidates[candidates["club"].isin(SEGUNDA_2025_26)].copy()
         if candidates.empty:
             continue
 

@@ -72,6 +72,21 @@ Definición completa e importancias del Random Forest en `data/final/success_sco
 
 ---
 
+## Clubes válidos de Segunda (actualizar cada temporada)
+
+Los destinos de cesión/venta se filtran a los **22 clubes que militan en Segunda
+en la temporada vigente**. La lista está en `src/normalizer.py` → `SEGUNDA_2025_26`.
+
+**Cada temporada nueva:** edita ese conjunto con los 22 equipos de LaLiga Hypermotion
+y reejecuta los pasos 6→9. Así el sistema nunca recomienda clubes que han ascendido
+(p. ej. Levante, ahora en Primera) o descendido.
+
+> Nota: la columna "Entren. Sub-23 (hist.)" en los destinos muestra el entrenador que
+> MÁS desarrolló jóvenes en ese club históricamente (evidencia), NO necesariamente el
+> entrenador actual. Es un indicador de cultura de club, no un dato de plantilla viva.
+
+---
+
 ## Dónde está desplegado
 
 - **Dashboard:** https://juankibenitez57.github.io/segunda-division-dashboard/
