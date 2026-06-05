@@ -1868,6 +1868,10 @@ async function executeSearch(query, type) {
   const t = type === 'auto' ? detectSearchType(query) : type;
 
   let html = '';
+  if (t === 'jugador' || t === 'club' || t === 'auto') {
+    await new Promise(resolve => loadMasterData(resolve));
+    await new Promise(resolve => loadLoanModelData(resolve));
+  }
   switch (t) {
     case 'club':         html = searchClub(query); break;
     case 'temporada':    html = searchSeason(query); break;
@@ -2143,11 +2147,121 @@ function detectSearchType(query) {
   return 'jugador';
 }
 
+function playerNameMatches(rowName, queryName) {
+  const a = norm(rowName);
+  const b = norm(queryName);
+  if (!a || !b) return false;
+  if (a === b || a.includes(b) || b.includes(a)) return true;
+  const words = b.split(/\s+/).filter(w => w.length >= 4);
+  return words.length && words.every(w => a.includes(w));
+}
+
+function getPlayerSeasonStats(name) {
+  const masterStats = (MASTER_DATA || [])
+    .filter(d => playerNameMatches(d.nombre, name))
+    .map(d => ({
+      temporada: d.temporada || '—',
+      club: d.club || '—',
+      entrenador: d.entrenador || '',
+      posicion: normDevPos(d.posicion_normalizada || d.posicion_es || d.posicion),
+      nacionalidad: d.nacionalidad || '',
+      edad: num(d.edad),
+      partidos: num(d.partidos),
+      minutos: num(d.minutos),
+      goles: num(d.goles),
+      xg: num(d.xg),
+      goles90: num(d.goles_por_90),
+      xg90: num(d.xg_por_90),
+      valor: num(d.valor_mercado_wyscout) || num(d.valor_mercado),
+      sub23: isTrue(d.es_sub23),
+      tieneWyscout: isTrue(d.tiene_wyscout),
+    }))
+    .sort((a, b) => ['2025-26','2024-25','2023-24','2022-23','2021-22'].indexOf(a.temporada) -
+      ['2025-26','2024-25','2023-24','2022-23','2021-22'].indexOf(b.temporada));
+
+  if (masterStats.length) return masterStats;
+
+  return (BETIS_PLAYERS_DATA || [])
+    .filter(d => playerNameMatches(d.jugador, name))
+    .map(d => ({
+      temporada: '2025-26',
+      club: d.equipo || 'Betis Deportivo',
+      entrenador: '',
+      posicion: d.posicion_normalizada || d.posicion_primaria || d.posicion_original || '',
+      nacionalidad: d.pais_nacimiento || d.pasaporte || '',
+      edad: num(d.edad),
+      partidos: num(d.partidos_jugados),
+      minutos: num(d.minutos_jugados),
+      goles: num(d.goles),
+      xg: num(d.xg),
+      goles90: num(d.goles_por_90),
+      xg90: num(d.xg_por_90),
+      valor: num(d.valor_mercado),
+      sub23: isTrue(d.es_sub23),
+      tieneWyscout: true,
+    }));
+}
+
+function summarizePlayerStats(stats) {
+  return {
+    temporadas: new Set(stats.map(s => s.temporada)).size,
+    clubes: new Set(stats.map(s => s.club).filter(Boolean)).size,
+    partidos: stats.reduce((s, r) => s + num(r.partidos), 0),
+    minutos: stats.reduce((s, r) => s + num(r.minutos), 0),
+    goles: stats.reduce((s, r) => s + num(r.goles), 0),
+    xg: stats.reduce((s, r) => s + num(r.xg), 0),
+  };
+}
+
+function getClubSeasonStats(club) {
+  if (!MASTER_DATA || !MASTER_DATA.length) return [];
+  const rows = MASTER_DATA.filter(d => d.club === club && num(d.minutos) > 0);
+  const bySeason = {};
+  rows.forEach(d => {
+    const s = d.temporada || '—';
+    if (!bySeason[s]) bySeason[s] = { temporada:s, jugadores:new Set(), sub23:new Set(), minutos:0, partidos:0, goles:0, xg:0 };
+    bySeason[s].jugadores.add(d.nombre);
+    if (isTrue(d.es_sub23)) bySeason[s].sub23.add(d.nombre);
+    bySeason[s].minutos += num(d.minutos);
+    bySeason[s].partidos += num(d.partidos);
+    bySeason[s].goles += num(d.goles);
+    bySeason[s].xg += num(d.xg);
+  });
+  return Object.values(bySeason)
+    .map(v => Object.assign({}, v, { jugadores: v.jugadores.size, sub23: v.sub23.size }))
+    .sort((a, b) => ['2025-26','2024-25','2023-24','2022-23','2021-22'].indexOf(a.temporada) -
+      ['2025-26','2024-25','2023-24','2022-23','2021-22'].indexOf(b.temporada));
+}
+
+function getClubTopPerformers(club, limit = 8) {
+  if (!MASTER_DATA || !MASTER_DATA.length) return [];
+  const byPlayer = {};
+  MASTER_DATA.filter(d => d.club === club && num(d.minutos) > 0).forEach(d => {
+    const key = d.nombre;
+    if (!byPlayer[key]) byPlayer[key] = { nombre:key, posicion:normDevPos(d.posicion_normalizada || d.posicion_es || d.posicion), minutos:0, partidos:0, goles:0, xg:0, temporadas:new Set() };
+    byPlayer[key].minutos += num(d.minutos);
+    byPlayer[key].partidos += num(d.partidos);
+    byPlayer[key].goles += num(d.goles);
+    byPlayer[key].xg += num(d.xg);
+    byPlayer[key].temporadas.add(d.temporada);
+  });
+  return Object.values(byPlayer)
+    .map(d => Object.assign({}, d, { temporadas: [...d.temporadas].join(', ') }))
+    .sort((a, b) => (b.goles - a.goles) || (b.minutos - a.minutos))
+    .slice(0, limit);
+}
+
 /* --- PLAYER SEARCH --- */
 function searchPlayer(query) {
   const q = norm(query);
   const players = [...new Set(ALL_DATA.map(d => d.jugador))].filter(Boolean);
-  const matches = players.filter(p => norm(p).includes(q));
+  const masterPlayers = [...new Set((MASTER_DATA || []).map(d => d.nombre))].filter(Boolean);
+  const betisPlayers = [...new Set((BETIS_PLAYERS_DATA || []).map(d => d.jugador))].filter(Boolean);
+  const matches = [...new Set([
+    ...players.filter(p => norm(p).includes(q)),
+    ...masterPlayers.filter(p => norm(p).includes(q)),
+    ...betisPlayers.filter(p => norm(p).includes(q))
+  ])];
   if (!matches.length) return noResults(query);
   const shown = matches.slice(0, 6);
   return `
@@ -2161,13 +2275,15 @@ function searchPlayer(query) {
 
 function buildPlayerCard(name) {
   const ops = ALL_DATA.filter(d => d.jugador === name);
-  if (!ops.length) return '';
+  const stats = getPlayerSeasonStats(name);
+  if (!ops.length && !stats.length) return '';
   const ord = ['2021-22','2022-23','2023-24','2024-25','2025-26'];
   const latest = [...ops].sort((a,b) => ord.indexOf(b.temporada) - ord.indexOf(a.temporada))[0];
-  const pos  = tPos(latest.posicion || '');
-  const nac  = latest.nacionalidad || '—';
-  const age  = latest.edad || '—';
-  const vm   = latest._vm ? formatM(latest._vm) : '—';
+  const latestStats = stats[0] || null;
+  const pos  = tPos(latest?.posicion || latestStats?.posicion || '');
+  const nac  = latest?.nacionalidad || latestStats?.nacionalidad || '—';
+  const age  = latest?.edad || latestStats?.edad || '—';
+  const vm   = latest?._vm ? formatM(latest._vm) : latestStats?.valor ? formatM(latestStats.valor) : '—';
   const clubs = [...new Set(ops.map(d => d.club))];
   const opsSorted = [...ops].sort((a,b) => ord.indexOf(a.temporada) - ord.indexOf(b.temporada));
   const revRows = REV_DATA.filter(d => d.jugador === name);
@@ -2188,6 +2304,20 @@ function buildPlayerCard(name) {
         </tr>`).join('')}
       </tbody></table>
     </div>`;
+
+  const statsHTML = stats.length ? `
+    <div class="ppc-section">
+      <div class="ppc-section-title">📊 Rendimiento por temporada</div>
+      <table class="ppc-table"><thead><tr>
+        <th>Temp.</th><th>Club</th><th>Entrenador</th><th>Pos.</th><th>Edad</th><th>Part.</th><th>Min</th><th>Goles</th><th>xG</th>
+      </tr></thead><tbody>
+        ${stats.map(s => `<tr>
+          <td>${s.temporada}</td><td class="bold">${s.club}</td><td>${s.entrenador || '—'}</td>
+          <td class="muted">${s.posicion || '—'}</td><td>${s.edad || '—'}</td><td>${fmt(s.partidos)}</td>
+          <td>${fmt(s.minutos)}</td><td>${fmt(s.goles)}</td><td>${s.xg ? s.xg.toFixed(2) : '—'}</td>
+        </tr>`).join('')}
+      </tbody></table>
+    </div>` : '';
 
   let revHTML = '';
   if (revRows.length) {
@@ -2237,12 +2367,12 @@ function buildPlayerCard(name) {
             <span class="ppc-badge age">Edad: ${age}</span>
             <span class="ppc-badge vm">VM: ${vm}</span>
           </div>
-          <div class="ppc-clubs-list">Clubes en 2ª:
+          ${clubs.length ? `<div class="ppc-clubs-list">Clubes en 2ª:
             ${clubs.map(c => `<span class="ppc-club-chip">${c}</span>`).join('')}
-          </div>
+          </div>` : ''}
         </div>
       </div>
-      ${opsHTML}${revHTML}
+      ${ops.length ? opsHTML : ''}${statsHTML}${revHTML}
       <div class="ppc-section" id="${statsId}" style="min-height:20px"></div>
     </div>`;
 }
@@ -2269,6 +2399,8 @@ function buildClubCard(clubName) {
   const ingreso= sumBy(bajas, 'importe_numerico');
   const balance= ingreso - gasto;
   const shield = clubShield(clubName);
+  const seasonStats = getClubSeasonStats(clubName);
+  const topPerformers = getClubTopPerformers(clubName, 6);
 
   const revOps = REV_DATA.filter(d => d.club === clubName);
   const totalRev = revOps.reduce((s,d) => s + (+d.revalorizacion_abs || 0), 0);
@@ -2311,6 +2443,30 @@ function buildClubCard(clubName) {
             <td style="color:var(--success);font-weight:700">${formatM(+d.revalorizacion_abs||0)}</td>
             <td style="color:var(--success);font-weight:700">${(+d.revalorizacion_pct||0).toFixed(0)}%</td>
           </tr>`).join('')}</tbody></table>
+        </div>` : ''}
+      ${seasonStats.length ? `
+        <div class="ppc-section">
+          <div class="ppc-section-title">📊 Rendimiento agregado por temporada</div>
+          <table class="ppc-table"><thead><tr>
+            <th>Temp.</th><th>Jugadores</th><th>Sub23</th><th>Partidos</th><th>Min</th><th>Goles</th><th>xG</th>
+          </tr></thead><tbody>
+            ${seasonStats.map(s => `<tr>
+              <td>${s.temporada}</td><td>${s.jugadores}</td><td>${s.sub23}</td><td>${fmt(s.partidos)}</td>
+              <td>${fmt(s.minutos)}</td><td>${fmt(s.goles)}</td><td>${s.xg ? s.xg.toFixed(2) : '—'}</td>
+            </tr>`).join('')}
+          </tbody></table>
+        </div>` : ''}
+      ${topPerformers.length ? `
+        <div class="ppc-section">
+          <div class="ppc-section-title">⚽ Producción ofensiva destacada</div>
+          <table class="ppc-table"><thead><tr>
+            <th>Jugador</th><th>Pos.</th><th>Temp.</th><th>Min</th><th>Goles</th><th>xG</th>
+          </tr></thead><tbody>
+            ${topPerformers.map(p => `<tr>
+              <td class="bold">${p.nombre}</td><td class="muted">${p.posicion || '—'}</td><td>${p.temporadas || '—'}</td>
+              <td>${fmt(p.minutos)}</td><td>${fmt(p.goles)}</td><td>${p.xg ? p.xg.toFixed(2) : '—'}</td>
+            </tr>`).join('')}
+          </tbody></table>
         </div>` : ''}
     </div>`;
 }
@@ -2500,9 +2656,10 @@ function renderScoutGPTTab() {
 
     let html;
     const qn = norm(q);
-    if (isDecisionModelQuery(qn)) {
+    if (isDecisionModelQuery(qn) || isLocalStatsQuery(qn)) {
       await new Promise(resolve => loadLoanModelData(resolve));
       await new Promise(resolve => loadDecisionModelData(resolve));
+      await new Promise(resolve => loadMasterData(resolve));
       html = processScoutQuery(q);
     } else {
       await new Promise(resolve => loadLoanModelData(resolve));
@@ -2871,11 +3028,25 @@ function processScoutQuery(raw) {
   if (isJugadors && isRev) return sgptTopJugadoresRev(topLimit);
   if (isROI) return sgptNacionalidadesROI(topLimit);
 
+  // Estadísticas concretas de jugador: goles, minutos, partidos, xG, temporadas
+  if (isLocalStatsQuery(q)) {
+    const betisStatsPlayer = detectBetisPlayerInQuery(q);
+    if (betisStatsPlayer) return sgptPlayerInfo(betisStatsPlayer.jugador);
+    const masterStatsPlayer = [...new Set((MASTER_DATA || []).map(d => d.nombre))].filter(Boolean)
+      .find(p => playerNameMatches(p, raw));
+    if (masterStatsPlayer) return sgptPlayerInfo(masterStatsPlayer);
+  }
+
   // Fallback: jugador de la carpeta Betis Deportivo → informe de decisión local
   const betisPlayerFallback = detectBetisPlayerInQuery(q);
   if (betisPlayerFallback && RF_PLAYER_RECOMMENDATIONS.length) {
     return sgptDecisionForBetisPlayer(betisPlayerFallback.jugador);
   }
+
+  // Fallback: jugador con estadísticas en master_player_development.csv
+  const masterPlayers = [...new Set((MASTER_DATA || []).map(d => d.nombre))].filter(Boolean);
+  const masterPlayerMatch = masterPlayers.find(p => playerNameMatches(p, raw));
+  if (masterPlayerMatch) return sgptPlayerInfo(masterPlayerMatch);
 
   // Fallback: nombre propio → jugador
   const players = [...new Set(ALL_DATA.map(d => d.jugador))].filter(Boolean);
@@ -3053,12 +3224,41 @@ function sgptClubOverview(club) {
   const ingreso= sumBy(bajas,'importe_numerico');
   const revOps = REV_DATA.filter(d => d.club === club);
   const totalRev = revOps.reduce((s,d) => s + (+d.revalorizacion_abs||0), 0);
+  const seasonStats = getClubSeasonStats(club);
+  const topPerformers = getClubTopPerformers(club, 6);
+  const totals = seasonStats.reduce((acc, s) => {
+    acc.jugadores += s.jugadores;
+    acc.sub23 += s.sub23;
+    acc.partidos += s.partidos;
+    acc.minutos += s.minutos;
+    acc.goles += s.goles;
+    acc.xg += s.xg;
+    return acc;
+  }, { jugadores:0, sub23:0, partidos:0, minutos:0, goles:0, xg:0 });
+
   return `<strong>${club}</strong><br>
-    ${ops.length} operaciones · ${altas.length} altas · ${bajas.length} bajas<br>
-    💸 Gasto: <span class="red">${formatM(gasto)}</span> ·
-    💰 Ingresos: <span class="green">${formatM(ingreso)}</span> ·
-    ⚖️ Balance: <span class="${ingreso-gasto >= 0 ? 'green' : 'red'}">${formatM(ingreso-gasto)}</span><br>
-    📈 Valor generado en revalorizaciones: <span class="green">${formatM(totalRev)}</span>`;
+    <span class="muted">Lectura para dirección deportiva: actividad de mercado, producción deportiva registrada y uso de jóvenes.</span>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Operaciones</span><br><strong>${ops.length}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Gasto</span><br><strong class="red">${formatM(gasto)}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Ingresos</span><br><strong class="green">${formatM(ingreso)}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Balance</span><br><strong class="${ingreso-gasto >= 0 ? 'green' : 'red'}">${formatDeltaM(ingreso-gasto)}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Valor generado</span><br><strong class="green">${formatM(totalRev)}</strong></div>
+      ${seasonStats.length ? `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Goles/xG</span><br><strong>${fmt(totals.goles)} / ${totals.xg.toFixed(1)}</strong></div>` : ''}
+    </div>
+    ${seasonStats.length ? `<strong>Rendimiento por temporada</strong><br>
+    <table><thead><tr><th>Temp.</th><th>Jug.</th><th>Sub23</th><th>Part.</th><th>Min</th><th>Goles</th><th>xG</th></tr></thead>
+    <tbody>${seasonStats.map(s => `<tr>
+      <td>${s.temporada}</td><td>${s.jugadores}</td><td>${s.sub23}</td><td>${fmt(s.partidos)}</td>
+      <td>${fmt(s.minutos)}</td><td>${fmt(s.goles)}</td><td>${s.xg ? s.xg.toFixed(2) : '—'}</td>
+    </tr>`).join('')}</tbody></table>` : ''}
+    ${topPerformers.length ? `<br><strong>Jugadores con más producción ofensiva registrada</strong><br>
+    <table><thead><tr><th>Jugador</th><th>Pos.</th><th>Temp.</th><th>Min</th><th>Goles</th><th>xG</th></tr></thead>
+    <tbody>${topPerformers.map(p => `<tr>
+      <td class="bold">${p.nombre}</td><td class="muted">${p.posicion || '—'}</td><td>${p.temporadas || '—'}</td>
+      <td>${fmt(p.minutos)}</td><td>${fmt(p.goles)}</td><td>${p.xg ? p.xg.toFixed(2) : '—'}</td>
+    </tr>`).join('')}</tbody></table>` : ''}
+    <br><span class="muted">Justificación: el bloque deportivo se calcula con registros Wyscout/master; el bloque de mercado se calcula con operaciones Transfermarkt consolidadas.</span>`;
 }
 
 function sgptSub23Revalorizados(n) {
@@ -3306,22 +3506,44 @@ function sgptTopJugadoresRev(n) {
 function sgptPlayerInfo(name) {
   const ops = ALL_DATA.filter(d => d.jugador === name);
   const rev = REV_DATA.find(d => d.jugador === name);
-  if (!ops.length) return `No encuentro operaciones para <strong>${name}</strong>.`;
+  const stats = getPlayerSeasonStats(name);
+  if (!ops.length && !stats.length) return `No encuentro registros para <strong>${name}</strong>.`;
 
   const order = ['2021-22','2022-23','2023-24','2024-25','2025-26'];
   const sortedOps = [...ops].sort((a,b) => order.indexOf(b.temporada) - order.indexOf(a.temporada));
-  const latest = sortedOps[0];
+  const latest = sortedOps[0] || null;
+  const latestStats = stats[0] || null;
   const totalImporte = sumBy(ops, 'importe_numerico');
   const clubes = [...new Set(ops.map(d => d.club).filter(Boolean))];
+  const totals = summarizePlayerStats(stats);
+  const mainPos = tPos(latest?.posicion || latestStats?.posicion || '') || '—';
+  const mainClub = latestStats?.club || latest?.club || '—';
+  const statText = stats.length
+    ? `${fmt(totals.partidos)} partidos, ${fmt(totals.minutos)} minutos, ${fmt(totals.goles)} goles y ${totals.xg.toFixed(2)} xG en ${totals.temporadas} temporada${totals.temporadas !== 1 ? 's' : ''}.`
+    : 'No hay registros Wyscout/master de rendimiento para este jugador.';
 
   return `<strong>${name}</strong><br>
-    <span class="muted">${tPos(latest?.posicion || '') || '—'} · ${latest?.nacionalidad || '—'} · último club registrado: ${latest?.club || '—'}</span>
+    <span class="muted">${mainPos} · ${latest?.nacionalidad || latestStats?.nacionalidad || '—'} · último club registrado: ${mainClub}</span>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
-      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Operaciones</span><br><strong>${ops.length}</strong></div>
-      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Clubes</span><br><strong>${clubes.length}</strong></div>
-      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Importe total</span><br><strong>${formatM(totalImporte)}</strong></div>
+      ${stats.length ? `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Partidos</span><br><strong>${fmt(totals.partidos)}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Minutos</span><br><strong>${fmt(totals.minutos)}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Goles</span><br><strong>${fmt(totals.goles)}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">xG</span><br><strong>${totals.xg.toFixed(2)}</strong></div>` : ''}
+      ${ops.length ? `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Operaciones</span><br><strong>${ops.length}</strong></div>
+      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Importe total</span><br><strong>${formatM(totalImporte)}</strong></div>` : ''}
       ${rev ? `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Revalorización</span><br><strong class="${(+rev.revalorizacion_abs||0) >= 0 ? 'green' : 'red'}">${formatDeltaM(+rev.revalorizacion_abs || 0)} · ${(+rev.revalorizacion_pct || 0).toFixed(0)}%</strong></div>` : ''}
     </div>
+    <div style="margin:8px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <strong>Lectura deportiva:</strong> <span class="muted">${statText}</span>
+    </div>
+    ${stats.length ? `<strong>Rendimiento por temporada</strong><br>
+    <table><thead><tr><th>Temp.</th><th>Club</th><th>Entrenador</th><th>Pos.</th><th>Edad</th><th>Part.</th><th>Min</th><th>Goles</th><th>xG</th></tr></thead>
+    <tbody>${stats.map(s => `<tr>
+      <td>${s.temporada}</td><td class="bold">${s.club}</td><td>${s.entrenador || '—'}</td>
+      <td class="muted">${s.posicion || '—'}</td><td>${s.edad || '—'}</td><td>${fmt(s.partidos)}</td>
+      <td>${fmt(s.minutos)}</td><td>${fmt(s.goles)}</td><td>${s.xg ? s.xg.toFixed(2) : '—'}</td>
+    </tr>`).join('')}</tbody></table>` : ''}
+    ${ops.length ? `<br><strong>Historial de operaciones</strong><br>
     <table><thead><tr><th>Temp.</th><th>Club</th><th>Movimiento</th><th>Tipo</th><th>Importe</th></tr></thead>
     <tbody>${sortedOps.slice(0, 8).map(op => `<tr>
       <td>${op.temporada || '—'}</td>
@@ -3329,8 +3551,9 @@ function sgptPlayerInfo(name) {
       <td>${op.movimiento || '—'}</td>
       <td class="muted">${prettyTipo(op.tipo_operacion || op.movimiento)}</td>
       <td>${op.importe_numerico ? formatM(op.importe_numerico) : (op.importe_original || '—')}</td>
-    </tr>`).join('')}</tbody></table>
-    ${sortedOps.length > 8 ? `<span class="muted">Mostrando las 8 operaciones más recientes.</span>` : ''}`;
+    </tr>`).join('')}</tbody></table>` : ''}
+    ${sortedOps.length > 8 ? `<span class="muted">Mostrando las 8 operaciones más recientes.</span><br>` : ''}
+    <span class="muted">Justificación: rendimiento tomado de master/Wyscout cuando existe; operaciones y valores tomados de Transfermarkt consolidado.</span>`;
 }
 
 function sgptDefault(raw) {
@@ -3612,6 +3835,10 @@ function isDecisionModelQuery(q) {
   return /recomend|operaci[oó]n|decision|decidir|salida|ceder|cesi[oó]n|destin|renovar|recompra|porcentaje|modelo|random|forest|ideal|encaje|vend(er)?|traspas|vent[a]?|interes/.test(q);
 }
 
+function isLocalStatsQuery(q) {
+  return /gol|goles|xg|minut|partid|estad[ií]stic|rendimiento|temporada|temporadas|asist|equipo|club|jugador/.test(q);
+}
+
 function detectBetisPlayerInQuery(q) {
   if (!BETIS_PLAYERS_DATA.length) return null;
   const exact = BETIS_PLAYERS_DATA.find(p => q.includes(norm(p.jugador)));
@@ -3745,11 +3972,11 @@ function sgptDecisionForBetisPlayer(playerName) {
     return 'El modelo RF de decisiones todavía se está cargando. Vuelve a lanzar la pregunta en unos segundos.';
   }
   const summary = rfSummaryForPlayer(playerName);
-  const rows = rfRowsForPlayer(playerName).slice(0, 3);
+  const rows = rfRowsForPlayer(playerName).slice(0, 5);
   const similar = RF_SIMILAR_EVENTS
     .filter(d => norm(d.jugador_betis) === norm(playerName))
     .sort((a, b) => num(a.ranking_similar) - num(b.ranking_similar))
-    .slice(0, 3);
+    .slice(0, 5);
 
   if (!summary) return `No encuentro recomendación RF para <strong>${playerName}</strong>.`;
 
@@ -3761,24 +3988,11 @@ function sgptDecisionForBetisPlayer(playerName) {
   const justificacion = dec?.justificacion || summary.razonamiento || '';
   const clubesText = dec?.clubes_ideales || summary.clubes_ideales || '';
   const entrenadoresText = dec?.entrenadores_ideales || summary.entrenadores_ideales || '';
-
-  const destinoCards = rows.map(d => `
-    <div style="padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
-      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
-        <strong>${d.ranking_destino_rf}. ${d.club}</strong>
-        <span class="green" style="font-weight:800">${num(d.score_destino_rf).toFixed(1)}</span>
-      </div>
-      <div class="muted" style="font-size:0.78rem;margin-top:2px">${d.entrenador || 'Entrenador no identificado'}</div>
-      <div style="font-size:0.8rem;margin-top:6px">
-        Reval. ${formatDeltaM(num(d.rf_revalorizacion_esperada))} · Prob + ${pct(d.rf_prob_revalorizacion_positiva)} · Demanda ${num(d.demand_score).toFixed(0)}/100
-      </div>
-    </div>`).join('');
-
-  const similarCards = similar.map(d => `
-    <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
-      <strong>${d.jugador_historico}</strong> · ${d.club}<br>
-      <span class="muted">${prettyTipo(d.tipo_suceso)} · ${num(d.edad).toFixed(0)} años · ${fmt(num(d.minutos))} min · similitud ${num(d.similaridad_score).toFixed(1)}</span>
-    </div>`).join('');
+  const stats = getPlayerSeasonStats(playerName);
+  const totals = summarizePlayerStats(stats);
+  const lectura = justificacion
+    ? justificacion
+    : `${summary.jugador} acumula ${fmt(totals.minutos)} minutos y ${fmt(totals.goles)} goles en los datos disponibles. El modelo prioriza destinos donde haya demanda real de su posición, minutos Sub-23 y precedentes de revalorización.`;
 
   return `<strong>${summary.jugador}</strong> · ${summary.posicion || '—'} · ${num(summary.edad).toFixed(0)} años<br>
     <div style="margin:10px 0;padding:14px;border:2px solid var(--primary);border-radius:10px;background:var(--primary-light)">
@@ -3796,12 +4010,34 @@ function sgptDecisionForBetisPlayer(playerName) {
           <div style="font-size:1.05rem;font-weight:900" class="green">${revalText}</div>
         </div>
       </div>
-      ${justificacion ? `<div style="margin-top:10px;font-size:0.84rem;color:var(--text-muted);line-height:1.5">${justificacion}</div>` : ''}
+    </div>
+    <strong>Datos técnicos del jugador</strong><br>
+    <table><thead><tr><th>Part.</th><th>Min</th><th>Goles</th><th>xG</th><th>Prob +</th><th>Cesión hist.</th><th>Traspaso hist.</th></tr></thead>
+    <tbody><tr>
+      <td>${fmt(totals.partidos)}</td><td>${fmt(totals.minutos)}</td><td>${fmt(totals.goles)}</td><td>${totals.xg.toFixed(2)}</td>
+      <td>${pct(summary.prob_revalorizacion_positiva_media_top5)}</td>
+      <td>${pct(summary.prob_cesion_historica)}</td><td>${pct(summary.prob_traspaso_historico)}</td>
+    </tr></tbody></table>
+    <div style="margin:10px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <strong>Justificación deportiva:</strong><br>
+      <span class="muted">${lectura}</span>
     </div>
     ${clubesText ? `<div style="margin-bottom:6px"><strong>Clubes ideales:</strong> <span class="muted">${clubesText}</span></div>` : ''}
     ${entrenadoresText ? `<div style="margin-bottom:10px"><strong>Entrenadores ideales:</strong> <span class="muted">${entrenadoresText}</span></div>` : ''}
-    ${destinoCards ? `<strong>Top destinos calculados</strong><div style="display:grid;gap:8px;margin:8px 0 12px">${destinoCards}</div>` : ''}
-    ${similarCards ? `<strong>Casos históricos parecidos</strong><div style="display:grid;gap:8px;margin-top:8px">${similarCards}</div>` : ''}`;
+    ${rows.length ? `<strong>Destinos calculados</strong><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score</th><th>Reval.</th><th>Prob +</th><th>Demanda</th></tr></thead>
+    <tbody>${rows.map(d => `<tr>
+      <td>${num(d.ranking_destino_rf)}</td><td class="bold">${d.club}</td><td>${d.entrenador || '—'}</td>
+      <td class="green">${num(d.score_destino_rf).toFixed(1)}</td><td>${formatDeltaM(num(d.rf_revalorizacion_esperada))}</td>
+      <td>${pct(d.rf_prob_revalorizacion_positiva)}</td><td>${num(d.demand_score).toFixed(0)}/100</td>
+    </tr>`).join('')}</tbody></table>` : ''}
+    ${similar.length ? `<br><strong>Casos históricos parecidos</strong><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>Tipo</th><th>Edad</th><th>Min</th><th>Goles</th><th>Sim.</th></tr></thead>
+    <tbody>${similar.map(d => `<tr>
+      <td>${num(d.ranking_similar)}</td><td class="bold">${d.jugador_historico}</td><td>${d.club}</td>
+      <td>${prettyTipo(d.tipo_suceso)}</td><td>${num(d.edad).toFixed(0)}</td><td>${fmt(num(d.minutos))}</td>
+      <td>${fmt(num(d.goles))}</td><td>${num(d.similaridad_score).toFixed(1)}</td>
+    </tr>`).join('')}</tbody></table>` : ''}`;
 }
 
 function sgptDecisionForPosition(pos, n) {
