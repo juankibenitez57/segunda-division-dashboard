@@ -361,6 +361,30 @@ def ask():
         return jsonify({"error": str(e)}), 503
 
 
+@app.route("/ai-debug")
+def ai_debug():
+    """Diagnóstico: lista modelos disponibles para la GEMINI_API_KEY."""
+    key = os.environ.get("GEMINI_API_KEY", "")
+    if not key:
+        return jsonify({"error": "Sin GEMINI_API_KEY"}), 503
+    info = {"key_prefix": key[:6] + "…", "key_format_ok": key.startswith("AIza")}
+    try:
+        r = requests.get(
+            f"https://generativelanguage.googleapis.com/v1beta/models?key={key}",
+            timeout=15)
+        info["list_status"] = r.status_code
+        if r.ok:
+            models = [m["name"].replace("models/", "")
+                      for m in r.json().get("models", [])
+                      if "generateContent" in m.get("supportedGenerationMethods", [])]
+            info["available_models"] = models[:20]
+        else:
+            info["list_error"] = r.text[:300]
+    except Exception as e:
+        info["exception"] = str(e)
+    return jsonify(info)
+
+
 @app.route("/status")
 def status():
     provider = _ai_provider()
