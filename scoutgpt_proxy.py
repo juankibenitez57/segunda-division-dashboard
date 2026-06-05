@@ -20,9 +20,13 @@ from urllib.parse import quote
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, request
-from groq import Groq as GroqClient
 
-_groq_available = True
+# Proveedores de IA (opcionales — el proxy funciona sin ellos)
+try:
+    from groq import Groq as GroqClient
+    _groq_available = True
+except ImportError:
+    _groq_available = False
 
 # ── Config ────────────────────────────────────────────────────────────────────
 PORT    = int(os.environ.get("PORT", 5050))
@@ -254,12 +258,53 @@ def parse_player_profile(soup: BeautifulSoup, pid: str) -> dict:
 
 # ── Rutas API ─────────────────────────────────────────────────────────────────
 
-SYSTEM_PROMPT = """Eres ScoutGPT, asistente experto en análisis de mercado de fútbol de la Segunda División española (temporadas 2021-22 a 2025-26).
-Tienes acceso a datos reales de fichajes, traspasos, cesiones y revalorizaciones de jugadores.
+SYSTEM_PROMPT = """Eres ScoutGPT, asistente experto en análisis de mercado y desarrollo de talento de la Segunda División española (temporadas 2021-22 a 2025-26).
+Tienes acceso a datos reales de:
+- Fichajes, traspasos, cesiones y revalorizaciones (Transfermarkt).
+- Rendimiento: minutos, partidos, goles, xG, valor de mercado (Wyscout).
+- Entrenadores por club y temporada.
 Responde SIEMPRE en español, de forma concisa y útil para un analista de scouting profesional.
 Cuando hagas rankings o listas, usa formato: 1. **Nombre** — dato clave.
-Si los datos no permiten responder la pregunta con precisión, dilo claramente.
+Basa tus respuestas EXCLUSIVAMENTE en los DATOS RELEVANTES proporcionados. Si no son suficientes, dilo claramente.
 Máximo 40 líneas."""
+
+
+def _ai_provider() -> str:
+    """Devuelve el proveedor de IA disponible: 'gemini', 'groq' o ''."""
+    if os.environ.get("GEMINI_API_KEY"):
+        return "gemini"
+    if os.environ.get("GROQ_API_KEY") and _groq_available:
+        return "groq"
+    return ""
+
+
+def _ask_gemini(question: str, context: str) -> str:
+    """Llama a Google Gemini vía REST (sin SDK)."""
+    key   = os.environ["GEMINI_API_KEY"]
+    model = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+    url   = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+    prompt = f"{SYSTEM_PROMPT}\n\nDATOS RELEVANTES:\n{context}\n\nPREGUNTA: {question}"
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 1400},
+    }
+    r = requests.post(url, json=payload, timeout=30)
+    r.raise_for_status()
+    data = r.json()
+    return data["candidates"][0]["content"]["parts"][0]["text"]
+
+
+def _ask_groq(question: str, context: str) -> str:
+    client = GroqClient(api_key=os.environ["GROQ_API_KEY"])
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user",   "content": f"DATOS RELEVANTES:\n{context}\n\nPREGUNTA: {question}"},
+        ],
+        max_tokens=1200, temperature=0.2,
+    )
+    return response.choices[0].message.content
 
 
 @app.route("/ask", methods=["POST", "OPTIONS"])
@@ -267,42 +312,35 @@ def ask():
     if request.method == "OPTIONS":
         return "", 204
 
-    groq_key = os.environ.get("GROQ_API_KEY", "")
-    if not groq_key or not _groq_available:
-        return jsonify({"error": "GROQ_API_KEY no configurada en el servidor"}), 503
+    provider = _ai_provider()
+    if not provider:
+        return jsonify({"error": "No hay proveedor de IA configurado (GEMINI_API_KEY o GROQ_API_KEY)"}), 503
 
     body     = request.get_json(force=True) or {}
     question = body.get("question", "").strip()
     context  = body.get("context", "").strip()
-
     if not question:
         return jsonify({"error": "Pregunta vacía"}), 400
 
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user",   "content": f"DATOS RELEVANTES:\n{context}\n\nPREGUNTA: {question}"},
-    ]
-
     try:
-        client   = GroqClient(api_key=groq_key)
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=messages,
-            max_tokens=1200,
-            temperature=0.2,
-        )
-        answer = response.choices[0].message.content
-        logger.info(f"Groq → {len(answer)} chars para: {question[:60]}")
-        return jsonify({"answer": answer})
+        if provider == "gemini":
+            answer = _ask_gemini(question, context)
+        else:
+            answer = _ask_groq(question, context)
+        logger.info(f"{provider} → {len(answer)} chars para: {question[:60]}")
+        return jsonify({"answer": answer, "provider": provider})
     except Exception as e:
-        logger.error(f"Groq error: {e}")
+        logger.error(f"{provider} error: {e}")
         return jsonify({"error": str(e)}), 503
 
 
 @app.route("/status")
 def status():
-    groq_ready = bool(os.environ.get("GROQ_API_KEY")) and _groq_available
-    return jsonify({"ok": True, "source": "transfermarkt", "version": "2.0", "ai": groq_ready})
+    provider = _ai_provider()
+    return jsonify({
+        "ok": True, "source": "transfermarkt", "version": "2.1",
+        "ai": bool(provider), "provider": provider or None,
+    })
 
 
 _photo_cache: dict[str, str] = {}   # spieler_id → photo URL

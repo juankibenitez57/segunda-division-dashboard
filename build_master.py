@@ -59,6 +59,7 @@ MASTER_COLS = [
     "edad",
     "posicion",             # inglés (TM canonical)
     "posicion_es",          # español
+    "posicion_normalizada", # Wyscout normalizada (Delantero, Extremo, etc.)
     # Participación (Wyscout)
     "partidos",
     "titularidades",
@@ -66,10 +67,21 @@ MASTER_COLS = [
     # Producción (Wyscout)
     "goles",
     "asistencias",
+    "xg",
     "amarillas",
     "rojas",
+    # Físico (Wyscout)
+    "altura",
+    "peso",
+    "pie",
+    # Métricas derivadas
+    "minutos_por_partido",
+    "goles_por_90",
+    "xg_por_90",
+    "es_sub23",
     # Mercado (Transfermarkt)
     "valor_mercado",        # VM en el momento del fichaje
+    "valor_mercado_wyscout",# VM según Wyscout (más actual/preciso)
     "valor_llegada",        # VM al llegar al club
     "valor_salida",         # VM al salir del club
     "revalorizacion_absoluta",
@@ -77,9 +89,11 @@ MASTER_COLS = [
     # Operación
     "tipo_operacion",       # cesion, traspaso, libre, retorno_cesion, otro
     "movimiento",           # alta / baja
+    "cesion",               # bool (Wyscout)
     "origen_desarrollo",    # Cantera/Filial, Segunda, Primera División, Extranjero
     # Metadata
     "fuente",               # tm, wyscout, manual
+    "tiene_wyscout",        # bool — si la fila tiene datos de rendimiento
 ]
 
 
@@ -234,68 +248,152 @@ def build_master(include_wyscout: bool = True) -> pd.DataFrame:
 
     master = pd.DataFrame(records, columns=MASTER_COLS)
 
-    # ── Merge con Wyscout ─────────────────────────────────────────────────────
-    if include_wyscout:
-        wyscout_records = import_all_wyscout(DATA_WYSCOUT)
-        # Excluir el archivo de muestra
-        wyscout_records = [r for r in wyscout_records if r.get("nombre") not in ("Jugador Ejemplo", "Otro Jugador")]
-
-        if wyscout_records:
-            wy = pd.DataFrame(wyscout_records)
-            wy["_key"] = wy["nombre"].apply(lambda x: player_key(x) if x else "")
-            master["_key"] = master["nombre"].apply(lambda x: player_key(x) if x else "")
-
-            wy_cols = ["_key", "club", "temporada", "partidos", "titularidades",
-                       "minutos", "goles", "asistencias", "amarillas", "rojas",
-                       "entrenador", "fecha_nacimiento"]
-
-            wy_merge = wy[[c for c in wy_cols if c in wy.columns]].copy()
-            master = master.merge(
-                wy_merge, on=["_key", "club", "temporada"],
-                how="left", suffixes=("", "_wy")
-            )
-
-            # Priorizar datos Wyscout para stats, entrenador
-            for col in ["partidos", "titularidades", "minutos", "goles",
-                        "asistencias", "amarillas", "rojas"]:
-                if f"{col}_wy" in master.columns:
-                    master[col] = master[f"{col}_wy"].combine_first(master[col])
-                    master.drop(columns=[f"{col}_wy"], inplace=True)
-
-            if "entrenador_wy" in master.columns:
-                master["entrenador"] = master["entrenador_wy"].combine_first(master["entrenador"])
-                master.drop(columns=["entrenador_wy"], inplace=True)
-
-            if "fecha_nacimiento_wy" in master.columns:
-                master["fecha_nacimiento"] = master["fecha_nacimiento_wy"].combine_first(master["fecha_nacimiento"])
-                master.drop(columns=["fecha_nacimiento_wy"], inplace=True)
-
-            master.drop(columns=["_key"], errors="ignore", inplace=True)
-            logger.info(f"Wyscout mergeado: {len(wyscout_records)} registros")
-        else:
-            master.drop(columns=["_key"], errors="ignore", inplace=True)
-            logger.info("Sin datos Wyscout disponibles (columnas de stats quedan vacías)")
-    else:
-        master.drop(columns=["_key"], errors="ignore", inplace=True)
-
-    # ── Deduplicar ────────────────────────────────────────────────────────────
+    # ── Deduplicar antes del merge ────────────────────────────────────────────
     before = len(master)
     master.drop_duplicates(subset=["nombre", "club", "temporada", "movimiento"],
                            keep="first", inplace=True)
-    if before > len(master):
-        logger.info(f"Deduplicados: {before - len(master)} filas eliminadas")
-
     master.reset_index(drop=True, inplace=True)
+    if before > len(master):
+        logger.info(f"Deduplicados TM: {before - len(master)} filas")
+
+    # ── Merge con Wyscout (matching robusto) ──────────────────────────────────
+    match_stats = {"exact": 0, "fuzzy_temp": 0, "total_master": len(master)}
+    if include_wyscout:
+        wy = load_wyscout(DATA_WYSCOUT)
+        if not wy.empty:
+            master = _merge_wyscout(master, wy, match_stats)
+            logger.info(f"Wyscout cargado: {len(wy)} registros")
+        else:
+            logger.info("Sin datos Wyscout disponibles")
+
+    # ── Métricas derivadas ────────────────────────────────────────────────────
+    master = _compute_metrics(master)
+
+    # ── Resumen ───────────────────────────────────────────────────────────────
+    con_wy = int(master["tiene_wyscout"].sum())
+    matched_pct = con_wy / len(master) * 100 if len(master) else 0
     logger.info(f"\n{'─'*55}")
     logger.info(f"  MASTER generado: {len(master):,} registros")
-    logger.info(f"  Jugadores únicos: {master['nombre'].nunique():,}")
-    logger.info(f"  Clubes:           {master['club'].nunique()}")
-    logger.info(f"  Entrenadores:     {master['entrenador'].nunique()}")
-    logger.info(f"  Temporadas:       {master['temporada'].nunique()}")
-    logger.info(f"  Con datos Wyscout: {master['minutos'].notna().sum()}")
+    logger.info(f"  Jugadores únicos:  {master['nombre'].nunique():,}")
+    logger.info(f"  Clubes:            {master['club'].nunique()}")
+    logger.info(f"  Entrenadores:      {master['entrenador'].nunique()}")
+    logger.info(f"  Temporadas:        {master['temporada'].nunique()}")
+    logger.info(f"  Sub-23:            {int(master['es_sub23'].sum())}")
+    logger.info(f"  ── Matching Wyscout ──")
+    logger.info(f"    Match exacto (jugador+club+temp): {match_stats['exact']}")
+    logger.info(f"    Match por jugador+temporada:      {match_stats['fuzzy_temp']}")
+    logger.info(f"    TOTAL con datos Wyscout:          {con_wy} ({matched_pct:.1f}%)")
     logger.info(f"{'─'*55}")
 
     return master
+
+
+def load_wyscout(directory) -> pd.DataFrame:
+    """Carga Wyscout usando el loader robusto (Excel + normalización)."""
+    try:
+        from src.wyscout_loader import load_all
+        return load_all(directory)
+    except Exception as e:
+        logger.warning(f"No se pudo cargar Wyscout: {e}")
+        return pd.DataFrame()
+
+
+def _merge_wyscout(master: pd.DataFrame, wy: pd.DataFrame, stats: dict) -> pd.DataFrame:
+    """
+    Enriquece el master con datos Wyscout mediante matching en dos niveles:
+      1. Exacto: (jugador_key, club_key, temporada)
+      2. Fallback: (jugador_key, temporada) — para casos de club no normalizado
+    """
+    # Claves de Wyscout
+    wy = wy.copy()
+    wy["_kct"] = wy.apply(lambda r: f"{player_key(str(r['jugador']))}|{player_key(str(r['equipo']))}|{r['temporada']}", axis=1)
+    wy["_kt"]  = wy.apply(lambda r: f"{player_key(str(r['jugador']))}|{r['temporada']}", axis=1)
+
+    # Quedarse con el registro de más minutos por clave (evita duplicados att/med/def)
+    wy = wy.sort_values("minutos_jugados", ascending=False, na_position="last")
+    wy_kct = wy.drop_duplicates("_kct").set_index("_kct")
+    wy_kt  = wy.drop_duplicates("_kt").set_index("_kt")
+
+    wy_fields = ["edad", "posicion_normalizada", "partidos_jugados", "minutos_jugados",
+                 "goles", "xg", "valor_mercado", "altura", "peso", "pie", "cesion",
+                 "pais_nacimiento", "pasaporte"]
+
+    def enrich(row):
+        kct = f"{player_key(str(row['nombre']))}|{player_key(str(row['club']))}|{row['temporada']}"
+        kt  = f"{player_key(str(row['nombre']))}|{row['temporada']}"
+        src = None
+        if kct in wy_kct.index:
+            src = wy_kct.loc[kct]
+            stats["exact"] += 1
+        elif kt in wy_kt.index:
+            src = wy_kt.loc[kt]
+            stats["fuzzy_temp"] += 1
+        if src is None:
+            row["tiene_wyscout"] = False
+            return row
+        row["tiene_wyscout"]         = True
+        row["partidos"]              = src.get("partidos_jugados")
+        row["minutos"]               = src.get("minutos_jugados")
+        row["goles"]                 = src.get("goles")
+        row["xg"]                    = src.get("xg")
+        row["altura"]                = src.get("altura")
+        row["peso"]                  = src.get("peso")
+        row["pie"]                   = src.get("pie")
+        row["cesion"]                = src.get("cesion")
+        row["valor_mercado_wyscout"] = src.get("valor_mercado")
+        row["posicion_normalizada"]  = src.get("posicion_normalizada")
+        # edad: priorizar Wyscout si master no la tiene
+        if pd.isna(row.get("edad")) or not row.get("edad"):
+            row["edad"] = src.get("edad")
+        return row
+
+    master = master.apply(enrich, axis=1)
+    return master
+
+
+def _compute_metrics(master: pd.DataFrame) -> pd.DataFrame:
+    """Calcula minutos_por_partido, goles_por_90, xg_por_90, es_sub23."""
+    def safe_div(a, b):
+        try:
+            a, b = float(a), float(b)
+            return round(a / b, 2) if b > 0 else None
+        except (TypeError, ValueError):
+            return None
+
+    master["minutos_por_partido"] = master.apply(
+        lambda r: safe_div(r.get("minutos"), r.get("partidos")), axis=1)
+    master["goles_por_90"] = master.apply(
+        lambda r: safe_div((float(r["goles"]) * 90) if pd.notna(r.get("goles")) else None, r.get("minutos")), axis=1)
+    master["xg_por_90"] = master.apply(
+        lambda r: safe_div((float(r["xg"]) * 90) if pd.notna(r.get("xg")) else None, r.get("minutos")), axis=1)
+    master["es_sub23"] = master["edad"].apply(
+        lambda e: bool(pd.notna(e) and 0 < float(e) < 23) if pd.notna(e) else False)
+    if "tiene_wyscout" not in master.columns:
+        master["tiene_wyscout"] = False
+    master["tiene_wyscout"] = master["tiene_wyscout"].fillna(False)
+
+    # Rellenar posicion_normalizada desde la posición TM cuando falta Wyscout
+    master["posicion_normalizada"] = master.apply(
+        lambda r: r["posicion_normalizada"] if pd.notna(r.get("posicion_normalizada"))
+        else _tm_pos_to_normalized(r.get("posicion")), axis=1)
+    return master
+
+
+# Mapeo de posición TM (inglés) → posición normalizada
+_TM_TO_NORM = {
+    "Goalkeeper": "Portero",
+    "Centre-Back": "Central", "Left-Back": "Lateral", "Right-Back": "Lateral",
+    "Defensive Midfield": "Mediocentro",
+    "Central Midfield": "Centrocampista",
+    "Attacking Midfield": "Mediapunta", "Left Midfield": "Centrocampista", "Right Midfield": "Centrocampista",
+    "Left Winger": "Extremo", "Right Winger": "Extremo",
+    "Centre-Forward": "Delantero", "Second Striker": "Delantero",
+}
+
+def _tm_pos_to_normalized(pos):
+    if pos is None or (isinstance(pos, float) and pd.isna(pos)):
+        return None
+    return _TM_TO_NORM.get(str(pos), None)
 
 
 def main():

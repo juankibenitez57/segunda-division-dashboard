@@ -395,7 +395,9 @@ function renderCurrentTab() {
     case 'tab-buscador':     if (!chartsRendered['tab-buscador']) { renderBuscadorTab(); chartsRendered['tab-buscador'] = true; } break;
     case 'tab-scoutgpt':     if (!chartsRendered['tab-scoutgpt']) { renderScoutGPTTab(); chartsRendered['tab-scoutgpt'] = true; } break;
     case 'tab-wyscout':      if (!chartsRendered['tab-wyscout'])  { renderWyscoutTab();  chartsRendered['tab-wyscout']  = true; } break;
-    case 'tab-desarrollo':   if (!chartsRendered['tab-desarrollo']) { renderDesarrolloTab(); chartsRendered['tab-desarrollo'] = true; } break;
+    case 'tab-clubes-dev':   renderClubesDevTab(); break;
+    case 'tab-entrenadores': if (!chartsRendered['tab-entrenadores']) { renderEntrenadoresTab(); chartsRendered['tab-entrenadores'] = true; } break;
+    case 'tab-pos-dev':      if (!chartsRendered['tab-pos-dev']) { renderPosDevTab(); chartsRendered['tab-pos-dev'] = true; } break;
     case 'tab-bbdd':         if (!chartsRendered['tab-bbdd']) { renderBBDDTab(); chartsRendered['tab-bbdd'] = true; } break;
   }
 }
@@ -2409,6 +2411,9 @@ function renderScoutGPTTab() {
   if (_sgptReady) return;
   _sgptReady = true;
 
+  // Precargar el master para consultas de desarrollo/entrenadores
+  loadMasterData(() => {});
+
   const input = document.getElementById('scoutgpt-input');
   const btn   = document.getElementById('scoutgpt-send');
 
@@ -3254,7 +3259,7 @@ function renderWyTablaResumen(data) {
 }
 
 /* ============================================================
-   DESARROLLO DE TALENTO — Tab
+   MASTER DATA — Carga compartida
    ============================================================ */
 
 let MASTER_DATA = [];
@@ -3271,119 +3276,218 @@ function loadMasterData(callback) {
   });
 }
 
-function renderDesarrolloTab() {
+const SEGUNDA_CLUBS_SET = new Set([
+  'AD Alcorcón','AD Ceuta FC','Albacete Balompié','Burgos CF','CD Castellón','CD Eldense',
+  'CD Leganés','CD Lugo','CD Mirandés','CD Tenerife','CF Fuenlabrada','Cultural Leonesa',
+  'Cádiz CF','Córdoba CF','Deportivo Alavés','Deportivo de La Coruña','Elche CF','FC Andorra',
+  'FC Cartagena','Girona FC','Granada CF','Levante UD','Málaga CF','RCD Espanyol Barcelona',
+  'Racing Ferrol','Racing Santander','Real Oviedo','Real Sociedad B','Real Valladolid CF',
+  'Real Zaragoza','SD Amorebieta','SD Eibar','SD Huesca','SD Ponferradina','Sporting Gijón',
+  'UD Almería','UD Ibiza','UD Las Palmas','Villarreal CF B','Real Betis','Real Betis B'
+]);
+
+function isTrue(v) { return v === true || v === 'True' || v === 'true'; }
+function num(v) { const n = +v; return isNaN(n) ? 0 : n; }
+
+function devBarH(id, entries, color, fmtFn) {
+  const top = entries.slice(0, 15);
+  plot(id, [{
+    type: 'bar', orientation: 'h',
+    x: top.map(e => e[1]).reverse(),
+    y: top.map(e => e[0]).reverse(),
+    text: top.map(e => fmtFn ? fmtFn(e[1]) : e[1]).reverse(),
+    textposition: 'auto',
+    marker: { color }
+  }], { margin: { t: 20, r: 30, b: 30, l: 150 } });
+}
+
+/* ============================================================
+   CLUBES DESARROLLADORES — Tab
+   ============================================================ */
+
+function renderClubesDevTab() {
+  loadMasterData(data => {
+    const notice = document.getElementById('cdev-notice');
+    if (!data.length) { notice.textContent = 'No se pudo cargar el dataset maestro.'; return; }
+
+    // Listeners (una vez)
+    if (!window._cdevInit) {
+      window._cdevInit = true;
+      document.getElementById('cdev-season').addEventListener('change', () => renderClubesDevTab());
+      document.getElementById('cdev-only-segunda').addEventListener('change', () => renderClubesDevTab());
+    }
+
+    const season = document.getElementById('cdev-season').value;
+    const onlySegunda = document.getElementById('cdev-only-segunda').checked;
+
+    let sub23 = data.filter(d => isTrue(d.es_sub23));
+    if (season !== 'all') sub23 = sub23.filter(d => d.temporada === season);
+    if (onlySegunda) sub23 = sub23.filter(d => SEGUNDA_CLUBS_SET.has(d.club));
+
+    const conWy = sub23.filter(d => isTrue(d.tiene_wyscout));
+    notice.innerHTML = `📊 ${sub23.length} registros Sub-23 · ${conWy.length} con datos de rendimiento Wyscout` +
+      (season !== 'all' ? ` · Temporada ${season}` : '');
+
+    // Agregaciones por club
+    const byClub = {};
+    sub23.forEach(d => {
+      const c = d.club;
+      if (!byClub[c]) byClub[c] = { minutos:0, jugadores:new Set(), goles:0, vmSum:0, vmCount:0, revSum:0 };
+      byClub[c].minutos += num(d.minutos);
+      byClub[c].jugadores.add(d.nombre);
+      byClub[c].goles += num(d.goles);
+      const vm = num(d.valor_mercado_wyscout) || num(d.valor_mercado);
+      if (vm > 0) { byClub[c].vmSum += vm; byClub[c].vmCount++; }
+      byClub[c].revSum += num(d.revalorizacion_absoluta);
+    });
+
+    const arr = Object.entries(byClub).map(([c, v]) => ({
+      club: c, minutos: v.minutos, jugadores: v.jugadores.size, goles: v.goles,
+      vmMedio: v.vmCount ? v.vmSum / v.vmCount : 0, rev: v.revSum
+    }));
+
+    const byMin  = arr.filter(a=>a.minutos>0).sort((a,b)=>b.minutos-a.minutos).map(a=>[a.club,Math.round(a.minutos)]);
+    const byJug  = [...arr].sort((a,b)=>b.jugadores-a.jugadores).map(a=>[a.club,a.jugadores]);
+    const byGol  = arr.filter(a=>a.goles>0).sort((a,b)=>b.goles-a.goles).map(a=>[a.club,a.goles]);
+    const byVal  = arr.filter(a=>a.vmMedio>0).sort((a,b)=>b.vmMedio-a.vmMedio).map(a=>[a.club,Math.round(a.vmMedio)]);
+    const byRev  = arr.filter(a=>a.rev>0).sort((a,b)=>b.rev-a.rev).map(a=>[a.club,Math.round(a.rev)]);
+
+    devBarH('chart-cdev-minutos', byMin, '#009a44', v => fmt(v));
+    devBarH('chart-cdev-jugadores', byJug, '#1d6fa4');
+    devBarH('chart-cdev-goles', byGol, '#e07b39');
+    devBarH('chart-cdev-valor', byVal, '#c8a951', v => formatM(v));
+    devBarH('chart-cdev-revalorizacion', byRev, '#8b5cf6', v => formatM(v));
+
+    // Tabla
+    const ranked = [...arr].sort((a,b)=>b.minutos-a.minutos).slice(0,25);
+    document.getElementById('cdev-table').innerHTML = `
+      <table class="ppc-table"><thead><tr>
+        <th>#</th><th>Club</th><th>Min Sub-23</th><th>Jugadores</th><th>Goles</th><th>VM medio</th><th>Revalorización</th>
+      </tr></thead><tbody>
+        ${ranked.map((a,i)=>`<tr>
+          <td>${i+1}</td><td><strong>${a.club}</strong></td>
+          <td>${fmt(a.minutos)}</td><td>${a.jugadores}</td><td>${a.goles}</td>
+          <td>${a.vmMedio>0?formatM(a.vmMedio):'—'}</td>
+          <td style="color:${a.rev>0?'var(--success)':'var(--text-muted)'}">${a.rev!==0?formatM(a.rev):'—'}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  });
+}
+
+/* ============================================================
+   ENTRENADORES — Tab
+   ============================================================ */
+
+function renderEntrenadoresTab() {
+  loadMasterData(data => {
+    const notice = document.getElementById('ent-notice');
+    if (!data.length) { notice.textContent = 'No se pudo cargar el dataset maestro.'; return; }
+
+    const conEnt = data.filter(d => d.entrenador);
+    const sub23  = conEnt.filter(d => isTrue(d.es_sub23));
+    notice.innerHTML = `👔 ${new Set(conEnt.map(d=>d.entrenador)).size} entrenadores · ${sub23.length} registros Sub-23 con entrenador asignado`;
+
+    // Agregación por entrenador
+    const byCoach = {};
+    conEnt.forEach(d => {
+      const c = d.entrenador;
+      if (!byCoach[c]) byCoach[c] = { minTotal:0, minSub23:0, jugSub23:new Set(), golesSub23:0, valorSub23:0 };
+      byCoach[c].minTotal += num(d.minutos);
+      if (isTrue(d.es_sub23)) {
+        byCoach[c].minSub23 += num(d.minutos);
+        byCoach[c].jugSub23.add(d.nombre);
+        byCoach[c].golesSub23 += num(d.goles);
+        byCoach[c].valorSub23 += num(d.revalorizacion_absoluta);
+      }
+    });
+
+    const arr = Object.entries(byCoach).map(([c,v]) => ({
+      coach: c, minSub23: v.minSub23, jugSub23: v.jugSub23.size,
+      golesSub23: v.golesSub23, valorSub23: v.valorSub23,
+      pctSub23: v.minTotal > 0 ? (v.minSub23 / v.minTotal * 100) : 0
+    }));
+
+    devBarH('chart-ent-minutos', arr.filter(a=>a.minSub23>0).sort((a,b)=>b.minSub23-a.minSub23).map(a=>[a.coach,Math.round(a.minSub23)]), '#009a44', v=>fmt(v));
+    devBarH('chart-ent-jugadores', [...arr].sort((a,b)=>b.jugSub23-a.jugSub23).map(a=>[a.coach,a.jugSub23]), '#1d6fa4');
+    devBarH('chart-ent-goles', arr.filter(a=>a.golesSub23>0).sort((a,b)=>b.golesSub23-a.golesSub23).map(a=>[a.coach,a.golesSub23]), '#e07b39');
+    devBarH('chart-ent-valor', arr.filter(a=>a.valorSub23>0).sort((a,b)=>b.valorSub23-a.valorSub23).map(a=>[a.coach,Math.round(a.valorSub23)]), '#c8a951', v=>formatM(v));
+    devBarH('chart-ent-pct', arr.filter(a=>a.minSub23>200).sort((a,b)=>b.pctSub23-a.pctSub23).map(a=>[a.coach,Math.round(a.pctSub23)]), '#be185d', v=>v+'%');
+
+    const ranked = arr.filter(a=>a.minSub23>0).sort((a,b)=>b.minSub23-a.minSub23).slice(0,25);
+    document.getElementById('ent-table').innerHTML = `
+      <table class="ppc-table"><thead><tr>
+        <th>#</th><th>Entrenador</th><th>Min Sub-23</th><th>Jugadores Sub-23</th><th>Goles Sub-23</th><th>Valor generado</th><th>% Utilización</th>
+      </tr></thead><tbody>
+        ${ranked.map((a,i)=>`<tr>
+          <td>${i+1}</td><td><strong>${a.coach}</strong></td>
+          <td>${fmt(a.minSub23)}</td><td>${a.jugSub23}</td><td>${a.golesSub23}</td>
+          <td style="color:${a.valorSub23>0?'var(--success)':'var(--text-muted)'}">${a.valorSub23!==0?formatM(a.valorSub23):'—'}</td>
+          <td>${a.pctSub23.toFixed(0)}%</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  });
+}
+
+/* ============================================================
+   DESARROLLO POR POSICIÓN — Tab
+   ============================================================ */
+
+function renderPosDevTab() {
   loadMasterData(data => {
     if (!data.length) {
-      document.getElementById('dev-kpis').innerHTML =
-        '<p style="color:var(--text-muted)">No se pudo cargar master_player_development.csv</p>';
+      document.getElementById('posdev-kpis').innerHTML = '<p style="color:var(--text-muted)">No se pudo cargar el dataset.</p>';
       return;
     }
-    renderDevKPIs(data);
-    renderDevEdad(data);
-    renderDevPosicion(data);
-    renderDevSub23(data);
-    renderDevEntrenadores(data);
-    renderDevTipos(data);
-    renderDevTablaTemporadas(data);
+
+    const conPos = data.filter(d => d.posicion_normalizada && d.posicion_normalizada !== 'nan');
+    const byPos = {};
+    conPos.forEach(d => {
+      const p = d.posicion_normalizada;
+      if (!byPos[p]) byPos[p] = { minutos:[], goles:0, xg90:[], vm:[], rev:[], count:0 };
+      byPos[p].count++;
+      if (num(d.minutos) > 0) byPos[p].minutos.push(num(d.minutos));
+      byPos[p].goles += num(d.goles);
+      if (num(d.xg_por_90) > 0) byPos[p].xg90.push(num(d.xg_por_90));
+      const vm = num(d.valor_mercado_wyscout) || num(d.valor_mercado);
+      if (vm > 0) byPos[p].vm.push(vm);
+      if (num(d.revalorizacion_absoluta) !== 0) byPos[p].rev.push(num(d.revalorizacion_absoluta));
+    });
+
+    const avg = a => a.length ? a.reduce((s,x)=>s+x,0)/a.length : 0;
+    const stats = Object.entries(byPos).map(([p,v]) => ({
+      pos: p, count: v.count,
+      minMedio: avg(v.minutos), goles: v.goles,
+      xg90: avg(v.xg90), vmMedio: avg(v.vm), revMedio: avg(v.rev)
+    }));
+
+    // KPIs
+    const totalConWy = conPos.filter(d=>isTrue(d.tiene_wyscout)).length;
+    document.getElementById('posdev-kpis').innerHTML = `
+      <div class="kpi-card"><div class="kpi-value">${stats.length}</div><div class="kpi-label">Posiciones</div></div>
+      <div class="kpi-card"><div class="kpi-value">${conPos.length}</div><div class="kpi-label">Registros</div></div>
+      <div class="kpi-card"><div class="kpi-value">${totalConWy}</div><div class="kpi-label">Con datos Wyscout</div></div>
+      <div class="kpi-card"><div class="kpi-value">${conPos.filter(d=>isTrue(d.es_sub23)).length}</div><div class="kpi-label">Sub-23</div></div>`;
+
+    const sBy = (key, asc=false) => [...stats].sort((a,b)=>asc?a[key]-b[key]:b[key]-a[key]);
+    devBarH('chart-posdev-minutos', sBy('minMedio').map(s=>[s.pos,Math.round(s.minMedio)]), '#009a44', v=>fmt(v));
+    devBarH('chart-posdev-goles', sBy('goles').map(s=>[s.pos,s.goles]), '#e07b39');
+    devBarH('chart-posdev-xg', sBy('xg90').map(s=>[s.pos,+s.xg90.toFixed(2)]), '#0891b2');
+    devBarH('chart-posdev-vm', sBy('vmMedio').map(s=>[s.pos,Math.round(s.vmMedio)]), '#c8a951', v=>formatM(v));
+    devBarH('chart-posdev-rev', sBy('revMedio').map(s=>[s.pos,Math.round(s.revMedio)]), '#8b5cf6', v=>formatM(v));
+
+    const ranked = sBy('vmMedio');
+    document.getElementById('posdev-table').innerHTML = `
+      <table class="ppc-table"><thead><tr>
+        <th>Posición</th><th>Registros</th><th>Min medio</th><th>Goles tot.</th><th>xG/90 medio</th><th>VM medio</th><th>Revalorización media</th>
+      </tr></thead><tbody>
+        ${ranked.map(s=>`<tr>
+          <td><strong>${s.pos}</strong></td><td>${s.count}</td>
+          <td>${fmt(s.minMedio)}</td><td>${s.goles}</td>
+          <td>${s.xg90.toFixed(2)}</td><td>${formatM(s.vmMedio)}</td>
+          <td style="color:${s.revMedio>0?'var(--success)':'var(--text-muted)'}">${formatM(s.revMedio)}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
   });
-}
-
-function renderDevKPIs(data) {
-  const jugadores   = new Set(data.map(d => d.nombre)).size;
-  const clubes      = new Set(data.map(d => d.club)).size;
-  const entrenadores= new Set(data.filter(d=>d.entrenador).map(d => d.entrenador)).size;
-  const temporadas  = new Set(data.map(d => d.temporada)).size;
-  const conMinutos  = data.filter(d => d.minutos > 0).length;
-  const sub23       = data.filter(d => (+d.edad||99) < 23).length;
-
-  document.getElementById('dev-kpis').innerHTML = `
-    <div class="kpi-card"><div class="kpi-value">${jugadores.toLocaleString('es-ES')}</div><div class="kpi-label">Jugadores únicos</div></div>
-    <div class="kpi-card"><div class="kpi-value">${clubes}</div><div class="kpi-label">Clubes</div></div>
-    <div class="kpi-card"><div class="kpi-value">${entrenadores}</div><div class="kpi-label">Entrenadores</div></div>
-    <div class="kpi-card"><div class="kpi-value">${temporadas}</div><div class="kpi-label">Temporadas</div></div>
-    <div class="kpi-card"><div class="kpi-value">${sub23}</div><div class="kpi-label">Registros Sub-23</div></div>
-    <div class="kpi-card"><div class="kpi-value" style="color:${conMinutos?'var(--success)':'var(--text-muted)'}">${conMinutos}</div><div class="kpi-label">Con datos Wyscout</div></div>`;
-}
-
-function renderDevEdad(data) {
-  const edades = data.map(d => +d.edad).filter(e => e > 14 && e < 42);
-  const bins = {};
-  edades.forEach(e => { const b = Math.floor(e/2)*2; bins[b] = (bins[b]||0)+1; });
-  const x = Object.keys(bins).sort((a,b)=>+a-+b).map(b => `${b}-${+b+1}`);
-  const y = x.map(b => bins[b.split('-')[0]]);
-  plot('chart-dev-edad', [{ type:'bar', x, y, marker:{color:'#009a44'} }],
-    { title:'', margin:{t:20,r:10,b:50,l:50},
-      xaxis:{title:'Edad'}, yaxis:{title:'Jugadores'} });
-}
-
-function renderDevPosicion(data) {
-  const byPos = {};
-  data.forEach(d => {
-    const p = d.posicion_es || tPos(d.posicion||'') || 'Desconocida';
-    byPos[p] = (byPos[p]||0) + 1;
-  });
-  const sorted = Object.entries(byPos).sort((a,b)=>b[1]-a[1]);
-  plot('chart-dev-posicion',
-    [{ type:'bar', orientation:'h',
-       x: sorted.map(([,v])=>v).reverse(),
-       y: sorted.map(([k])=>k).reverse(),
-       marker:{color:'#1d6fa4'} }],
-    { margin:{t:20,r:20,b:30,l:110} });
-}
-
-function renderDevSub23(data) {
-  const sub23  = data.filter(d => (+d.edad||99) < 23).length;
-  const senior = data.length - sub23;
-  plot('chart-dev-sub23',
-    [{ type:'pie', values:[sub23, senior], labels:['Sub-23','Senior'],
-       marker:{colors:['#009a44','#e5e7eb']}, textinfo:'percent+label',
-       hole:0.4 }],
-    { margin:{t:20,r:10,b:20,l:10}, showlegend:true });
-}
-
-function renderDevEntrenadores(data) {
-  const byCoach = {};
-  data.filter(d=>d.entrenador).forEach(d => { byCoach[d.entrenador]=(byCoach[d.entrenador]||0)+1; });
-  const top = Object.entries(byCoach).sort((a,b)=>b[1]-a[1]).slice(0,15);
-  plot('chart-dev-entrenadores',
-    [{ type:'bar', orientation:'h',
-       x: top.map(([,v])=>v).reverse(),
-       y: top.map(([k])=>k).reverse(),
-       marker:{color:'#8b5cf6'} }],
-    { margin:{t:20,r:20,b:30,l:160} });
-}
-
-function renderDevTipos(data) {
-  const byTipo = {};
-  data.forEach(d => { const t = d.tipo_operacion||'otro'; byTipo[t]=(byTipo[t]||0)+1; });
-  const colors = {cesion:'#1d6fa4', traspaso:'#009a44', libre:'#c8a951', retorno_cesion:'#8b5cf6', otro:'#e5e7eb'};
-  const entries = Object.entries(byTipo).sort((a,b)=>b[1]-a[1]);
-  plot('chart-dev-tipos',
-    [{ type:'bar', x: entries.map(([k])=>k), y: entries.map(([,v])=>v),
-       marker:{color: entries.map(([k])=>colors[k]||'#999')} }],
-    { margin:{t:20,r:10,b:50,l:50} });
-}
-
-function renderDevTablaTemporadas(data) {
-  const byTemp = groupBy(data, 'temporada');
-  const temps  = ['2021-22','2022-23','2023-24','2024-25','2025-26'];
-  const rows = temps.map(t => {
-    const rows_t = byTemp[t] || [];
-    const conWy  = rows_t.filter(d=>d.minutos>0).length;
-    const coaches = new Set(rows_t.filter(d=>d.entrenador).map(d=>d.entrenador)).size;
-    return `<tr>
-      <td><strong>${t}</strong></td>
-      <td>${rows_t.length}</td>
-      <td>${new Set(rows_t.map(d=>d.nombre)).size}</td>
-      <td>${new Set(rows_t.map(d=>d.club)).size}</td>
-      <td>${coaches}</td>
-      <td><span style="color:${conWy?'var(--success)':'var(--text-muted)'}">${conWy || '—'}</span></td>
-    </tr>`;
-  }).join('');
-  document.getElementById('dev-table-temporadas').innerHTML = `
-    <table class="ppc-table"><thead><tr>
-      <th>Temporada</th><th>Registros</th><th>Jugadores</th><th>Clubes</th><th>Entrenadores</th><th>Con Wyscout</th>
-    </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 /* ============================================================
@@ -3403,52 +3507,65 @@ function buildQueryContext(question) {
       rows.map(d => `${d.jugador}|${d.club}|edad:${d.edad_llegada}|VM entrada:${formatM(+d.vm_llegada||0)}|VM salida:${formatM(+d.vm_salida||0)}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
   }
 
-  // Entrenador + Sub-23 (usa master si está cargado)
-  if (/entrenador/.test(q) && /sub.?23/.test(q)) {
-    if (MASTER_DATA.length) {
-      const sub23 = MASTER_DATA.filter(d => (+d.edad||99) < 23 && d.entrenador);
-      const byCoach = groupBy(sub23, 'entrenador');
-      const ranked = Object.entries(byCoach)
-        .map(([c,v]) => [c, v.length, new Set(v.map(d=>d.nombre)).size])
-        .sort((a,b)=>b[1]-a[1]).slice(0,20);
-      return 'Entrenadores con más jugadores Sub-23 en plantilla:\n' +
-        ranked.map(([c,r,j]) => `${c}|registros:${r}|jugadores_unicos:${j}`).join('\n');
-    }
+  const M = MASTER_DATA;
+  const isSub23 = d => d.es_sub23 === true || d.es_sub23 === 'True' || (+d.edad > 0 && +d.edad < 23);
+  const posMatch = (d, kw) => (d.posicion_normalizada||'').toLowerCase().includes(kw);
+
+  // Entrenador que desarrolla mejor una posición concreta
+  if (M.length && /entrenador/.test(q) && /(delant|extrem|central|lateral|medio|portero|centrocampista)/.test(q)) {
+    const posKw = /delant/.test(q)?'delantero':/extrem/.test(q)?'extremo':/central/.test(q)?'central':/lateral/.test(q)?'lateral':/portero/.test(q)?'portero':/medio|centrocampista/.test(q)?'centro':'';
+    const rows = M.filter(d => d.entrenador && isSub23(d) && posMatch(d, posKw) && +d.minutos > 0);
+    const by = groupBy(rows, 'entrenador');
+    const ranked = Object.entries(by)
+      .map(([c,v]) => [c, v.reduce((s,d)=>s+(+d.minutos||0),0), v.reduce((s,d)=>s+(+d.goles||0),0), new Set(v.map(d=>d.nombre)).size])
+      .sort((a,b)=>b[1]-a[1]).slice(0,20);
+    return `Entrenadores que más desarrollan Sub-23 en posición "${posKw}":\n` +
+      ranked.map(([c,m,g,j])=>`${c}|minutos:${Math.round(m)}|goles:${g}|jugadores:${j}`).join('\n');
   }
 
-  // Club + minutos + Sub-23
-  if (/club|equipo/.test(q) && /minuto/.test(q) && /sub.?23|jov[ei]n/.test(q)) {
-    if (MASTER_DATA.length) {
-      const sub23 = MASTER_DATA.filter(d => (+d.edad||99) < 23 && d.minutos > 0);
-      const byClub = groupBy(sub23, 'club');
-      const ranked = Object.entries(byClub)
-        .map(([c,v]) => [c, v.reduce((s,d)=>s+(+d.minutos||0),0), v.length])
-        .sort((a,b)=>b[1]-a[1]).slice(0,20);
-      return 'Clubes que más minutos dieron a Sub-23:\n' +
-        ranked.map(([c,m,j]) => `${c}|minutos_total:${Math.round(m)}|jugadores:${j}`).join('\n');
-    }
+  // Entrenador + Sub-23 (minutos, jugadores, utilización)
+  if (M.length && /entrenador/.test(q) && /sub.?23|jov/.test(q)) {
+    const sub23 = M.filter(d => isSub23(d) && d.entrenador);
+    const by = groupBy(sub23, 'entrenador');
+    const ranked = Object.entries(by)
+      .map(([c,v]) => [c, new Set(v.map(d=>d.nombre)).size, v.reduce((s,d)=>s+(+d.minutos||0),0), v.reduce((s,d)=>s+(+d.goles||0),0)])
+      .sort((a,b)=>b[2]-a[2]).slice(0,20);
+    return 'Entrenadores que más utilizan Sub-23 (orden por minutos):\n' +
+      ranked.map(([c,j,m,g]) => `${c}|jugadores_sub23:${j}|minutos_sub23:${Math.round(m)}|goles_sub23:${g}`).join('\n');
   }
 
-  // Delanteros Sub-23 por minutos
-  if (/delantero/.test(q) && /sub.?23/.test(q) && /minuto/.test(q)) {
-    if (MASTER_DATA.length) {
-      const rows = MASTER_DATA.filter(d => (+d.edad||99) < 23 && d.minutos > 0 &&
-        (d.posicion_es === 'Delantero' || (d.posicion||'').includes('Forward') || (d.posicion||'').includes('Striker')))
-        .sort((a,b) => (+b.minutos||0) - (+a.minutos||0)).slice(0,30);
-      return 'Delanteros Sub-23 por minutos:\n' +
-        rows.map(d => `${d.nombre}|${d.club}|${d.temporada}|edad:${d.edad}|min:${d.minutos}|goles:${d.goles||0}|asis:${d.asistencias||0}`).join('\n');
-    }
+  // Club + Sub-23 (minutos / utilización / jugadores)
+  if (M.length && /club|equipo/.test(q) && /sub.?23|jov/.test(q)) {
+    const sub23 = M.filter(d => isSub23(d));
+    const by = groupBy(sub23, 'club');
+    const ranked = Object.entries(by)
+      .map(([c,v]) => [c, v.reduce((s,d)=>s+(+d.minutos||0),0), new Set(v.map(d=>d.nombre)).size, v.reduce((s,d)=>s+(+d.goles||0),0)])
+      .sort((a,b)=>b[1]-a[1]).slice(0,25);
+    return 'Clubes que más desarrollan Sub-23 (minutos, jugadores, goles):\n' +
+      ranked.map(([c,m,j,g]) => `${c}|minutos_sub23:${Math.round(m)}|jugadores_sub23:${j}|goles_sub23:${g}`).join('\n');
+  }
+
+  // Posición Sub-23 por minutos o goles (extremos, delanteros, etc.)
+  if (M.length && /(delant|extrem|central|lateral|medio|portero|centrocampista|mediapunta)/.test(q) && /sub.?23/.test(q)) {
+    const posKw = /delant/.test(q)?'delantero':/extrem/.test(q)?'extremo':/central/.test(q)?'central':/lateral/.test(q)?'lateral':/portero/.test(q)?'portero':/mediapunta/.test(q)?'mediapunta':'centro';
+    const wantGoles = /gol/.test(q);
+    let rows = M.filter(d => isSub23(d) && posMatch(d, posKw) && +d.minutos > 0);
+    rows = rows.sort((a,b) => wantGoles ? (+b.goles||0)-(+a.goles||0) : (+b.minutos||0)-(+a.minutos||0)).slice(0,30);
+    const season = detectSeasonInQuery(q);
+    if (season) rows = rows.filter(d => d.temporada === season);
+    return `${posKw} Sub-23 por ${wantGoles?'goles':'minutos'}:\n` +
+      rows.map(d => `${d.nombre}|${d.club}|${d.temporada}|edad:${d.edad}|min:${d.minutos}|goles:${d.goles||0}|xG/90:${d.xg_por_90||0}|VM:${formatM(num(d.valor_mercado_wyscout)||num(d.valor_mercado))}`).join('\n');
   }
 
   // Entrenador específico
-  const coaches_list = MASTER_DATA.length ? [...new Set(MASTER_DATA.map(d=>d.entrenador).filter(Boolean))] : [];
+  const coaches_list = M.length ? [...new Set(M.map(d=>d.entrenador).filter(Boolean))] : [];
   const coachMatch = coaches_list.find(c => norm(c).split(' ').some(w => w.length > 4 && q.includes(norm(w))));
-  if (coachMatch && MASTER_DATA.length) {
-    const rows = MASTER_DATA.filter(d => d.entrenador === coachMatch).slice(0, MAX);
-    const sub23c = rows.filter(d=>(+d.edad||99)<23).length;
+  if (coachMatch && M.length) {
+    const rows = M.filter(d => d.entrenador === coachMatch);
+    const sub23 = rows.filter(isSub23);
     return `Datos del entrenador ${coachMatch}:\n` +
-      `registros:${rows.length}|jugadores_unicos:${new Set(rows.map(d=>d.nombre)).size}|sub23:${sub23c}\n` +
-      rows.slice(0,40).map(d=>`${d.nombre}|${d.club}|${d.temporada}|edad:${d.edad}|${d.posicion_es||''}`).join('\n');
+      `registros:${rows.length}|jugadores_unicos:${new Set(rows.map(d=>d.nombre)).size}|sub23:${sub23.length}|minutos_sub23:${Math.round(sub23.reduce((s,d)=>s+(+d.minutos||0),0))}\n` +
+      rows.slice(0,40).map(d=>`${d.nombre}|${d.club}|${d.temporada}|edad:${d.edad}|${d.posicion_normalizada||''}|min:${d.minutos||0}`).join('\n');
   }
 
   // Clubes por valor generado
