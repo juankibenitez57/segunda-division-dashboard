@@ -278,13 +278,15 @@ def _ai_provider() -> str:
     return ""
 
 
-# Modelos a probar en orden (free tier más generoso primero).
-# Si el usuario fija GEMINI_MODEL, ese se prueba primero.
+# Modelos a probar en orden (verificados disponibles vía /ai-debug).
+# Los "lite" tienen la cuota gratuita más generosa.
 GEMINI_MODELS = [
     "gemini-2.0-flash-lite",
-    "gemini-1.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-flash-lite-latest",
     "gemini-2.0-flash",
-    "gemini-1.5-flash-8b",
+    "gemini-2.5-flash",
+    "gemini-flash-latest",
 ]
 
 
