@@ -278,20 +278,47 @@ def _ai_provider() -> str:
     return ""
 
 
+# Modelos a probar en orden (free tier más generoso primero).
+# Si el usuario fija GEMINI_MODEL, ese se prueba primero.
+GEMINI_MODELS = [
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash-8b",
+]
+
+
 def _ask_gemini(question: str, context: str) -> str:
-    """Llama a Google Gemini vía REST (sin SDK)."""
-    key   = os.environ["GEMINI_API_KEY"]
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
-    url   = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+    """Llama a Google Gemini vía REST (sin SDK). Prueba varios modelos ante 429."""
+    key    = os.environ["GEMINI_API_KEY"]
     prompt = f"{SYSTEM_PROMPT}\n\nDATOS RELEVANTES:\n{context}\n\nPREGUNTA: {question}"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"temperature": 0.2, "maxOutputTokens": 1400},
     }
-    r = requests.post(url, json=payload, timeout=30)
-    r.raise_for_status()
-    data = r.json()
-    return data["candidates"][0]["content"]["parts"][0]["text"]
+
+    forced = os.environ.get("GEMINI_MODEL")
+    models = ([forced] if forced else []) + [m for m in GEMINI_MODELS if m != forced]
+
+    last_err = None
+    for model in models:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+        try:
+            r = requests.post(url, json=payload, timeout=30)
+            if r.status_code == 429:
+                last_err = f"429 en {model}"
+                logger.warning(f"Gemini 429 con {model}, probando siguiente…")
+                continue
+            r.raise_for_status()
+            data = r.json()
+            logger.info(f"Gemini OK con modelo {model}")
+            return data["candidates"][0]["content"]["parts"][0]["text"]
+        except Exception as e:
+            last_err = str(e)
+            logger.warning(f"Gemini error con {model}: {e}")
+            continue
+
+    raise RuntimeError(f"Todos los modelos Gemini fallaron. Último: {last_err}")
 
 
 def _ask_groq(question: str, context: str) -> str:
