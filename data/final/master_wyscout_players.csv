@@ -449,7 +449,7 @@
 2021-22,med,Brandon Thomas,Apollon,"CF, LW",CF,Delantero,31.0,Spain,"Spain, England",derecho,173,68,1800000,2027-05-31,40,3026,9,9.58,False,brandon thomas|apollon|2021-22
 2022-23,att,G. Simeone,Atlético Madrid,CF,CF,Delantero,23.0,Argentina,"Argentina, Spain",derecho,173,75,0,2030-06-30,36,3025,9,9.96,False,g simeone|atletico madrid|2022-23
 2025-26,med,Sergio Álvarez,SD Eibar,"RDMF, RCMF, LDMF",RDMF,Mediocentro,34.0,Spain,Spain,derecho,183,73,1000000,2028-06-30,36,3019,2,0.93,False,sergio alvarez|sd eibar|2025-26
-2024-25,att,Raúl Sánchez,CD Castellón,"LWB, CF, LW",LWB,Carrilero,28.0,Spain,Spain,derecho,188,75,500000,2028-06-30,34,3017,12,8.06,False,raul sanchez|cd castellon|2024-25
+2024-25,att,Raúl Sánchez,CD Castellón,"LWB, CF, LW",LWB,Lateral,28.0,Spain,Spain,derecho,188,75,500000,2028-06-30,34,3017,12,8.06,False,raul sanchez|cd castellon|2024-25
 2023-24,def,Brian Oliván,Sporting Gijón,LB,LB,Lateral,31.0,Spain,Spain,izquierdo,175,73,0,2026-06-30,37,3017,0,1.1,False,brian olivan|sporting gijon|2023-24
 2021-22,def,Sergi Palencia,Los Angeles FC,RB,RB,Lateral,29.0,Spain,Spain,derecho,172,67,2000000,2028-12-31,35,3009,0,0.36,False,sergi palencia|los angeles fc|2021-22
 2022-23,med,J. Dubasin,Sporting Gijón,"CF, RW, RWF",CF,Delantero,26.0,Spain,"Spain, Belgium",derecho,181,68,0,2028-06-30,41,3003,10,8.97,False,j dubasin|sporting gijon|2022-23
@@ -691,7 +691,7 @@
 2025-26,att,Joaquín Muñoz,Málaga CF,"LW, LWF, LAMF",LW,Extremo,27.0,Spain,Spain,derecho,172,67,900000,2027-06-30,38,2621,5,8.17,False,joaquin munoz|malaga cf|2025-26
 2025-26,def,Jesús Vallejo,Albacete Balompié,"LCB, RCB",LCB,Central,29.0,Spain,Spain,derecho,184,79,1000000,2027-06-30,30,2621,0,0.19,False,jesus vallejo|albacete balompie|2025-26
 2025-26,med,J. Ponceau,Real Valladolid CF,"LCMF, RCMF, AMF",LCMF,Centrocampista,25.0,Angola,"Angola, France",derecho,170,60,0,2028-06-30,37,2621,1,1.34,False,j ponceau|real valladolid cf|2025-26
-2024-25,def,Gerard Valentín,Al Wakrah,"RWB, RB, RW",RWB,Carrilero,32.0,Spain,Spain,derecho,177,75,800000,2027-06-30,38,2620,1,1.34,False,gerard valentin|al wakrah|2024-25
+2024-25,def,Gerard Valentín,Al Wakrah,"RWB, RB, RW",RWB,Lateral,32.0,Spain,Spain,derecho,177,75,800000,2027-06-30,38,2620,1,1.34,False,gerard valentin|al wakrah|2024-25
 2023-24,def,Antonio Espigares,Gil Vicente,RCB,RCB,Central,21.0,Spain,Spain,derecho,187,78,0,2029-06-30,31,2619,0,1.17,False,antonio espigares|gil vicente|2023-24
 2025-26,def,Nélson Monte,UD Almería,RCB,RCB,Central,30.0,Portugal,Portugal,derecho,187,78,500000,2028-06-30,27,2618,0,0.12,False,nelson monte|ud almeria|2025-26
 2022-23,med,Roberto López,CD Leganés,"RW, RWF, RCMF",RW,Extremo,25.0,Spain,Spain,izquierdo,179,70,2500000,2027-06-30,40,2618,7,4.44,False,roberto lopez|cd leganes|2022-23
@@ -1096,12 +1096,12 @@
 2025-26,def,Martín Aguirregabiria,Real Zaragoza,RB,RB,Lateral,30.0,Spain,Spain,derecho,180,69,1200000,2026-06-30,25,2061,1,0.13,False,martin aguirregabiria|real zaragoza|2025-26
 2023-24,att,Ángel Rodríguez,CF Fuenlabrada,CF,CF,Delantero,38.0,Spain,Spain,derecho,171,65,400000,2026-06-30,37,2060,10,10.31,False,angel rodriguez|cf fuenlabrada|2023-24
 2024-25,def,Jorge Moreno,Cádiz CF,"RB, LCB, RCB",RB,Lateral,24.0,Spain,Spain,derecho,184,78,0,,23,2060,0,0.31,False,jorge moreno|cadiz cf|2024-25
-2024-25,med,K. Mamah,CD Castellón,RWB,RWB,Carrilero,27.0,Nigeria,Nigeria,derecho,182,72,0,2027-06-30,24,2059,4,2.6,False,k mamah|cd castellon|2024-25
+2024-25,med,K. Mamah,CD Castellón,RWB,RWB,Lateral,27.0,Nigeria,Nigeria,derecho,182,72,0,2027-06-30,24,2059,4,2.6,False,k mamah|cd castellon|2024-25
 2021-22,def,Aritz Arambarri,SD Eibar,LCB,LCB,Central,27.0,Spain,Spain,derecho,186,77,500000,2027-06-30,24,2057,0,0.16,False,aritz arambarri|sd eibar|2021-22
 2023-24,med,Iván Morante,Burgos CF,"RDMF, LDMF, RCMF",RDMF,Mediocentro,25.0,Spain,Spain,izquierdo,183,75,700000,2026-06-30,34,2056,2,0.59,False,ivan morante|burgos cf|2023-24
 2025-26,def,A. Yaakobishvili,FC Andorra,GK,GK,Portero,20.0,Hungary,"Hungary, Georgia",izquierdo,185,75,0,2028-06-30,21,2053,0,0.0,True,a yaakobishvili|fc andorra|2025-26
 2023-24,def,A. Pașcanu,Rapid Bucureşti,"RB, RCB",RB,Lateral,27.0,Romania,"Romania, England",derecho,187,85,0,2027-06-30,26,2052,1,0.55,False,a pascanu|rapid bucuresti|2023-24
-2021-22,med,Ander Martín,FC Cartagena,"LWB, LB, LW",LWB,Carrilero,25.0,Spain,Spain,izquierdo,176,78,400000,2027-06-30,29,2050,3,2.32,False,ander martin|fc cartagena|2021-22
+2021-22,med,Ander Martín,FC Cartagena,"LWB, LB, LW",LWB,Lateral,25.0,Spain,Spain,izquierdo,176,78,400000,2027-06-30,29,2050,3,2.32,False,ander martin|fc cartagena|2021-22
 2025-26,def,A. Tuhami,AD Ceuta FC,RB,RB,Lateral,31.0,Spain,"Spain, Morocco",derecho,174,71,900000,2027-06-30,26,2046,0,0.71,False,a tuhami|ad ceuta fc|2025-26
 2021-22,def,J. El Yamiq,Real Zaragoza,LCB,LCB,Central,33.0,Morocco,Morocco,derecho,193,80,1600000,2026-06-30,25,2044,2,2.93,False,j el yamiq|real zaragoza|2021-22
 2022-23,def,Marc Pubill,Atlético Madrid,RB,RB,Lateral,22.0,Spain,Spain,derecho,190,78,0,2030-06-30,28,2044,1,1.33,False,marc pubill|atletico madrid|2022-23
@@ -1863,7 +1863,7 @@
 2024-25,def,Salva Ruiz,CD Castellón,"RCB, LCB, LB",RCB,Central,30.0,Spain,Spain,izquierdo,177,70,400000,2026-06-30,20,1145,0,0.35,False,salva ruiz|cd castellon|2024-25
 2023-24,def,Frederico Venâncio,Santa Clara,RCB,RCB,Central,33.0,Portugal,Portugal,derecho,186,80,700000,2026-06-30,19,1144,0,0.03,False,frederico venancio|santa clara|2023-24
 2024-25,att,A. Mabil,CD Castellón,"LW, RWB, RWF",LW,Extremo,30.0,South Sudan,"South Sudan, Australia",derecho,178,75,1000000,2028-06-30,14,1144,0,3.73,False,a mabil|cd castellon|2024-25
-2021-22,def,David Juncà,Gimnàstic Tarragona,"LWB, LB",LWB,Carrilero,32.0,Spain,Spain,izquierdo,178,67,200000,2026-06-30,25,1140,1,0.23,False,david junca|gimnastic tarragona|2021-22
+2021-22,def,David Juncà,Gimnàstic Tarragona,"LWB, LB",LWB,Lateral,32.0,Spain,Spain,izquierdo,178,67,200000,2026-06-30,25,1140,1,0.23,False,david junca|gimnastic tarragona|2021-22
 2021-22,def,Álex Sola,Granada CF,"RB, RWB",RB,Lateral,26.0,Spain,Spain,derecho,178,75,4000000,2026-06-30,16,1139,2,1.03,False,alex sola|granada cf|2021-22
 2024-25,med,G. Escalante,La Serena,RCMF,RCMF,Centrocampista,32.0,Argentina,"Argentina, Italy",derecho,182,72,1500000,2026-12-31,24,1138,1,1.84,False,g escalante|la serena|2024-25
 2023-24,att,Darío Poveda,Farense,CF,CF,Delantero,28.0,Spain,Spain,derecho,186,75,500000,2026-06-30,25,1137,3,2.16,False,dario poveda|farense|2023-24
@@ -2145,7 +2145,7 @@
 2021-22,med,Marc Gual,Rio Ave,"CF, AMF",CF,Delantero,29.0,Spain,Spain,derecho,184,73,1300000,2028-06-30,14,843,1,2.11,False,marc gual|rio ave|2021-22
 2024-25,att,Alberto Marí,CD Mirandés,CF,CF,Delantero,24.0,Spain,Spain,derecho,183,77,0,2027-06-30,27,842,3,2.5,True,alberto mari|cd mirandes|2024-25
 2021-22,def,L. Olaza,Krasnodar,"LB, LWB",LB,Lateral,31.0,Uruguay,Uruguay,izquierdo,176,70,3000000,2026-06-30,11,841,0,0.58,False,l olaza|krasnodar|2021-22
-2024-25,att,M. Seuntjens,Groningen,"LWB, CF, LCMF",LWB,Carrilero,33.0,Netherlands,Netherlands,derecho,187,81,850000,2026-06-30,12,838,0,1.18,False,m seuntjens|groningen|2024-25
+2024-25,att,M. Seuntjens,Groningen,"LWB, CF, LCMF",LWB,Lateral,33.0,Netherlands,Netherlands,derecho,187,81,850000,2026-06-30,12,838,0,1.18,False,m seuntjens|groningen|2024-25
 2023-24,med,J. Varane,Queens Park Rangers,"RCMF, LCMF",RCMF,Centrocampista,24.0,France,"France, Martinique",derecho,189,78,600000,2030-06-30,23,838,0,0.2,False,j varane|queens park rangers|2023-24
 2022-23,att,Víctor Campuzano,Sydney,CF,CF,Delantero,28.0,Spain,Spain,izquierdo,174,72,0,2027-06-30,20,836,2,3.81,False,victor campuzano|sydney|2022-23
 2022-23,def,Álex Petxa,Deportivo de La Coruña,RB,RB,Lateral,28.0,Spain,Spain,derecho,180,72,600000,2028-06-30,13,835,0,0.28,False,alex petxa|deportivo de la coruna|2022-23
@@ -2194,7 +2194,7 @@
 2022-23,def,N. Lozano,,LCB,LCB,Central,32.0,Colombia,"Colombia, Spain",izquierdo,185,82,200000,,9,787,0,0.12,False,n lozano||2022-23
 2024-25,med,Naim García,CD Leganés,"RW, RAMF, LW",RW,Extremo,23.0,Spain,Spain,izquierdo,178,75,500000,2027-06-30,18,786,0,0.45,False,naim garcia|cd leganes|2024-25
 2022-23,med,Juanjo Narváez,Al Raed,"LW, CF",LW,Extremo,31.0,Colombia,"Colombia, Spain",derecho,181,76,600000,,15,785,0,0.84,False,juanjo narvaez|al raed|2022-23
-2024-25,med,B. Cipenga,CD Castellón,"LWB, LWF",LWB,Carrilero,27.0,Congo DR,Congo DR,derecho,172,69,550000,2026-06-30,15,784,3,2.26,False,b cipenga|cd castellon|2024-25
+2024-25,med,B. Cipenga,CD Castellón,"LWB, LWF",LWB,Lateral,27.0,Congo DR,Congo DR,derecho,172,69,550000,2026-06-30,15,784,3,2.26,False,b cipenga|cd castellon|2024-25
 2025-26,med,Théo Zidane,Córdoba CF,"LCMF, RDMF",LCMF,Centrocampista,24.0,France,"France, Spain",derecho,196,78,300000,2026-06-30,21,783,0,1.32,False,theo zidane|cordoba cf|2025-26
 2025-26,def,David Gil,Cádiz CF,GK,GK,Portero,32.0,Spain,Spain,izquierdo,186,81,700000,2027-06-30,8,783,0,0.0,False,david gil|cadiz cf|2025-26
 2023-24,def,Gustavo Henrique,Corinthians,"LCB, CB, RCB",LCB,Central,32.0,Brazil,Brazil,derecho,196,86,1000000,2027-12-31,12,781,1,0.79,False,gustavo henrique|corinthians|2023-24
@@ -2583,7 +2583,7 @@
 2024-25,def,J. Hernández Mesas,Degerfors,"RCB, LCB",RCB,Central,22.0,Spain,Spain,unknown,185,80,0,2029-12-31,5,386,0,0.0,False,j hernandez mesas|degerfors|2024-25
 2025-26,att,Samuel Ntamack,Amiens SC,CF,CF,Delantero,25.0,France,France,derecho,178,75,0,,12,385,2,1.69,True,samuel ntamack|amiens sc|2025-26
 2025-26,att,S. Ntamack,SD Huesca,CF,CF,Delantero,24.0,France,"France, Cameroon",derecho,178,75,500000,2028-06-30,12,385,2,1.69,False,s ntamack|sd huesca|2025-26
-2022-23,med,Aldair,Levski Sofia,"RWB, RW, RB",RWB,Carrilero,26.0,Portugal,Portugal,derecho,180,60,0,2027-06-30,8,383,0,0.01,False,aldair|levski sofia|2022-23
+2022-23,med,Aldair,Levski Sofia,"RWB, RW, RB",RWB,Lateral,26.0,Portugal,Portugal,derecho,180,60,0,2027-06-30,8,383,0,0.01,False,aldair|levski sofia|2022-23
 2023-24,def,L. Blanco,Boca Juniors,"LB, LWB",LB,Lateral,26.0,Argentina,Argentina,izquierdo,176,81,4000000,2028-12-31,10,382,0,0.09,False,l blanco|boca juniors|2023-24
 2025-26,att,M. Bouldini,Granada CF,CF,CF,Delantero,30.0,Morocco,Morocco,derecho,187,88,2200000,2028-06-30,15,381,0,1.08,True,m bouldini|granada cf|2025-26
 2021-22,def,Diogo Queirós,Dunkerque,RCB,RCB,Central,26.0,Portugal,Portugal,derecho,185,80,450000,2026-06-30,5,380,0,0.21,False,diogo queiros|dunkerque|2021-22
@@ -2695,7 +2695,7 @@
 2023-24,def,Álex Martínez,Marbella,LB,LB,Lateral,35.0,Spain,Spain,izquierdo,176,67,100000,2026-06-30,5,291,0,0.0,False,alex martinez|marbella|2023-24
 2025-26,def,Saúl Del Cerro,Burgos CF,"LCB, CB",LCB,Central,22.0,Spain,Spain,izquierdo,0,0,0,2027-06-30,9,290,0,0.0,False,saul del cerro|burgos cf|2025-26
 2025-26,att,Álvaro García,CD Castellón,CF,CF,Delantero,26.0,Spain,Spain,derecho,192,70,150000,2028-06-30,16,289,1,1.02,False,alvaro garcia|cd castellon|2025-26
-2021-22,def,David Simón,Kifissia,"RWB, RCB, RB",RWB,Carrilero,37.0,Spain,Spain,derecho,179,68,100000,2026-06-30,4,288,0,0.0,False,david simon|kifissia|2021-22
+2021-22,def,David Simón,Kifissia,"RWB, RCB, RB",RWB,Lateral,37.0,Spain,Spain,derecho,179,68,100000,2026-06-30,4,288,0,0.0,False,david simon|kifissia|2021-22
 2021-22,def,Ramón Juan,UD Ibiza,GK,GK,Portero,26.0,Spain,Spain,derecho,179,79,600000,2026-06-30,3,288,0,0.0,False,ramon juan|ud ibiza|2021-22
 2021-22,def,Cristian Rivero,Valencia,GK,GK,Portero,27.0,Spain,Spain,derecho,188,75,200000,2027-06-30,3,286,0,0.0,False,cristian rivero|valencia|2021-22
 2023-24,def,Nacho Monsalve,Hércules,LCB,LCB,Central,31.0,Spain,Spain,ambidiestro,189,81,200000,2027-06-30,3,284,0,0.0,False,nacho monsalve|hercules|2023-24
@@ -2716,7 +2716,7 @@
 2025-26,med,Juan Bernat,SD Eibar,"LB, LCMF",LB,Lateral,33.0,Spain,Spain,izquierdo,170,67,0,2026-06-30,10,276,0,0.0,False,juan bernat|sd eibar|2025-26
 2024-25,att,F. Mwepu,Atlético Sanluqueño,CF,CF,Delantero,26.0,Zambia,Zambia,derecho,178,70,300000,2027-06-30,9,276,1,2.06,True,f mwepu|atletico sanluqueno|2024-25
 2023-24,def,Houboulang Mendes,Fortuna Sittard,RB,RB,Lateral,27.0,France,"France, Guinea-Bissau",derecho,184,76,700000,2028-06-30,5,276,0,0.0,False,houboulang mendes|fortuna sittard|2023-24
-2022-23,med,Juanjo Nieto,Celje,"RWB, RB",RWB,Carrilero,31.0,Spain,Spain,derecho,174,73,700000,2026-06-30,6,275,0,0.0,False,juanjo nieto|celje|2022-23
+2022-23,med,Juanjo Nieto,Celje,"RWB, RB",RWB,Lateral,31.0,Spain,Spain,derecho,174,73,700000,2026-06-30,6,275,0,0.0,False,juanjo nieto|celje|2022-23
 2025-26,med,Iñaki González,UD Las Palmas,"LDMF, LCMF, RCMF",LDMF,Mediocentro,21.0,Spain,Spain,derecho,0,0,0,2029-06-30,11,275,0,0.0,False,inaki gonzalez|ud las palmas|2025-26
 2022-23,att,S. Mráz,Servette,CF,CF,Delantero,28.0,Slovakia,Slovakia,derecho,183,75,450000,2027-06-30,11,275,0,0.04,False,s mraz|servette|2022-23
 2022-23,att,Alfon González,Villarreal CF B,"CF, RW",CF,Delantero,27.0,Spain,Spain,derecho,172,60,300000,2028-06-30,8,271,0,0.09,True,alfon gonzalez|villarreal cf b|2022-23
@@ -2823,7 +2823,7 @@
 2021-22,med,J. Robles,UD Sanse,"RCMF, DMF, LCMF",RCMF,Centrocampista,25.0,Spain,Spain,derecho,190,73,100000,2026-06-30,9,172,0,0.02,False,j robles|ud sanse|2021-22
 2021-22,med,H. Boussefiane,Marbella,"RW, LW",RW,Extremo,27.0,Morocco,Morocco,derecho,177,65,300000,2026-06-30,6,171,0,0.0,False,h boussefiane|marbella|2021-22
 2024-25,def,Alberto Dadie,Real Sociedad B,"RW, RWB, LB",RW,Extremo,23.0,Spain,Spain,derecho,170,62,0,2026-06-30,10,171,0,0.04,False,alberto dadie|real sociedad b|2024-25
-2024-25,med,M. Traoré,Teruel,"LWB, RWB",LWB,Carrilero,23.0,Mali,Mali,izquierdo,170,64,0,2028-06-30,6,171,0,0.63,True,m traore|teruel|2024-25
+2024-25,med,M. Traoré,Teruel,"LWB, RWB",LWB,Lateral,23.0,Mali,Mali,izquierdo,170,64,0,2028-06-30,6,171,0,0.63,True,m traore|teruel|2024-25
 2025-26,med,Arick Betancourt,Ceuta B,"LWF, AMF, LAMF",LWF,Extremo,22.0,Spain,Spain,unknown,0,0,0,,5,170,0,0.06,False,arick betancourt|ceuta b|2025-26
 2023-24,att,Ilias Akhomach,Rayo Vallecano,"RW, CF",RW,Extremo,21.0,Spain,"Spain, Morocco",izquierdo,174,68,15000000,2028-06-30,2,170,0,0.17,True,ilias akhomach|rayo vallecano|2023-24
 2021-22,att,Iker Amorrortu,,"CF, RW",CF,Delantero,29.0,Spain,Spain,derecho,168,65,150000,,8,170,1,0.24,False,iker amorrortu||2021-22
@@ -2878,7 +2878,7 @@
 2025-26,med,Jan Salas,Córdoba CF,"RCMF, DMF",RCMF,Centrocampista,20.0,Spain,Spain,derecho,182,75,0,2028-06-30,4,132,0,0.0,True,jan salas|cordoba cf|2025-26
 2023-24,med,M. Sesè,Atlético Levante,"RB, RAMF",RB,Lateral,23.0,Spain,Spain,derecho,178,67,0,2026-06-30,8,131,0,0.01,False,m sese|atletico levante|2023-24
 2023-24,med,L. Shabani,Partizani Tirana,"RW, RB",RW,Extremo,26.0,Sweden,"Sweden, Albania",derecho,175,71,250000,2027-06-30,2,131,0,0.0,False,l shabani|partizani tirana|2023-24
-2024-25,def,Santi Borikó,Arenas Club,"RWB, RCB",RWB,Carrilero,22.0,Equatorial Guinea,"Equatorial Guinea, Spain",derecho,0,0,0,2026-06-30,4,131,0,0.0,True,santi boriko|arenas club|2024-25
+2024-25,def,Santi Borikó,Arenas Club,"RWB, RCB",RWB,Lateral,22.0,Equatorial Guinea,"Equatorial Guinea, Spain",derecho,0,0,0,2026-06-30,4,131,0,0.0,True,santi boriko|arenas club|2024-25
 2022-23,med,L. Torres,Técnico Universitario,"RCMF, RDMF, LDMF",RCMF,Centrocampista,23.0,Ecuador,Ecuador,derecho,186,70,100000,2027-12-31,4,131,0,0.01,False,l torres|tecnico universitario|2022-23
 2023-24,def,E. Callis,,RB,RB,Lateral,24.0,Spain,Spain,unknown,0,0,0,,2,131,0,0.04,False,e callis||2023-24
 2021-22,med,S. Buer,Lealtad,"LCMF, LDMF, RDMF",LCMF,Centrocampista,27.0,Ghana,Ghana,derecho,182,74,50000,2026-06-30,6,131,0,0.36,False,s buer|lealtad|2021-22
@@ -2951,7 +2951,7 @@
 2022-23,def,Ž. Frelih,Spartak Trnava,GK,GK,Portero,28.0,Slovenia,Slovenia,izquierdo,197,90,450000,2026-06-30,1,99,0,0.0,False,z frelih|spartak trnava|2022-23
 2022-23,def,Jesús Owono,FC Andorra,GK,GK,Portero,25.0,Equatorial Guinea,"Equatorial Guinea, Spain",derecho,183,67,1000000,2029-06-30,1,99,0,0.0,True,jesus owono|fc andorra|2022-23
 2021-22,def,Álex Pérez,,RCB,RCB,Central,33.0,Spain,Spain,derecho,191,85,100000,,3,98,0,0.14,False,alex perez||2021-22
-2025-26,med,Sergio Sanchís,Unionistas de Salamanca,"RWB, RW, RAMF",RWB,Carrilero,25.0,Spain,Spain,izquierdo,179,82,150000,2028-06-30,3,98,0,0.09,True,sergio sanchis|unionistas de salamanca|2025-26
+2025-26,med,Sergio Sanchís,Unionistas de Salamanca,"RWB, RW, RAMF",RWB,Lateral,25.0,Spain,Spain,izquierdo,179,82,150000,2028-06-30,3,98,0,0.09,True,sergio sanchis|unionistas de salamanca|2025-26
 2025-26,def,P. Andreev,Lech Poznań,GK,GK,Portero,21.0,Bulgaria,Bulgaria,derecho,192,81,2000000,2029-06-30,1,98,0,0.0,True,p andreev|lech poznan|2025-26
 2024-25,def,Alfonso Pastor,Rio Ave,GK,GK,Portero,25.0,Spain,Spain,derecho,190,82,200000,2026-06-30,1,98,0,0.0,False,alfonso pastor|rio ave|2024-25
 2021-22,med,A. Kawaya,,"LAMF, LW",LAMF,Mediapunta,28.0,Belgium,"Belgium, Congo DR",izquierdo,174,82,0,,3,98,0,0.04,False,a kawaya||2021-22
@@ -3043,7 +3043,7 @@
 2021-22,med,Álex Claverías,Melilla,RCMF,RCMF,Centrocampista,25.0,Spain,Spain,izquierdo,170,68,0,2026-06-30,1,63,1,0.31,False,alex claverias|melilla|2021-22
 2024-25,att,A. Galarza Altuna,Barakaldo,"CF, AMF",CF,Delantero,23.0,Spain,Spain,unknown,0,0,0,2026-06-30,5,63,0,0.13,False,a galarza altuna|barakaldo|2024-25
 2021-22,def,David Rodríguez,CD Tenerife,RB,RB,Lateral,25.0,Spain,Spain,derecho,179,70,250000,2028-06-30,1,62,0,0.0,False,david rodriguez|cd tenerife|2021-22
-2024-25,med,Carlos Clerc,Real Valladolid CF,LWB,LWB,Carrilero,33.0,Spain,Spain,izquierdo,181,72,1200000,2026-06-30,1,62,0,0.0,False,carlos clerc|real valladolid cf|2024-25
+2024-25,med,Carlos Clerc,Real Valladolid CF,LWB,LWB,Lateral,33.0,Spain,Spain,izquierdo,181,72,1200000,2026-06-30,1,62,0,0.0,False,carlos clerc|real valladolid cf|2024-25
 2025-26,med,Alejandro Morante,Cultural Leonesa,"LAMF, RW",LAMF,Mediapunta,20.0,Spain,Spain,,0,0,0,,3,61,0,0.03,False,alejandro morante|cultural leonesa|2025-26
 2025-26,def,Javi Sánchez,Arouca,"RCB, LCB",RCB,Central,29.0,Spain,Spain,derecho,189,84,1500000,2026-06-30,2,61,0,0.41,False,javi sanchez|arouca|2025-26
 2024-25,med,Borislav Ivanov Stankov,SD Ponferradina,"AMF, CF, RAMF",AMF,Mediapunta,24.0,Spain,Spain,derecho,182,0,0,,5,60,0,0.05,False,borislav ivanov stankov|sd ponferradina|2024-25
@@ -3059,7 +3059,7 @@
 2023-24,med,Pau Sans,Real Zaragoza,"CF, LW, LAMF",CF,Delantero,21.0,Spain,Spain,derecho,177,72,0,2029-06-30,3,57,0,0.26,False,pau sans|real zaragoza|2023-24
 2023-24,att,Iker Gil,Real Madrid C,CF,CF,Delantero,20.0,Spain,Spain,,171,0,0,2027-06-30,1,56,0,0.0,False,iker gil|real madrid c|2023-24
 2023-24,med,Ethyan González,Muaither,"CF, AMF",CF,Delantero,23.0,Spain,Spain,derecho,185,76,150000,2026-06-30,4,55,0,0.02,False,ethyan gonzalez|muaither|2023-24
-2023-24,med,Juan Carlos Sabater,Real Zaragoza,RWB,RWB,Carrilero,20.0,Spain,Spain,derecho,0,0,0,2026-06-30,1,54,0,0.05,False,juan carlos sabater|real zaragoza|2023-24
+2023-24,med,Juan Carlos Sabater,Real Zaragoza,RWB,RWB,Lateral,20.0,Spain,Spain,derecho,0,0,0,2026-06-30,1,54,0,0.05,False,juan carlos sabater|real zaragoza|2023-24
 2021-22,att,M. Sylla,Real Valladolid CF,"LWF, CF",LWF,Extremo,30.0,Senegal,"Senegal, Spain",derecho,184,80,1500000,2026-06-30,1,54,0,0.0,False,m sylla|real valladolid cf|2021-22
 2022-23,att,Dani Selma,Pontevedra,CF,CF,Delantero,24.0,Spain,Spain,izquierdo,186,77,0,2026-06-30,5,54,0,0.02,False,dani selma|pontevedra|2022-23
 2024-25,def,C. Montes,Lokomotiv Moskva,RCB,RCB,Central,28.0,Mexico,Mexico,derecho,195,75,0,2029-06-30,1,53,0,0.05,False,c montes|lokomotiv moskva|2024-25
@@ -3153,12 +3153,12 @@
 2023-24,med,S. Amallah,Real Valladolid CF,RCMF,RCMF,Centrocampista,28.0,Belgium,"Belgium, Morocco",derecho,185,81,1500000,2027-06-30,1,28,0,0.0,False,s amallah|real valladolid cf|2023-24
 2021-22,med,Javier Avilés,Algeciras,"RAMF, LAMF, RW",RAMF,Mediapunta,28.0,Spain,Spain,derecho,181,72,250000,2026-06-30,3,28,0,0.04,False,javier aviles|algeciras|2021-22
 2023-24,med,Álex Cardero,AEK Larnaca ,"RW, LCMF",RW,Extremo,22.0,Spain,Spain,derecho,0,0,200000,2028-06-30,3,28,1,0.1,True,alex cardero|aek larnaca|2023-24
-2024-25,med,Iker Punzano,Ourense CF,LWB,LWB,Carrilero,21.0,Spain,Spain,,186,77,0,2027-06-30,1,28,0,0.0,False,iker punzano|ourense cf|2024-25
+2024-25,med,Iker Punzano,Ourense CF,LWB,LWB,Lateral,21.0,Spain,Spain,,186,77,0,2027-06-30,1,28,0,0.0,False,iker punzano|ourense cf|2024-25
 2022-23,def,Carlos Jimenez,Levante UD,RB,RB,Lateral,17.0,Spain,Spain,unknown,0,0,0,,1,27,0,0.0,False,carlos jimenez|levante ud|2022-23
 2021-22,att,L. Antonetti,Estrela Amadora,CF,CF,Delantero,22.0,Spain,"Spain, Puerto Rico",izquierdo,189,81,0,2028-06-30,2,27,0,0.3,False,l antonetti|estrela amadora|2021-22
 2022-23,def,E. Attipoe,Ebro,RB,RB,Lateral,25.0,Ghana,Ghana,derecho,178,71,0,2026-06-30,1,27,0,0.0,False,e attipoe|ebro|2022-23
 2021-22,med,Marcos Olguín,Marbella,"RCMF, DMF, LDMF",RCMF,Centrocampista,24.0,Spain,Spain,derecho,0,0,25000,2026-06-30,2,26,0,0.0,False,marcos olguin|marbella|2021-22
-2021-22,med,Ángel López,Tarazona,RWB,RWB,Carrilero,22.0,Spain,Spain,derecho,176,70,150000,2026-06-30,1,26,0,0.0,False,angel lopez|tarazona|2021-22
+2021-22,med,Ángel López,Tarazona,RWB,RWB,Lateral,22.0,Spain,Spain,derecho,176,70,150000,2026-06-30,1,26,0,0.0,False,angel lopez|tarazona|2021-22
 2022-23,med,Ibraima,Tenerife U19,LCMF,LCMF,Centrocampista,,Spain,Spain,,0,0,0,,1,26,0,0.0,False,ibraima|tenerife u19|2022-23
 2021-22,med,M. Prendes,Gimnàstic Tarragona,LCMF,LCMF,Centrocampista,24.0,Spain,Spain,derecho,184,79,0,2027-06-30,1,26,0,0.15,False,m prendes|gimnastic tarragona|2021-22
 2021-22,med,Manzano,Águilas,LW,LW,Extremo,26.0,Spain,Spain,derecho,175,70,100000,2026-06-30,2,26,0,0.0,False,manzano|aguilas|2021-22
@@ -3174,7 +3174,7 @@
 2023-24,med,D. Barro,Austin FC II,RCMF,RCMF,Centrocampista,23.0,Côte d'Ivoire,Côte d'Ivoire,derecho,0,0,0,2026-12-31,1,24,0,0.0,False,d barro|austin fc ii|2023-24
 2023-24,med,M. Malsa,,"LW, RCMF",LW,Extremo,30.0,France,"France, Martinique",derecho,175,74,800000,,2,24,0,0.0,False,m malsa||2023-24
 2024-25,def,Jaime Vallejo,CD Eldense,LB,LB,Lateral,23.0,Spain,Spain,izquierdo,179,71,0,2026-06-30,2,23,0,0.0,True,jaime vallejo|cd eldense|2024-25
-2022-23,med,A. Guzmán,Puente Genil,"LWB, LCMF",LWB,Carrilero,23.0,Spain,Spain,unknown,0,0,0,2026-06-30,2,23,0,0.03,False,a guzman|puente genil|2022-23
+2022-23,med,A. Guzmán,Puente Genil,"LWB, LCMF",LWB,Lateral,23.0,Spain,Spain,unknown,0,0,0,2026-06-30,2,23,0,0.03,False,a guzman|puente genil|2022-23
 2024-25,med,M. Pezzolesi,Atlético Paso,LCMF,LCMF,Centrocampista,23.0,Argentina,Argentina,,0,0,0,2026-06-30,1,23,0,0.02,False,m pezzolesi|atletico paso|2024-25
 2024-25,att,Raúl Sola,Atlético Sanluqueño,CF,CF,Delantero,24.0,Spain,Spain,derecho,175,67,150000,2026-06-30,1,23,0,0.0,False,raul sola|atletico sanluqueno|2024-25
 2022-23,med,A. Ramos,,"AMF, LW",AMF,Mediapunta,25.0,Spain,Spain,derecho,193,0,0,,1,23,0,0.0,False,a ramos||2022-23
@@ -3227,7 +3227,7 @@
 2024-25,med,Oscar Carrasco,Tarazona,"AMF, LCMF",AMF,Mediapunta,23.0,Spain,Spain,,0,0,0,2027-06-30,3,16,0,0.0,True,oscar carrasco|tarazona|2024-25
 2022-23,att,Diego Aznar,SD Huesca,"CF, RCMF",CF,Delantero,22.0,Spain,Spain,derecho,0,0,0,2028-06-30,2,16,0,0.0,False,diego aznar|sd huesca|2022-23
 2022-23,med,A. Palacios,Cornellà U19,RW,RW,Extremo,20.0,Spain,Spain,ambidiestro,178,0,0,,1,16,0,0.0,False,a palacios|cornella u19|2022-23
-2025-26,med,I. Obeng,Algeciras,"RWB, RW",RWB,Carrilero,22.0,Ghana,Ghana,izquierdo,182,74,0,2028-06-30,2,16,0,0.0,True,i obeng|algeciras|2025-26
+2025-26,med,I. Obeng,Algeciras,"RWB, RW",RWB,Lateral,22.0,Ghana,Ghana,izquierdo,182,74,0,2028-06-30,2,16,0,0.0,True,i obeng|algeciras|2025-26
 2025-26,def,J. Domingo Ponce,Albacete Balompié,RCB,RCB,Central,19.0,Spain,Spain,,0,0,0,2026-06-30,1,15,0,0.0,False,j domingo ponce|albacete balompie|2025-26
 2023-24,med,J. Carrillo,Pumas UNAM,"RW, LW",RW,Extremo,24.0,Mexico,Mexico,derecho,168,62,0,,1,15,0,0.0,False,j carrillo|pumas unam|2023-24
 2025-26,def,Samu Fernández,Deportivo de La Coruña,RCB,RCB,Central,19.0,Spain,Spain,,0,0,0,2028-06-30,1,15,0,0.0,False,samu fernandez|deportivo de la coruna|2025-26
@@ -3244,7 +3244,7 @@
 2022-23,att,Ale García,UD Las Palmas,CF,CF,Delantero,22.0,Spain,Spain,derecho,181,75,250000,2029-06-30,2,14,0,0.15,False,ale garcia|ud las palmas|2022-23
 2021-22,med,Pablo Marín,Real Sociedad B,AMF,AMF,Mediapunta,22.0,Spain,Spain,derecho,178,73,1500000,2029-06-30,1,14,0,0.0,False,pablo marin|real sociedad b|2021-22
 2022-23,med,Juan Aspra,Antequera,LCMF,LCMF,Centrocampista,23.0,Spain,Spain,izquierdo,179,70,200000,2026-06-30,1,14,0,0.0,False,juan aspra|antequera|2022-23
-2023-24,med,Pablo Cortés,Deportivo Alavés,RWB,RWB,Carrilero,21.0,Spain,Spain,izquierdo,0,0,0,2027-06-30,1,14,0,0.0,False,pablo cortes|deportivo alaves|2023-24
+2023-24,med,Pablo Cortés,Deportivo Alavés,RWB,RWB,Lateral,21.0,Spain,Spain,izquierdo,0,0,0,2027-06-30,1,14,0,0.0,False,pablo cortes|deportivo alaves|2023-24
 2023-24,med,Isra García,Linares Deportivo,LW,LW,Extremo,21.0,Spain,Spain,,182,68,0,2026-06-30,1,14,0,0.0,False,isra garcia|linares deportivo|2023-24
 2025-26,att,W. Chatiliez,FC Cartagena,RWF,RWF,Extremo,21.0,Spain,Spain,izquierdo,0,0,0,2027-06-30,1,13,0,0.0,True,w chatiliez|fc cartagena|2025-26
 2021-22,att,D. Sankhare,Cádiz CF,CF,CF,Delantero,23.0,Spain,"Spain, Mauritania",derecho,188,0,0,2027-06-30,1,13,0,0.0,True,d sankhare|cadiz cf|2021-22
@@ -3292,7 +3292,7 @@
 2024-25,med,G. Nsukula,UD Ibiza,RCMF,RCMF,Centrocampista,22.0,France,France,unknown,0,0,0,2029-06-30,1,8,0,0.0,False,g nsukula|ud ibiza|2024-25
 2024-25,med,S. Cortes,Recreativo Granada,RW,RW,Extremo,19.0,Spain,Spain,,0,0,0,2029-06-30,1,7,0,0.0,False,s cortes|recreativo granada|2024-25
 2022-23,att,Christian Martínez,Águilas,CF,CF,Delantero,25.0,Spain,Spain,derecho,0,0,50000,2026-06-30,1,7,0,0.0,False,christian martinez|aguilas|2022-23
-2023-24,med,Sergio Navarro,AD Alcorcón,RWB,RWB,Carrilero,24.0,Spain,Spain,derecho,176,69,0,2026-06-30,1,7,0,0.0,False,sergio navarro|ad alcorcon|2023-24
+2023-24,med,Sergio Navarro,AD Alcorcón,RWB,RWB,Lateral,24.0,Spain,Spain,derecho,176,69,0,2026-06-30,1,7,0,0.0,False,sergio navarro|ad alcorcon|2023-24
 2024-25,med,A. Alfaro,Torreense,RCMF,RCMF,Centrocampista,23.0,Spain,Spain,derecho,183,74,0,2028-06-30,1,7,0,0.0,False,a alfaro|torreense|2024-25
 2022-23,att,Salifo Caropitche,Guadalajara,CF,CF,Delantero,24.0,Guinea-Bissau,Guinea-Bissau,unknown,190,0,0,2026-06-30,1,7,0,0.0,True,salifo caropitche|guadalajara|2022-23
 2024-25,med,Valentín Gómez,Talavera CF,RAMF,RAMF,Mediapunta,21.0,Spain,Spain,,0,0,0,2026-06-30,1,7,0,0.0,False,valentin gomez|talavera cf|2024-25

@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.normalizer import normalize_club, normalize_player_name
+from src.normalizer import normalize_club, normalize_development_position, normalize_player_name
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,10 @@ def _normalize_position(raw: str, default_cat: str) -> tuple[str, str]:
     if not raw:
         return '', CATEGORY_DEFAULT.get(default_cat, '')
     primary = str(raw).split(',')[0].strip()
-    normalized = POS_CODE_MAP.get(primary, CATEGORY_DEFAULT.get(default_cat, primary))
+    normalized = normalize_development_position(
+        primary,
+        POS_CODE_MAP.get(primary, CATEGORY_DEFAULT.get(default_cat, primary)),
+    )
     return primary, normalized
 
 

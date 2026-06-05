@@ -40,7 +40,7 @@ CLUB_ALIASES: dict[str, list[str]] = {
     "Real Oviedo":            ["Oviedo"],
     "Real Sociedad B":        ["Real Sociedad II", "R. Sociedad B"],
     "Real Valladolid CF":     ["Valladolid", "R. Valladolid", "Real Valladolid"],
-    "Real Zaragoza":          ["Zaragoza", "R. Zaragoza"],
+    "Real Zaragoza":          ["Zaragoza", "R. Zaragoza", "Real Zaragoza CF", "R Zaragoza"],
     "SD Amorebieta":          ["Amorebieta"],
     "SD Eibar":               ["Eibar", "S.D. Eibar"],
     "SD Huesca":              ["Huesca"],
@@ -152,6 +152,96 @@ def normalize_position(pos: str) -> tuple[str, str]:
     en = WYSCOUT_POS.get(pos, pos)
     es = POS_ES.get(en, en)
     return en, es
+
+
+DEVELOPMENT_POSITION_ALIASES: dict[str, str] = {
+    # Delanteros
+    "centre forward": "Delantero",
+    "centre-forward": "Delantero",
+    "center forward": "Delantero",
+    "center-forward": "Delantero",
+    "delantero centro": "Delantero",
+    "segundo delantero": "Delantero",
+    "second striker": "Delantero",
+    "striker": "Delantero",
+    "cf": "Delantero",
+    "st": "Delantero",
+    "ss": "Delantero",
+    # Extremos
+    "left winger": "Extremo",
+    "right winger": "Extremo",
+    "extremo izquierdo": "Extremo",
+    "extremo derecho": "Extremo",
+    "extremo izq": "Extremo",
+    "extremo der": "Extremo",
+    "lw": "Extremo",
+    "rw": "Extremo",
+    "lwf": "Extremo",
+    "rwf": "Extremo",
+    # Mediocentros / centrocampistas
+    "pivote": "Mediocentro",
+    "defensive midfield": "Mediocentro",
+    "defensive midfielder": "Mediocentro",
+    "mediocentro defensivo": "Mediocentro",
+    "dm": "Mediocentro",
+    "dmf": "Mediocentro",
+    "ldmf": "Mediocentro",
+    "rdmf": "Mediocentro",
+    "mediocentro": "Centrocampista",
+    "central midfield": "Centrocampista",
+    "central midfielder": "Centrocampista",
+    "centrocampista": "Centrocampista",
+    "cm": "Centrocampista",
+    "lcmf": "Centrocampista",
+    "rcmf": "Centrocampista",
+    "attacking midfield": "Mediapunta",
+    "attacking midfielder": "Mediapunta",
+    "mediapunta": "Mediapunta",
+    "am": "Mediapunta",
+    "amf": "Mediapunta",
+    # Defensas
+    "centre back": "Central",
+    "centre-back": "Central",
+    "center back": "Central",
+    "center-back": "Central",
+    "central": "Central",
+    "cb": "Central",
+    "lcb": "Central",
+    "rcb": "Central",
+    "left back": "Lateral",
+    "left-back": "Lateral",
+    "right back": "Lateral",
+    "right-back": "Lateral",
+    "lateral izquierdo": "Lateral",
+    "lateral derecho": "Lateral",
+    "lb": "Lateral",
+    "rb": "Lateral",
+    "lwb": "Lateral",
+    "rwb": "Lateral",
+    # Porteros
+    "goalkeeper": "Portero",
+    "portero": "Portero",
+    "gk": "Portero",
+}
+
+
+def normalize_development_position(pos: str, default: str | None = None) -> str | None:
+    """
+    Bucket de posición para análisis de desarrollo.
+    Devuelve categorías comparables entre TM y Wyscout.
+    """
+    if not pos:
+        return default
+    key = _strip(str(pos))
+    if key in DEVELOPMENT_POSITION_ALIASES:
+        return DEVELOPMENT_POSITION_ALIASES[key]
+
+    # Wyscout a veces concatena posiciones: "LCMF, DMF, RCMF".
+    primary = key.split()[0] if "," not in str(pos) else _strip(str(pos).split(",")[0])
+    if primary in DEVELOPMENT_POSITION_ALIASES:
+        return DEVELOPMENT_POSITION_ALIASES[primary]
+
+    return default if default is not None else str(pos).strip()
 
 
 # ── Jugadores ──────────────────────────────────────────────────────────────────

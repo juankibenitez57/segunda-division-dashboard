@@ -43,6 +43,32 @@ const POS_ES = {
   'Attacking Midfield':'Mediapunta',
 };
 
+const POSITION_QUERY_ALIASES = {
+  'delantero': 'Delantero',
+  'delanteros': 'Delantero',
+  'segundo delantero': 'Delantero',
+  'delantero centro': 'Delantero',
+  'striker': 'Delantero',
+  'extremo': 'Extremo',
+  'extremos': 'Extremo',
+  'extremo derecho': 'Extremo',
+  'extremo izquierdo': 'Extremo',
+  'mediocentro': 'Mediocentro',
+  'mediocentros': 'Mediocentro',
+  'pivote': 'Mediocentro',
+  'pivotes': 'Mediocentro',
+  'centrocampista': 'Centrocampista',
+  'centrocampistas': 'Centrocampista',
+  'mediapunta': 'Mediapunta',
+  'mediapuntas': 'Mediapunta',
+  'central': 'Central',
+  'centrales': 'Central',
+  'lateral': 'Lateral',
+  'laterales': 'Lateral',
+  'portero': 'Portero',
+  'porteros': 'Portero'
+};
+
 /* ===================== UTILITY FUNCTIONS ===================== */
 function tPos(p) { return POS_ES[p] || p; }
 
@@ -2726,6 +2752,13 @@ function processScoutQuery(raw) {
   if (detectedClub && (isCompra || isGasto)) return sgptClubCompras(detectedClub, threshold);
   if (detectedClub) return sgptClubOverview(detectedClub);
 
+  // Desarrollo de talento desde master_player_development.csv
+  if (/entrenador/.test(q) && detectedPos && /desarroll|mejor|utiliza|usa/.test(q)) return sgptEntrenadoresDesarrollanPosicion(detectedPos, topLimit);
+  if (isClubs && detectedPos && /desarroll|mejor|utiliza|usa|valor/.test(q)) return sgptClubesDesarrollanPosicion(detectedPos, topLimit);
+  if (isSub23 && detectedPos) return sgptSub23PorPosicion(detectedPos, q, topLimit);
+  if (/entrenador/.test(q) && isSub23) return sgptEntrenadoresSub23Uso(topLimit);
+  if (isClubs && isSub23) return sgptClubesSub23Uso(topLimit);
+
   // Gasto / compras globales sin club ni temporada
   if (isClubs && (isGasto || isCompra) && isRanking) return sgptTopGastadoresSeason(null, topLimit);
 
@@ -2884,6 +2917,9 @@ function detectClubInQuery(q) {
 }
 
 function detectPositionInQuery(q) {
+  for (const [alias, canonical] of Object.entries(POSITION_QUERY_ALIASES)) {
+    if (q.includes(norm(alias))) return canonical;
+  }
   const entries = [...Object.entries(POS_ES), ...Object.values(POS_ES).map(v => [v, v])];
   for (const [en, es] of entries) {
     if (q.includes(norm(en)) || q.includes(norm(es))) return es;
@@ -2951,6 +2987,86 @@ function sgptSub23General(n) {
   return `<strong>Clubes que más fichan Sub-23:</strong> ${data.length} operaciones con jugadores menores de 23 años.<br>
     <table><thead><tr><th>#</th><th>Club</th><th>Operaciones Sub-23</th></tr></thead>
     <tbody>${top.map(([c,n],i) => `<tr><td>${i+1}</td><td class="bold">${c}</td><td>${n}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function sgptMasterReady() {
+  return MASTER_DATA && MASTER_DATA.length;
+}
+
+function sgptSub23PorPosicion(pos, q, n) {
+  if (!sgptMasterReady()) return sgptSub23General(n);
+  const wantValue = /valor|genera|revalori/.test(q);
+  const wantGoals = /gol/.test(q);
+  const rows = MASTER_DATA
+    .filter(d => isTrue(d.es_sub23) && devPosMatch(d, pos) && num(d.minutos) > 0)
+    .sort((a, b) => {
+      if (wantValue) return (num(b.revalorizacion_absoluta) || num(b.valor_mercado_wyscout) || num(b.valor_mercado)) -
+        (num(a.revalorizacion_absoluta) || num(a.valor_mercado_wyscout) || num(a.valor_mercado));
+      if (wantGoals) return num(b.goles) - num(a.goles);
+      return num(b.minutos) - num(a.minutos);
+    })
+    .slice(0, n);
+  if (!rows.length) return `No hay ${pos} Sub-23 con minutos Wyscout en el master.`;
+  const metricTitle = wantValue ? 'valor/revalorización' : wantGoals ? 'goles' : 'minutos';
+  return `<strong>${pos} Sub-23 por ${metricTitle}:</strong><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>Temp.</th><th>Edad</th><th>Min</th><th>Goles</th><th>xG</th><th>Valor</th></tr></thead>
+    <tbody>${rows.map((d,i) => `<tr>
+      <td>${i+1}</td><td class="bold">${d.nombre}</td><td>${d.club}</td><td>${d.temporada}</td>
+      <td>${d.edad || '—'}</td><td>${fmt(num(d.minutos))}</td><td>${num(d.goles)}</td><td>${num(d.xg).toFixed(2)}</td>
+      <td class="green">${formatM(num(d.revalorizacion_absoluta) || num(d.valor_mercado_wyscout) || num(d.valor_mercado))}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptClubesSub23Uso(n) {
+  if (!sgptMasterReady()) return sgptSub23General(n);
+  const sub23 = MASTER_DATA.filter(d => isTrue(d.es_sub23));
+  const by = groupBy(sub23, 'club');
+  const ranked = Object.entries(by)
+    .map(([club, rows]) => [club, sumBy(rows, 'minutos'), new Set(rows.map(d => d.nombre)).size, sumBy(rows, 'goles')])
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, n);
+  return `<strong>Clubes que más utilizan Sub-23</strong> (orden por minutos):<br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Min Sub-23</th><th>Jugadores</th><th>Goles</th></tr></thead>
+    <tbody>${ranked.map(([c,m,j,g],i) => `<tr><td>${i+1}</td><td class="bold">${c}</td><td>${fmt(m)}</td><td>${j}</td><td>${g}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function sgptEntrenadoresSub23Uso(n) {
+  if (!sgptMasterReady()) return 'El master de desarrollo todavía no está cargado. Vuelve a lanzar la pregunta en unos segundos.';
+  const rows = MASTER_DATA.filter(d => d.entrenador && isTrue(d.es_sub23));
+  const by = groupBy(rows, 'entrenador');
+  const ranked = Object.entries(by)
+    .map(([coach, list]) => [coach, sumBy(list, 'minutos'), new Set(list.map(d => d.nombre)).size, sumBy(list, 'goles'), [...new Set(list.map(d => normDevPos(d.posicion_normalizada || d.posicion_es || d.posicion)).filter(Boolean))].sort().join(', ')])
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, n);
+  return `<strong>Entrenadores que más utilizan Sub-23</strong> (orden por minutos):<br>
+    <table><thead><tr><th>#</th><th>Entrenador</th><th>Min Sub-23</th><th>Jugadores</th><th>Goles</th><th>Posiciones</th></tr></thead>
+    <tbody>${ranked.map(([c,m,j,g,p],i) => `<tr><td>${i+1}</td><td class="bold">${c}</td><td>${fmt(m)}</td><td>${j}</td><td>${g}</td><td class="muted">${p || '—'}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function sgptClubesDesarrollanPosicion(pos, n) {
+  if (!sgptMasterReady()) return sgptClubesPorPosicion(pos);
+  const rows = MASTER_DATA.filter(d => isTrue(d.es_sub23) && devPosMatch(d, pos));
+  const by = groupBy(rows, 'club');
+  const ranked = Object.entries(by)
+    .map(([club, list]) => [club, sumBy(list, 'minutos'), new Set(list.map(d => d.nombre)).size, sumBy(list, 'goles'), sumBy(list, 'revalorizacion_absoluta')])
+    .sort((a,b) => (b[4] || b[1]) - (a[4] || a[1]))
+    .slice(0, n);
+  return `<strong>Clubes que mejor desarrollan ${pos}</strong> (Sub-23):<br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Valor gen.</th><th>Min</th><th>Jugadores</th><th>Goles</th></tr></thead>
+    <tbody>${ranked.map(([c,m,j,g,v],i) => `<tr><td>${i+1}</td><td class="bold">${c}</td><td class="green">${v ? formatM(v) : '—'}</td><td>${fmt(m)}</td><td>${j}</td><td>${g}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function sgptEntrenadoresDesarrollanPosicion(pos, n) {
+  if (!sgptMasterReady()) return 'El master de desarrollo todavía no está cargado. Vuelve a lanzar la pregunta en unos segundos.';
+  const rows = MASTER_DATA.filter(d => d.entrenador && isTrue(d.es_sub23) && devPosMatch(d, pos));
+  const by = groupBy(rows, 'entrenador');
+  const ranked = Object.entries(by)
+    .map(([coach, list]) => [coach, sumBy(list, 'minutos'), new Set(list.map(d => d.nombre)).size, sumBy(list, 'goles'), sumBy(list, 'revalorizacion_absoluta')])
+    .sort((a,b) => (b[4] || b[1]) - (a[4] || a[1]))
+    .slice(0, n);
+  return `<strong>Entrenadores que mejor desarrollan ${pos}</strong> (Sub-23):<br>
+    <table><thead><tr><th>#</th><th>Entrenador</th><th>Valor gen.</th><th>Min</th><th>Jugadores</th><th>Goles</th></tr></thead>
+    <tbody>${ranked.map(([c,m,j,g,v],i) => `<tr><td>${i+1}</td><td class="bold">${c}</td><td class="green">${v ? formatM(v) : '—'}</td><td>${fmt(m)}</td><td>${j}</td><td>${g}</td></tr>`).join('')}</tbody></table>`;
 }
 
 function sgptNacionalidadesROI(n) {
@@ -3288,6 +3404,18 @@ const SEGUNDA_CLUBS_SET = new Set([
 
 function isTrue(v) { return v === true || v === 'True' || v === 'true'; }
 function num(v) { const n = +v; return isNaN(n) ? 0 : n; }
+function normDevPos(p) {
+  const raw = (p || '').toString().trim();
+  if (!raw || raw === 'nan') return '';
+  const q = norm(raw);
+  return POSITION_QUERY_ALIASES[q] || raw;
+}
+function devPosMatch(row, pos) {
+  if (!pos) return true;
+  const p = normDevPos(row.posicion_normalizada || row.posicion_es || tPos(row.posicion || ''));
+  if (pos === 'Mediocentro') return p === 'Mediocentro' || p === 'Centrocampista';
+  return p === pos;
+}
 
 function devBarH(id, entries, color, fmtFn) {
   const top = entries.slice(0, 15);
@@ -3332,10 +3460,11 @@ function renderClubesDevTab() {
     const byClub = {};
     sub23.forEach(d => {
       const c = d.club;
-      if (!byClub[c]) byClub[c] = { minutos:0, jugadores:new Set(), goles:0, vmSum:0, vmCount:0, revSum:0 };
+      if (!byClub[c]) byClub[c] = { minutos:0, jugadores:new Set(), goles:0, vmSum:0, vmCount:0, revSum:0, edadSum:0, edadCount:0 };
       byClub[c].minutos += num(d.minutos);
       byClub[c].jugadores.add(d.nombre);
       byClub[c].goles += num(d.goles);
+      if (num(d.edad) > 0) { byClub[c].edadSum += num(d.edad); byClub[c].edadCount++; }
       const vm = num(d.valor_mercado_wyscout) || num(d.valor_mercado);
       if (vm > 0) { byClub[c].vmSum += vm; byClub[c].vmCount++; }
       byClub[c].revSum += num(d.revalorizacion_absoluta);
@@ -3343,6 +3472,7 @@ function renderClubesDevTab() {
 
     const arr = Object.entries(byClub).map(([c, v]) => ({
       club: c, minutos: v.minutos, jugadores: v.jugadores.size, goles: v.goles,
+      edadMedia: v.edadCount ? v.edadSum / v.edadCount : 0,
       vmMedio: v.vmCount ? v.vmSum / v.vmCount : 0, rev: v.revSum
     }));
 
@@ -3362,11 +3492,11 @@ function renderClubesDevTab() {
     const ranked = [...arr].sort((a,b)=>b.minutos-a.minutos).slice(0,25);
     document.getElementById('cdev-table').innerHTML = `
       <table class="ppc-table"><thead><tr>
-        <th>#</th><th>Club</th><th>Min Sub-23</th><th>Jugadores</th><th>Goles</th><th>VM medio</th><th>Revalorización</th>
+        <th>#</th><th>Club</th><th>Min Sub-23</th><th>Jugadores</th><th>Edad media</th><th>Goles</th><th>VM medio</th><th>Revalorización</th>
       </tr></thead><tbody>
         ${ranked.map((a,i)=>`<tr>
           <td>${i+1}</td><td><strong>${a.club}</strong></td>
-          <td>${fmt(a.minutos)}</td><td>${a.jugadores}</td><td>${a.goles}</td>
+          <td>${fmt(a.minutos)}</td><td>${a.jugadores}</td><td>${a.edadMedia ? a.edadMedia.toFixed(1) : '—'}</td><td>${a.goles}</td>
           <td>${a.vmMedio>0?formatM(a.vmMedio):'—'}</td>
           <td style="color:${a.rev>0?'var(--success)':'var(--text-muted)'}">${a.rev!==0?formatM(a.rev):'—'}</td>
         </tr>`).join('')}
@@ -3391,20 +3521,23 @@ function renderEntrenadoresTab() {
     const byCoach = {};
     conEnt.forEach(d => {
       const c = d.entrenador;
-      if (!byCoach[c]) byCoach[c] = { minTotal:0, minSub23:0, jugSub23:new Set(), golesSub23:0, valorSub23:0 };
+      if (!byCoach[c]) byCoach[c] = { minTotal:0, minSub23:0, jugSub23:new Set(), golesSub23:0, valorSub23:0, posiciones:new Set() };
       byCoach[c].minTotal += num(d.minutos);
       if (isTrue(d.es_sub23)) {
         byCoach[c].minSub23 += num(d.minutos);
         byCoach[c].jugSub23.add(d.nombre);
         byCoach[c].golesSub23 += num(d.goles);
         byCoach[c].valorSub23 += num(d.revalorizacion_absoluta);
+        const pos = normDevPos(d.posicion_normalizada || d.posicion_es || d.posicion);
+        if (pos) byCoach[c].posiciones.add(pos);
       }
     });
 
     const arr = Object.entries(byCoach).map(([c,v]) => ({
       coach: c, minSub23: v.minSub23, jugSub23: v.jugSub23.size,
       golesSub23: v.golesSub23, valorSub23: v.valorSub23,
-      pctSub23: v.minTotal > 0 ? (v.minSub23 / v.minTotal * 100) : 0
+      pctSub23: v.minTotal > 0 ? (v.minSub23 / v.minTotal * 100) : 0,
+      posiciones: [...v.posiciones].sort().join(', ')
     }));
 
     devBarH('chart-ent-minutos', arr.filter(a=>a.minSub23>0).sort((a,b)=>b.minSub23-a.minSub23).map(a=>[a.coach,Math.round(a.minSub23)]), '#009a44', v=>fmt(v));
@@ -3416,13 +3549,13 @@ function renderEntrenadoresTab() {
     const ranked = arr.filter(a=>a.minSub23>0).sort((a,b)=>b.minSub23-a.minSub23).slice(0,25);
     document.getElementById('ent-table').innerHTML = `
       <table class="ppc-table"><thead><tr>
-        <th>#</th><th>Entrenador</th><th>Min Sub-23</th><th>Jugadores Sub-23</th><th>Goles Sub-23</th><th>Valor generado</th><th>% Utilización</th>
+        <th>#</th><th>Entrenador</th><th>Min Sub-23</th><th>Jugadores Sub-23</th><th>Goles Sub-23</th><th>Valor generado</th><th>% Utilización</th><th>Posiciones utilizadas</th>
       </tr></thead><tbody>
         ${ranked.map((a,i)=>`<tr>
           <td>${i+1}</td><td><strong>${a.coach}</strong></td>
           <td>${fmt(a.minSub23)}</td><td>${a.jugSub23}</td><td>${a.golesSub23}</td>
           <td style="color:${a.valorSub23>0?'var(--success)':'var(--text-muted)'}">${a.valorSub23!==0?formatM(a.valorSub23):'—'}</td>
-          <td>${a.pctSub23.toFixed(0)}%</td>
+          <td>${a.pctSub23.toFixed(0)}%</td><td>${a.posiciones || '—'}</td>
         </tr>`).join('')}
       </tbody></table>`;
   });
@@ -3439,10 +3572,10 @@ function renderPosDevTab() {
       return;
     }
 
-    const conPos = data.filter(d => d.posicion_normalizada && d.posicion_normalizada !== 'nan');
+    const conPos = data.filter(d => normDevPos(d.posicion_normalizada || d.posicion_es || d.posicion));
     const byPos = {};
     conPos.forEach(d => {
-      const p = d.posicion_normalizada;
+      const p = normDevPos(d.posicion_normalizada || d.posicion_es || d.posicion);
       if (!byPos[p]) byPos[p] = { minutos:[], goles:0, xg90:[], vm:[], rev:[], count:0 };
       byPos[p].count++;
       if (num(d.minutos) > 0) byPos[p].minutos.push(num(d.minutos));
@@ -3498,22 +3631,13 @@ function buildQueryContext(question) {
   const q = norm(question);
   const MAX = 80;
 
-  // Sub-23 revalorizados
-  if (/sub.?23/.test(q) && /revalori|valor/.test(q)) {
-    const rows = REV_DATA.filter(d => (+d.edad_llegada || 99) < 23)
-      .sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0))
-      .slice(0, MAX);
-    return 'Sub-23 más revalorizados en Segunda División:\n' +
-      rows.map(d => `${d.jugador}|${d.club}|edad:${d.edad_llegada}|VM entrada:${formatM(+d.vm_llegada||0)}|VM salida:${formatM(+d.vm_salida||0)}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
-  }
-
   const M = MASTER_DATA;
   const isSub23 = d => d.es_sub23 === true || d.es_sub23 === 'True' || (+d.edad > 0 && +d.edad < 23);
-  const posMatch = (d, kw) => (d.posicion_normalizada||'').toLowerCase().includes(kw);
+  const posMatch = (d, kw) => devPosMatch(d, POSITION_QUERY_ALIASES[kw] || kw);
 
   // Entrenador que desarrolla mejor una posición concreta
   if (M.length && /entrenador/.test(q) && /(delant|extrem|central|lateral|medio|portero|centrocampista)/.test(q)) {
-    const posKw = /delant/.test(q)?'delantero':/extrem/.test(q)?'extremo':/central/.test(q)?'central':/lateral/.test(q)?'lateral':/portero/.test(q)?'portero':/medio|centrocampista/.test(q)?'centro':'';
+    const posKw = /delant/.test(q)?'delantero':/extrem/.test(q)?'extremo':/central/.test(q)?'central':/lateral/.test(q)?'lateral':/portero/.test(q)?'portero':/medio|centrocampista/.test(q)?'mediocentro':'';
     const rows = M.filter(d => d.entrenador && isSub23(d) && posMatch(d, posKw) && +d.minutos > 0);
     const by = groupBy(rows, 'entrenador');
     const ranked = Object.entries(by)
@@ -3547,14 +3671,28 @@ function buildQueryContext(question) {
 
   // Posición Sub-23 por minutos o goles (extremos, delanteros, etc.)
   if (M.length && /(delant|extrem|central|lateral|medio|portero|centrocampista|mediapunta)/.test(q) && /sub.?23/.test(q)) {
-    const posKw = /delant/.test(q)?'delantero':/extrem/.test(q)?'extremo':/central/.test(q)?'central':/lateral/.test(q)?'lateral':/portero/.test(q)?'portero':/mediapunta/.test(q)?'mediapunta':'centro';
+    const posKw = /delant/.test(q)?'delantero':/extrem/.test(q)?'extremo':/central/.test(q)?'central':/lateral/.test(q)?'lateral':/portero/.test(q)?'portero':/mediapunta/.test(q)?'mediapunta':'mediocentro';
     const wantGoles = /gol/.test(q);
+    const wantValor = /valor|revalori|genera/.test(q);
     let rows = M.filter(d => isSub23(d) && posMatch(d, posKw) && +d.minutos > 0);
-    rows = rows.sort((a,b) => wantGoles ? (+b.goles||0)-(+a.goles||0) : (+b.minutos||0)-(+a.minutos||0)).slice(0,30);
+    rows = rows.sort((a,b) => {
+      if (wantValor) return (num(b.revalorizacion_absoluta)||num(b.valor_mercado_wyscout)||num(b.valor_mercado)) -
+        (num(a.revalorizacion_absoluta)||num(a.valor_mercado_wyscout)||num(a.valor_mercado));
+      return wantGoles ? (+b.goles||0)-(+a.goles||0) : (+b.minutos||0)-(+a.minutos||0);
+    }).slice(0,30);
     const season = detectSeasonInQuery(q);
     if (season) rows = rows.filter(d => d.temporada === season);
-    return `${posKw} Sub-23 por ${wantGoles?'goles':'minutos'}:\n` +
-      rows.map(d => `${d.nombre}|${d.club}|${d.temporada}|edad:${d.edad}|min:${d.minutos}|goles:${d.goles||0}|xG/90:${d.xg_por_90||0}|VM:${formatM(num(d.valor_mercado_wyscout)||num(d.valor_mercado))}`).join('\n');
+    return `${posKw} Sub-23 por ${wantValor?'valor':wantGoles?'goles':'minutos'}:\n` +
+      rows.map(d => `${d.nombre}|${d.club}|${d.temporada}|edad:${d.edad}|min:${d.minutos}|goles:${d.goles||0}|xG/90:${d.xg_por_90||0}|VM:${formatM(num(d.valor_mercado_wyscout)||num(d.valor_mercado))}|rev:${formatM(num(d.revalorizacion_absoluta))}`).join('\n');
+  }
+
+  // Sub-23 revalorizados genéricos
+  if (/sub.?23/.test(q) && /revalori|valor/.test(q)) {
+    const rows = REV_DATA.filter(d => (+d.edad_llegada || 99) < 23)
+      .sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0))
+      .slice(0, MAX);
+    return 'Sub-23 más revalorizados en Segunda División:\n' +
+      rows.map(d => `${d.jugador}|${d.club}|edad:${d.edad_llegada}|VM entrada:${formatM(+d.vm_llegada||0)}|VM salida:${formatM(+d.vm_salida||0)}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
   }
 
   // Entrenador específico
