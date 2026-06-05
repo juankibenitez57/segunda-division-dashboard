@@ -394,6 +394,7 @@ function renderCurrentTab() {
     case 'tab-sub23':        renderSub23Tab(); break;
     case 'tab-buscador':     if (!chartsRendered['tab-buscador']) { renderBuscadorTab(); chartsRendered['tab-buscador'] = true; } break;
     case 'tab-scoutgpt':     if (!chartsRendered['tab-scoutgpt']) { renderScoutGPTTab(); chartsRendered['tab-scoutgpt'] = true; } break;
+    case 'tab-wyscout':      if (!chartsRendered['tab-wyscout'])  { renderWyscoutTab();  chartsRendered['tab-wyscout']  = true; } break;
     case 'tab-desarrollo':   if (!chartsRendered['tab-desarrollo']) { renderDesarrolloTab(); chartsRendered['tab-desarrollo'] = true; } break;
     case 'tab-bbdd':         if (!chartsRendered['tab-bbdd']) { renderBBDDTab(); chartsRendered['tab-bbdd'] = true; } break;
   }
@@ -2512,68 +2513,6 @@ async function processWithAI(question) {
   }
 }
 
-/* --- Construye el contexto de datos para la IA --- */
-function buildQueryContext(question) {
-  const q = norm(question);
-  const MAX = 80;
-
-  // Sub-23 revalorizados
-  if (/sub.?23/.test(q) && /revalori|valor/.test(q)) {
-    const rows = REV_DATA.filter(d => (+d.edad_llegada || 99) < 23)
-      .sort((a,b) => (+b.revalorizacion_abs||0) - (+a.revalorizacion_abs||0))
-      .slice(0, MAX);
-    return 'Sub-23 más revalorizados en Segunda División:\n' +
-      rows.map(d => `${d.jugador}|${d.club}|edad:${d.edad_llegada}|VM entrada:${formatM(+d.vm_llegada||0)}|VM salida:${formatM(+d.vm_salida||0)}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
-  }
-
-  // Clubes por valor generado
-  if (/club|equipo/.test(q) && /valor|revalori|generar/.test(q)) {
-    const byClub = groupBy(REV_DATA, 'club');
-    const rows = Object.entries(byClub)
-      .map(([c,v]) => [c, v.reduce((s,d)=>s+(+d.revalorizacion_abs||0),0), v.length, v.reduce((s,d)=>s+(+d.revalorizacion_pct||0),0)/v.length])
-      .sort((a,b) => b[1]-a[1]).slice(0, MAX);
-    return 'Clubes por valor generado:\n' +
-      rows.map(([c,t,n,r]) => `${c}|valor_total:${formatM(t)}|jugadores:${n}|ROI_medio:${r.toFixed(0)}%`).join('\n');
-  }
-
-  // Temporada específica
-  const detectedSeason = detectSeasonInQuery(q);
-  if (detectedSeason) {
-    const data = ALL_DATA.filter(d => d.temporada === detectedSeason).slice(0, MAX);
-    const resumen = `Temporada ${detectedSeason}: ${data.length} ops, dinero:${formatM(sumBy(data,'importe_numerico'))}`;
-    const rows = [...data].filter(d=>d.importe_numerico>0).sort((a,b)=>b.importe_numerico-a.importe_numerico).slice(0,30);
-    return resumen + '\nTop fichajes:\n' + rows.map(d=>`${d.jugador}|${d.club}|${d.movimiento}|${formatM(d.importe_numerico)}`).join('\n');
-  }
-
-  // Club específico
-  const club = detectClubInQuery(q);
-  if (club) {
-    const data = ALL_DATA.filter(d => d.club === club).slice(0, MAX);
-    return `Datos de ${club}:\n` + data.map(d=>`${d.temporada}|${d.jugador}|${d.movimiento}|${d.tipo_operacion}|${formatM(d.importe_numerico||0)}`).join('\n');
-  }
-
-  // ROI / nacionalidades
-  if (/roi|nacional|pa[ií]s/.test(q)) {
-    const byNac = groupBy(REV_DATA.filter(d=>d.revalorizacion_pct!=null), 'nacionalidad');
-    const rows = Object.entries(byNac)
-      .map(([n,v])=>[n, v.reduce((s,d)=>s+(+d.revalorizacion_pct||0),0)/v.length, v.length])
-      .filter(([,, cnt])=>cnt>=3).sort((a,b)=>b[1]-a[1]).slice(0,30);
-    return 'ROI medio por nacionalidad:\n' + rows.map(([n,r,c])=>`${n}|ROI:${r.toFixed(0)}%|jugadores:${c}`).join('\n');
-  }
-
-  // Posición
-  const pos = detectPositionInQuery(q);
-  if (pos) {
-    const rows = REV_DATA.filter(d=>(d.posicion_es||tPos(d.posicion||''))===pos).slice(0,MAX);
-    return `Stats para posición ${pos}:\n` + rows.map(d=>`${d.jugador}|${d.club}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
-  }
-
-  // General — top revalorizados
-  const topRev = [...REV_DATA].sort((a,b)=>(+b.revalorizacion_abs||0)-(+a.revalorizacion_abs||0)).slice(0,MAX);
-  return `Resumen dataset: ${ALL_DATA.length} operaciones, ${REV_DATA.length} revalorizaciones, 5 temporadas (2021-26)\n` +
-    'Top revalorizados:\n' + topRev.map(d=>`${d.jugador}|${d.club}|${d.posicion_es||''}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
-}
-
 /* --- Convierte respuesta markdown de la IA a HTML --- */
 function formatAIResponse(text) {
   return text
@@ -3164,6 +3103,154 @@ function sgptDefault(raw) {
     · "Top 20 Sub-23 más revalorizados"<br>
     · "¿Qué clubes generan más valor?"<br>
     · "¿Qué nacionalidades tienen mejor ROI?"</span>`;
+}
+
+/* ============================================================
+   WYSCOUT DATA — Tab
+   ============================================================ */
+
+let WY_DATA = [];
+
+function loadWyscoutData(callback) {
+  if (WY_DATA.length) { callback(WY_DATA); return; }
+  Papa.parse('data/final/master_wyscout_players.csv', {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => {
+      WY_DATA = r.data.filter(d => d.jugador);
+      callback(WY_DATA);
+    },
+    error: () => callback([])
+  });
+}
+
+function renderWyscoutTab() {
+  loadWyscoutData(data => {
+    if (!data.length) {
+      document.getElementById('wy-kpis').innerHTML =
+        '<p style="color:var(--text-muted)">No se pudo cargar master_wyscout_players.csv. Ejecuta python3 build_wyscout_master.py</p>';
+      return;
+    }
+    renderWyKPIs(data);
+    renderWyEdad(data);
+    renderWyPosicion(data);
+    renderWyMinutos(data);
+    renderWyVM(data);
+    renderWySub23(data);
+    renderWyEquipos(data);
+    renderWyTablaResumen(data);
+  });
+}
+
+function renderWyKPIs(data) {
+  const jugadores  = new Set(data.map(d => d.jugador)).size;
+  const equipos    = new Set(data.map(d => d.equipo)).size;
+  const temporadas = new Set(data.map(d => d.temporada)).size;
+  const sub23      = data.filter(d => (+d.edad||99) < 23).length;
+  const cesiones   = data.filter(d => d.cesion === true || d.cesion === 'True').length;
+  const conGoles   = data.filter(d => (+d.goles||0) > 0).length;
+
+  document.getElementById('wy-kpis').innerHTML = `
+    <div class="kpi-card"><div class="kpi-value">${data.length.toLocaleString('es-ES')}</div><div class="kpi-label">Registros totales</div></div>
+    <div class="kpi-card"><div class="kpi-value">${jugadores.toLocaleString('es-ES')}</div><div class="kpi-label">Jugadores únicos</div></div>
+    <div class="kpi-card"><div class="kpi-value">${equipos}</div><div class="kpi-label">Equipos</div></div>
+    <div class="kpi-card"><div class="kpi-value">${temporadas}</div><div class="kpi-label">Temporadas</div></div>
+    <div class="kpi-card"><div class="kpi-value">${sub23}</div><div class="kpi-label">Sub-23</div></div>
+    <div class="kpi-card"><div class="kpi-value">${cesiones}</div><div class="kpi-label">En cesión</div></div>`;
+}
+
+function renderWyEdad(data) {
+  const edades = data.map(d => +d.edad).filter(e => e > 14 && e < 42);
+  const bins = {};
+  edades.forEach(e => { const b = Math.floor(e); bins[b] = (bins[b]||0)+1; });
+  const x = Object.keys(bins).sort((a,b)=>+a-+b).map(Number);
+  const y = x.map(b => bins[b]);
+  plot('chart-wy-edad', [{ type:'bar', x, y, marker:{color:'#009a44'} }],
+    { margin:{t:20,r:10,b:50,l:50}, xaxis:{title:'Edad'}, yaxis:{title:'Jugadores'} });
+}
+
+function renderWyPosicion(data) {
+  const byPos = {};
+  data.forEach(d => { const p = d.posicion_normalizada || 'Desconocida'; byPos[p] = (byPos[p]||0)+1; });
+  const sorted = Object.entries(byPos).sort((a,b)=>b[1]-a[1]);
+  plot('chart-wy-posicion',
+    [{ type:'bar', orientation:'h',
+       x: sorted.map(([,v])=>v).reverse(),
+       y: sorted.map(([k])=>k).reverse(),
+       marker:{color:'#1d6fa4'} }],
+    { margin:{t:20,r:20,b:30,l:130} });
+}
+
+function renderWyMinutos(data) {
+  const buckets = {'0-500':0,'500-1000':0,'1000-1500':0,'1500-2000':0,'2000-2500':0,'2500+':0};
+  data.forEach(d => {
+    const m = +d.minutos_jugados||0;
+    if (m < 500)  buckets['0-500']++;
+    else if (m < 1000) buckets['500-1000']++;
+    else if (m < 1500) buckets['1000-1500']++;
+    else if (m < 2000) buckets['1500-2000']++;
+    else if (m < 2500) buckets['2000-2500']++;
+    else buckets['2500+']++;
+  });
+  plot('chart-wy-minutos',
+    [{ type:'bar', x: Object.keys(buckets), y: Object.values(buckets), marker:{color:'#e07b39'} }],
+    { margin:{t:20,r:10,b:50,l:50}, xaxis:{title:'Minutos jugados'} });
+}
+
+function renderWyVM(data) {
+  const vms = data.map(d => +d.valor_mercado||0).filter(v => v > 0);
+  const buckets = {'<500k':0,'500k-1M':0,'1-5M':0,'5-15M':0,'15M+':0};
+  vms.forEach(v => {
+    if (v < 500000)  buckets['<500k']++;
+    else if (v < 1e6)  buckets['500k-1M']++;
+    else if (v < 5e6)  buckets['1-5M']++;
+    else if (v < 15e6) buckets['5-15M']++;
+    else buckets['15M+']++;
+  });
+  plot('chart-wy-vm',
+    [{ type:'bar', x: Object.keys(buckets), y: Object.values(buckets), marker:{color:'#c8a951'} }],
+    { margin:{t:20,r:10,b:50,l:50}, xaxis:{title:'Valor de mercado'} });
+}
+
+function renderWySub23(data) {
+  const temps = ['2021-22','2022-23','2023-24','2024-25','2025-26'];
+  const sub23  = temps.map(t => data.filter(d => d.temporada===t && (+d.edad||99)<23).length);
+  const senior = temps.map(t => data.filter(d => d.temporada===t && (+d.edad||99)>=23).length);
+  plot('chart-wy-sub23', [
+    { type:'bar', name:'Sub-23', x:temps, y:sub23, marker:{color:'#009a44'} },
+    { type:'bar', name:'Senior', x:temps, y:senior, marker:{color:'#e5e7eb'} }
+  ], { barmode:'stack', margin:{t:20,r:10,b:50,l:50}, showlegend:true });
+}
+
+function renderWyEquipos(data) {
+  const byTeam = {};
+  data.forEach(d => { byTeam[d.equipo] = (byTeam[d.equipo]||0)+1; });
+  const top = Object.entries(byTeam).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  plot('chart-wy-equipos',
+    [{ type:'bar', orientation:'h',
+       x: top.map(([,v])=>v).reverse(),
+       y: top.map(([k])=>k).reverse(),
+       marker:{color:'#8b5cf6'} }],
+    { margin:{t:20,r:20,b:30,l:170} });
+}
+
+function renderWyTablaResumen(data) {
+  const temps = ['2021-22','2022-23','2023-24','2024-25','2025-26'];
+  const cats  = ['att','med','def'];
+  const header = `<tr><th>Temporada</th>${cats.map(c=>`<th>${c}</th>`).join('')}<th>Total</th><th>Sub-23</th><th>Con goles</th></tr>`;
+  const rows = temps.map(t => {
+    const tData = data.filter(d => d.temporada === t);
+    const byCat = cats.map(c => tData.filter(d => d.categoria===c).length);
+    const sub23 = tData.filter(d => (+d.edad||99)<23).length;
+    const goals = tData.filter(d => (+d.goles||0)>0).length;
+    return `<tr><td><strong>${t}</strong></td>${byCat.map(n=>`<td>${n}</td>`).join('')}<td><strong>${tData.length}</strong></td><td style="color:var(--success)">${sub23}</td><td>${goals}</td></tr>`;
+  }).join('');
+  const totals = cats.map(c => data.filter(d=>d.categoria===c).length);
+  document.getElementById('wy-table-resumen').innerHTML = `
+    <table class="ppc-table">
+      <thead>${header}</thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="border-top:2px solid var(--border)"><td><strong>Total</strong></td>${totals.map(n=>`<td><strong>${n}</strong></td>`).join('')}<td><strong>${data.length}</strong></td><td style="color:var(--success)"><strong>${data.filter(d=>(+d.edad||99)<23).length}</strong></td><td><strong>${data.filter(d=>(+d.goles||0)>0).length}</strong></td></tr></tfoot>
+    </table>`;
 }
 
 /* ============================================================
