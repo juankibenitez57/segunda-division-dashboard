@@ -42,6 +42,11 @@ POSITION_MINUTES_COL = {
     "Portero": "minutos_sub23_porteros",
 }
 
+DESTINATION_POSITION_FALLBACKS = {
+    "Centrocampista": ["Mediocentro"],
+    "Mediapunta": ["Mediocentro", "Extremo"],
+}
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s  %(levelname)-8s  %(message)s",
@@ -179,7 +184,8 @@ def build_model(players: pd.DataFrame, evidence: pd.DataFrame, coaches: pd.DataF
         if not pos:
             continue
 
-        candidates = evidence[evidence["posicion"] == pos].copy()
+        candidate_positions = [pos] + DESTINATION_POSITION_FALLBACKS.get(pos, [])
+        candidates = evidence[evidence["posicion"].isin(candidate_positions)].copy()
         if candidates.empty:
             continue
 

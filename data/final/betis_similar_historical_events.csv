@@ -1,0 +1,411 @@
+﻿jugador_betis,ranking_similar,jugador_historico,temporada,club,entrenador,posicion,edad,tipo_suceso,minutos,goles,xg,valor_mercado,revalorizacion,similaridad_score
+Pablo Garcia,1,Antonio Cordero,2024-25,Cádiz CF,Pako Ayestarán,Extremo,19.0,sub23_wyscout,2303.0,6.0,7.07,0.0,,87.79
+Pablo Garcia,2,Aarón Ochoa,2025-26,Málaga CF,,Extremo,19.0,sub23_wyscout,847.0,2.0,1.32,0.0,,84.83
+Pablo Garcia,3,David Mella,2024-25,Deportivo de La Coruña,Óscar Gilsanz,Extremo,20.0,sub23_wyscout,2886.0,6.0,7.03,0.0,,82.32
+Pablo Garcia,4,Antoñito Cordero,2025-26,Cádiz CF,Pako Ayestarán,Extremo,19.0,cesion,1407.0,3.0,2.12,2000000.0,,79.21
+Pablo Garcia,5,Lander Astiazaran,2025-26,Real Sociedad B,,Extremo,19.0,sub23_wyscout,2809.0,6.0,4.86,150000.0,,76.79
+Pablo Garcia,6,Javi Hernández,2025-26,CD Mirandés,,Extremo,21.0,cesion,2023.0,7.0,5.71,500000.0,,76.64
+Pablo Garcia,7,N. Carrillo,2025-26,Deportivo Alavés,,Extremo,19.0,sub23_wyscout,203.0,1.0,0.11,0.0,,75.54
+Pablo Garcia,8,Víctor Moreno,2025-26,Cultural Leonesa,,Extremo,20.0,cesion,820.0,2.0,1.39,250000.0,,75.44
+Pablo Garcia,9,José De La Rosa,2024-25,Cádiz CF,Pako Ayestarán,Extremo,21.0,sub23_wyscout,935.0,1.0,2.41,0.0,,75.24
+Pablo Garcia,10,Dani Fernández,2024-25,CD Tenerife,Óscar Cano,Extremo,18.0,sub23_wyscout,361.0,1.0,0.35,0.0,,74.23
+I. Amores,1,D. Sia,2025-26,CD Mirandés,,Extremo,20.0,sub23_wyscout,225.0,0.0,0.57,0.0,,93.12
+I. Amores,2,Álex Lozano,2023-24,Sporting Gijón,David Gallego,Extremo,20.0,sub23_wyscout,109.0,0.0,0.08,0.0,,92.87
+I. Amores,3,W. Chatiliez,2024-25,FC Cartagena,,Extremo,20.0,sub23_wyscout,129.0,1.0,0.21,0.0,,92.43
+I. Amores,4,Víctor Moreno,2023-24,Cultural Leonesa,,Extremo,20.0,sub23_wyscout,214.0,1.0,0.34,0.0,,92.31
+I. Amores,5,N. Carrillo,2025-26,Deportivo Alavés,,Extremo,19.0,sub23_wyscout,203.0,1.0,0.11,0.0,,88.36
+I. Amores,6,D. Díaz,2024-25,Racing Santander,,Extremo,20.0,sub23_wyscout,42.0,0.0,0.2,0.0,,88.16
+I. Amores,7,Jesús Belza,2023-24,CD Tenerife,Luis Miguel Ramis,Extremo,21.0,sub23_wyscout,356.0,0.0,0.03,0.0,,86.74
+I. Amores,8,Álex Calvo,2022-23,FC Andorra,Eder Sarabia,Extremo,21.0,sub23_wyscout,307.0,1.0,0.43,0.0,,86.06
+I. Amores,9,Borja Vázquez,2024-25,SD Ponferradina,,Extremo,20.0,sub23_wyscout,22.0,0.0,0.02,0.0,,85.0
+I. Amores,10,L. Quintero,2023-24,Villarreal CF B,,Extremo,21.0,sub23_wyscout,471.0,0.0,0.92,0.0,,84.77
+M. Hamdoune,1,Matia Barzic,2024-25,Cultural Leonesa,,Central,21.0,sub23_wyscout,1839.0,0.0,0.37,0.0,,92.04
+M. Hamdoune,2,Jorge Cabello,2023-24,CD Mirandés,Sergio Pellicer,Central,21.0,sub23_wyscout,542.0,0.0,0.01,0.0,,91.55
+M. Hamdoune,3,B. Kovačević,2025-26,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2004.0,0.0,0.57,0.0,,91.45
+M. Hamdoune,4,B. Kovačević,2024-25,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2521.0,0.0,0.93,0.0,,90.0
+M. Hamdoune,5,Oscar Naasei,2024-25,Granada CF,Fran Escribá,Central,21.0,sub23_wyscout,359.0,0.0,0.0,0.0,,89.49
+M. Hamdoune,6,Marc Bombardó,2025-26,FC Andorra,,Central,20.0,sub23_wyscout,1437.0,0.0,0.64,0.0,,88.68
+M. Hamdoune,7,Jorge Cabello,2024-25,CD Mirandés,Míchel Alonso,Central,22.0,sub23_wyscout,1642.0,0.0,0.03,0.0,,88.52
+M. Hamdoune,8,L. Noubi,2025-26,Deportivo de La Coruña,Óscar Gilsanz,Central,21.0,sub23_wyscout,2274.0,1.0,2.17,0.0,,88.23
+M. Hamdoune,9,Juanma Herzog,2025-26,UD Las Palmas,,Central,22.0,sub23_wyscout,665.0,0.0,0.15,0.0,,88.1
+M. Hamdoune,10,Jorge Cabello,2025-26,CD Mirandés,,Central,21.0,cesion,2078.0,0.0,0.45,900000.0,,86.37
+Adrian Martin,1,M. Jiménez Gambín,2025-26,Granada CF,,Centrocampista,19.0,sub23_wyscout,68.0,0.0,0.0,0.0,,93.56
+Adrian Martin,2,F. Garcia Moreno,2025-26,Albacete Balompié,,Centrocampista,18.0,sub23_wyscout,48.0,0.0,0.01,0.0,,90.12
+Adrian Martin,3,D. Carballo,2024-25,Real Valladolid CF,Diego Cocca,Centrocampista,20.0,sub23_wyscout,36.0,0.0,0.0,0.0,,88.71
+Adrian Martin,4,N. Riestra,2025-26,Sporting Gijón,,Centrocampista,18.0,sub23_wyscout,28.0,0.0,0.0,0.0,,87.49
+Adrian Martin,5,J. Antras Santos,2025-26,Córdoba CF,,Centrocampista,19.0,sub23_wyscout,9.0,0.0,0.0,0.0,,86.54
+Adrian Martin,6,L. Terrer Casas,2024-25,Real Zaragoza,Víctor Fernández,Centrocampista,20.0,sub23_wyscout,18.0,0.0,0.0,0.0,,85.38
+Adrian Martin,7,D. Díaz,2025-26,Racing Santander,,Centrocampista,21.0,sub23_wyscout,38.0,0.0,0.03,0.0,,84.62
+Adrian Martin,8,I. Alani,2025-26,Real Valladolid CF,Diego Cocca,Centrocampista,19.0,sub23_wyscout,446.0,0.0,0.09,0.0,,84.3
+Adrian Martin,9,S. Martínez,2025-26,Racing Santander,,Centrocampista,19.0,sub23_wyscout,451.0,0.0,0.21,0.0,,84.22
+Adrian Martin,10,P. Mbemba,2025-26,Sporting Gijón,,Centrocampista,21.0,sub23_wyscout,79.0,0.0,0.08,0.0,,84.14
+V. Răfăilă,1,Carlos López,2024-25,Málaga CF,,Portero,21.0,sub23_wyscout,97.0,0.0,0.0,0.0,,94.56
+V. Răfăilă,2,Rubén Gómez,2023-24,Villarreal CF B,,Portero,21.0,sub23_wyscout,97.0,0.0,0.0,0.0,,94.56
+V. Răfăilă,3,L. Gómez,2025-26,Racing Santander,,Portero,19.0,sub23_wyscout,104.0,0.0,0.0,0.0,,86.16
+V. Răfăilă,4,Antal Yaakobishvili,2025-26,FC Andorra,,Portero,21.0,cesion,2053.0,0.0,0.0,0.0,,85.23
+V. Răfăilă,5,S. Eriksson,2025-26,Racing Santander,,Portero,20.0,sub23_wyscout,613.0,0.0,0.0,0.0,,81.89
+V. Răfăilă,6,Álvaro Aceves,2024-25,Real Valladolid CF,Diego Cocca,Portero,22.0,sub23_wyscout,70.0,0.0,0.0,600000.0,,78.57
+V. Răfăilă,7,Ander Astralaga,2025-26,Granada CF,,Portero,21.0,cesion,1423.0,0.0,0.0,800000.0,,77.06
+V. Răfăilă,8,Dani Martín,2025-26,SD Huesca,,Portero,19.0,cesion,410.0,0.0,0.0,300000.0,,74.52
+V. Răfăilă,9,Álvaro Aceves,2023-24,Real Valladolid CF,Paulo Pezzolano,Portero,22.0,sub23_wyscout,1416.0,0.0,0.0,600000.0,,67.71
+V. Răfăilă,10,Adri Suárez,2025-26,UD Las Palmas,,Portero,20.0,libre,0.0,0.0,0.0,0.0,,67.26
+Antonio Toral,1,Mario Cantero,2024-25,Burgos CF,José Alberto,Extremo,22.0,libre,363.0,0.0,0.01,0.0,,93.51
+Antonio Toral,2,L. Quintero,2023-24,Villarreal CF B,,Extremo,21.0,sub23_wyscout,471.0,0.0,0.92,0.0,,90.06
+Antonio Toral,3,Jesús Belza,2023-24,CD Tenerife,Luis Miguel Ramis,Extremo,21.0,sub23_wyscout,356.0,0.0,0.03,0.0,,89.05
+Antonio Toral,4,Álex Calvo,2022-23,FC Andorra,Eder Sarabia,Extremo,21.0,sub23_wyscout,307.0,1.0,0.43,0.0,,87.15
+Antonio Toral,5,Dani Requena,2023-24,Córdoba CF,,Extremo,22.0,sub23_wyscout,1549.0,1.0,2.79,0.0,,85.68
+Antonio Toral,6,José De La Rosa,2024-25,Cádiz CF,Pako Ayestarán,Extremo,21.0,sub23_wyscout,935.0,1.0,2.41,0.0,,84.14
+Antonio Toral,7,D. Sia,2025-26,CD Mirandés,,Extremo,20.0,sub23_wyscout,225.0,0.0,0.57,0.0,,82.36
+Antonio Toral,8,Alberto Moleiro,2022-23,Villarreal CF B,Miguel Álvarez,Extremo,22.0,sub23_wyscout,2876.0,0.0,4.87,0.0,,82.11
+Antonio Toral,9,Jastin García Lopez,2025-26,FC Andorra,,Extremo,22.0,sub23_wyscout,1518.0,3.0,4.32,0.0,,82.01
+Antonio Toral,10,T. De Nipoti,2025-26,CD Castellón,,Extremo,22.0,sub23_wyscout,244.0,0.0,0.17,200000.0,,81.66
+D. Traoré,1,Miguel Conde,2025-26,Sporting Gijón,,Mediapunta,20.0,sub23_wyscout,80.0,0.0,0.0,0.0,,89.13
+D. Traoré,2,L. Terrer Casas,2023-24,Real Zaragoza,Víctor Fernández,Mediapunta,20.0,sub23_wyscout,175.0,0.0,0.07,0.0,,88.18
+D. Traoré,3,Alejandro Morante,2025-26,Cultural Leonesa,,Mediapunta,20.0,sub23_wyscout,61.0,0.0,0.03,0.0,,87.79
+D. Traoré,4,Hugo Pinilla,2024-25,Real Zaragoza,Víctor Fernández,Mediapunta,19.0,sub23_wyscout,20.0,0.0,0.0,0.0,,86.76
+D. Traoré,5,Paco Cortés,2025-26,Levante UD,Julián Calero,Mediapunta,18.0,sub23_wyscout,176.0,2.0,0.54,0.0,,85.26
+D. Traoré,6,Dani Fernández,2023-24,CD Tenerife,Luis Miguel Ramis,Mediapunta,18.0,sub23_wyscout,24.0,0.0,0.34,0.0,,82.99
+D. Traoré,7,Dylan Perera,2023-24,CD Tenerife,Luis Miguel Ramis,Mediapunta,21.0,sub23_wyscout,39.0,0.0,0.0,0.0,,81.23
+D. Traoré,8,D. Fuentes,2025-26,Racing Santander,,Mediapunta,22.0,sub23_wyscout,94.0,0.0,0.27,0.0,,80.97
+D. Traoré,9,E. Ortiz Prendes,2025-26,Sporting Gijón,,Mediapunta,21.0,sub23_wyscout,28.0,0.0,0.0,0.0,,79.62
+D. Traoré,10,N. Tounkara Diarrá,2024-25,AD Alcorcón,,Mediapunta,21.0,sub23_wyscout,25.0,0.0,0.0,0.0,,79.08
+Y. Koré,1,Pelayo Fernández,2025-26,Cádiz CF,Pako Ayestarán,Central,22.0,cesion,878.0,1.0,1.22,500000.0,,93.81
+Y. Koré,2,Jorge Cabello,2025-26,CD Mirandés,,Central,21.0,cesion,2078.0,0.0,0.45,900000.0,,93.42
+Y. Koré,3,Matia Barzic,2025-26,Cultural Leonesa,,Central,21.0,cesion,3093.0,2.0,1.25,500000.0,,90.62
+Y. Koré,4,Adrián Pica,2025-26,CD Mirandés,,Central,23.0,cesion,578.0,1.0,0.28,1200000.0,,89.1
+Y. Koré,5,Diego Sánchez,2023-24,Sporting Gijón,David Gallego,Central,22.0,sub23_wyscout,1510.0,0.0,0.38,600000.0,,85.08
+Y. Koré,6,Iker Córdoba,2025-26,CD Mirandés,,Central,19.0,cesion,1463.0,0.0,0.89,100000.0,,83.9
+Y. Koré,7,Andrés Cuenca,2025-26,Sporting Gijón,,Central,18.0,cesion,697.0,0.0,0.4,500000.0,,83.87
+Y. Koré,8,Diego Sánchez,2024-25,Sporting Gijón,Rubén Albés,Central,22.0,sub23_wyscout,2701.0,1.0,0.53,600000.0,,83.55
+Y. Koré,9,Loïc Williams,2024-25,Granada CF,Fran Escribá,Central,22.0,traspaso,2671.0,1.0,0.59,500000.0,,83.43
+Y. Koré,10,F. González,2025-26,Racing Santander,,Central,22.0,sub23_wyscout,2139.0,1.0,3.43,2000000.0,,82.52
+Marcos Solís,1,Álex López,2024-25,Córdoba CF,Iván Ania,Lateral,20.0,sub23_wyscout,102.0,0.0,0.0,0.0,,93.84
+Marcos Solís,2,Juan Carlos Sabater,2023-24,Real Zaragoza,Víctor Fernández,Lateral,20.0,sub23_wyscout,54.0,0.0,0.05,0.0,,90.66
+Marcos Solís,3,Pere Haro,2025-26,CD Lugo,,Lateral,21.0,sub23_wyscout,147.0,0.0,0.01,0.0,,89.97
+Marcos Solís,4,Marc Aznar,2025-26,SD Huesca,,Lateral,20.0,sub23_wyscout,45.0,0.0,0.47,0.0,,89.41
+Marcos Solís,5,H. San Modesto,2025-26,Real Valladolid CF,Diego Cocca,Lateral,20.0,sub23_wyscout,651.0,0.0,0.18,0.0,,86.79
+Marcos Solís,6,I. Fadel,2025-26,CD Castellón,,Lateral,22.0,sub23_wyscout,140.0,0.0,0.0,0.0,,85.84
+Marcos Solís,7,Buba Sangaré,2023-24,Elche CF,Sebastián Beccacece,Lateral,18.0,sub23_wyscout,107.0,0.0,0.0,0.0,,85.32
+Marcos Solís,8,J. Díaz Peregrina,2025-26,Cádiz CF,Pako Ayestarán,Lateral,20.0,sub23_wyscout,935.0,0.0,0.05,0.0,,85.09
+Marcos Solís,9,M. Timorán Paz,2025-26,Córdoba CF,,Lateral,19.0,sub23_wyscout,40.0,0.0,0.0,0.0,,84.86
+Marcos Solís,10,Iván Garriel,2023-24,Real Valladolid CF,Paulo Pezzolano,Lateral,20.0,sub23_wyscout,16.0,0.0,0.0,0.0,,84.83
+M. Mensah,1,Mario García,2025-26,Racing Santander,,Lateral,22.0,sub23_wyscout,1353.0,0.0,0.44,0.0,,94.42
+M. Mensah,2,Jorge Cabello,2024-25,CD Mirandés,Míchel Alonso,Central,22.0,sub23_wyscout,1642.0,0.0,0.03,0.0,,93.15
+M. Mensah,3,César Álvarez,2024-25,CD Tenerife,Óscar Cano,Lateral,22.0,sub23_wyscout,793.0,0.0,0.57,0.0,,92.77
+M. Mensah,4,M. Mensah,2025-26,Real Zaragoza,,Centrocampista,22.0,sub23_wyscout,767.0,0.0,0.51,0.0,,92.65
+M. Mensah,5,Antal Yaakobishvili,2025-26,FC Andorra,,Portero,21.0,cesion,2053.0,0.0,0.0,0.0,,92.63
+M. Mensah,6,Juanma Herzog,2025-26,UD Las Palmas,,Central,22.0,sub23_wyscout,665.0,0.0,0.15,0.0,,91.79
+M. Mensah,7,M. Diakité,2024-25,Cádiz CF,Pako Ayestarán,Centrocampista,22.0,sub23_wyscout,1572.0,2.0,0.25,0.0,,91.05
+M. Mensah,8,Marcos Luna,2024-25,UD Almería,Rubén Albés,Lateral,22.0,sub23_wyscout,1597.0,2.0,0.69,0.0,,90.88
+M. Mensah,9,Javi Hernández,2024-25,CD Mirandés,Míchel Alonso,Centrocampista,22.0,sub23_wyscout,1478.0,1.0,2.73,0.0,,90.82
+M. Mensah,10,Salim El Jebari,2024-25,CD Mirandés,Míchel Alonso,Delantero,22.0,sub23_wyscout,896.0,2.0,0.97,0.0,,90.55
+Ismael Barea,1,S. Eriksson,2025-26,Racing Santander,,Portero,20.0,sub23_wyscout,613.0,0.0,0.0,0.0,,92.73
+Ismael Barea,2,J. Dómina,2025-26,Cádiz CF,Pako Ayestarán,Delantero,20.0,sub23_wyscout,250.0,0.0,0.21,0.0,,92.62
+Ismael Barea,3,H. San Modesto,2025-26,Real Valladolid CF,Diego Cocca,Lateral,20.0,sub23_wyscout,651.0,0.0,0.18,0.0,,92.43
+Ismael Barea,4,L. Terrer Casas,2025-26,Real Zaragoza,,Centrocampista,20.0,sub23_wyscout,214.0,0.0,0.13,0.0,,91.91
+Ismael Barea,5,D. Sia,2025-26,CD Mirandés,,Extremo,20.0,sub23_wyscout,225.0,0.0,0.57,0.0,,91.8
+Ismael Barea,6,L. Terrer Casas,2023-24,Real Zaragoza,Víctor Fernández,Mediapunta,20.0,sub23_wyscout,175.0,0.0,0.07,0.0,,90.93
+Ismael Barea,7,J. Díaz Peregrina,2025-26,Cádiz CF,Pako Ayestarán,Lateral,20.0,sub23_wyscout,935.0,0.0,0.05,0.0,,90.67
+Ismael Barea,8,Víctor Moreno,2023-24,Cultural Leonesa,,Extremo,20.0,sub23_wyscout,214.0,1.0,0.34,0.0,,90.49
+Ismael Barea,9,Oscar Naasei,2024-25,Granada CF,Fran Escribá,Central,21.0,sub23_wyscout,359.0,0.0,0.0,0.0,,90.07
+Ismael Barea,10,Jesús Belza,2023-24,CD Tenerife,Luis Miguel Ramis,Extremo,21.0,sub23_wyscout,356.0,0.0,0.03,0.0,,90.06
+Carlos Reina,1,B. Nsongo Tonfack,2025-26,Deportivo Alavés,,Delantero,21.0,sub23_wyscout,997.0,6.0,3.81,0.0,,91.06
+Carlos Reina,2,Rafa Rodríguez,2025-26,Málaga CF,,Delantero,21.0,sub23_wyscout,1513.0,4.0,2.28,0.0,,89.37
+Carlos Reina,3,Joel Roca,2024-25,Girona FC,,Delantero,20.0,sub23_wyscout,2033.0,6.0,6.63,0.0,,88.66
+Carlos Reina,4,M. Kim,2025-26,FC Andorra,,Delantero,20.0,sub23_wyscout,2600.0,6.0,6.51,0.0,,87.53
+Carlos Reina,5,Jorge Pascual,2023-24,Granada CF,,Delantero,22.0,sub23_wyscout,2708.0,4.0,5.03,0.0,,85.26
+Carlos Reina,6,Chuki,2025-26,Real Valladolid CF,Diego Cocca,Delantero,22.0,sub23_wyscout,2552.0,8.0,7.6,0.0,,84.21
+Carlos Reina,7,Chupe,2024-25,Málaga CF,,Delantero,20.0,sub23_wyscout,1054.0,4.0,2.98,0.0,,83.77
+Carlos Reina,8,G. Petit,2025-26,Granada CF,,Delantero,19.0,sub23_wyscout,1675.0,7.0,4.03,0.0,,83.7
+Carlos Reina,9,Salim El Jebari,2024-25,CD Mirandés,Míchel Alonso,Delantero,22.0,sub23_wyscout,896.0,2.0,0.97,0.0,,78.78
+Carlos Reina,10,Unax Del Cura,2025-26,CD Mirandés,,Delantero,20.0,sub23_wyscout,1034.0,5.0,5.27,25000.0,,76.83
+M. Kamara Rodriguez,1,Sergio Gabriel,2024-25,CD Mirandés,Míchel Alonso,Extremo,22.0,sub23_wyscout,14.0,0.0,0.0,0.0,,85.7
+M. Kamara Rodriguez,2,Mario Cantero,2024-25,Burgos CF,José Alberto,Extremo,22.0,libre,363.0,0.0,0.01,0.0,,85.45
+M. Kamara Rodriguez,3,E. Eyong,2024-25,Levante UD,Julián Calero,Extremo,22.0,sub23_wyscout,9.0,0.0,0.0,0.0,,83.67
+M. Kamara Rodriguez,4,W. Chatiliez,2024-25,FC Cartagena,,Extremo,20.0,sub23_wyscout,129.0,1.0,0.21,0.0,,83.26
+M. Kamara Rodriguez,5,Álex Calvo,2022-23,FC Andorra,Eder Sarabia,Extremo,21.0,sub23_wyscout,307.0,1.0,0.43,0.0,,83.21
+M. Kamara Rodriguez,6,Álex Lozano,2023-24,Sporting Gijón,David Gallego,Extremo,20.0,sub23_wyscout,109.0,0.0,0.08,0.0,,82.74
+M. Kamara Rodriguez,7,D. Díaz,2024-25,Racing Santander,,Extremo,20.0,sub23_wyscout,42.0,0.0,0.2,0.0,,82.38
+M. Kamara Rodriguez,8,Jesús Belza,2023-24,CD Tenerife,Luis Miguel Ramis,Extremo,21.0,sub23_wyscout,356.0,0.0,0.03,0.0,,81.19
+M. Kamara Rodriguez,9,W. Chatiliez,2025-26,FC Cartagena,,Extremo,21.0,sub23_wyscout,13.0,0.0,0.0,0.0,,80.98
+M. Kamara Rodriguez,10,Víctor Moreno,2023-24,Cultural Leonesa,,Extremo,20.0,sub23_wyscout,214.0,1.0,0.34,0.0,,80.71
+Yanis Senhadji,1,Ayman Arguigue,2024-25,Villarreal CF B,,Delantero,21.0,sub23_wyscout,135.0,0.0,1.12,0.0,,92.72
+Yanis Senhadji,2,S. De La Torre,2025-26,Racing Santander,,Delantero,21.0,sub23_wyscout,129.0,0.0,0.01,0.0,,92.52
+Yanis Senhadji,3,Siren Diao,2024-25,CD Mirandés,Míchel Alonso,Delantero,21.0,sub23_wyscout,210.0,2.0,1.45,0.0,,91.36
+Yanis Senhadji,4,J. Recoba,2025-26,UD Las Palmas,,Delantero,22.0,sub23_wyscout,210.0,0.0,0.23,0.0,,89.96
+Yanis Senhadji,5,Julen Martínez,2025-26,CD Mirandés,,Delantero,21.0,sub23_wyscout,75.0,0.0,0.16,0.0,,89.96
+Yanis Senhadji,6,K. Sánchez,2024-25,FC Cartagena,,Delantero,20.0,sub23_wyscout,160.0,0.0,0.67,0.0,,89.57
+Yanis Senhadji,7,Pau Sans,2022-23,Real Zaragoza,Lluís Carreras,Delantero,20.0,sub23_wyscout,147.0,0.0,0.5,0.0,,89.2
+Yanis Senhadji,8,J. Dómina,2025-26,Cádiz CF,Pako Ayestarán,Delantero,20.0,sub23_wyscout,250.0,0.0,0.21,0.0,,89.08
+Yanis Senhadji,9,Pau Sans,2023-24,Real Zaragoza,Víctor Fernández,Delantero,21.0,sub23_wyscout,57.0,0.0,0.26,0.0,,88.7
+Yanis Senhadji,10,Ángel Carvajal,2025-26,Real Valladolid CF,Diego Cocca,Delantero,22.0,sub23_wyscout,200.0,1.0,1.55,0.0,,88.39
+Ginés Sorroche,1,Javi Hernández,2024-25,CD Mirandés,Míchel Alonso,Centrocampista,22.0,sub23_wyscout,1478.0,1.0,2.73,0.0,,91.97
+Ginés Sorroche,2,M. Diakité,2024-25,Cádiz CF,Pako Ayestarán,Centrocampista,22.0,sub23_wyscout,1572.0,2.0,0.25,0.0,,91.67
+Ginés Sorroche,3,M. Mensah,2025-26,Real Zaragoza,,Centrocampista,22.0,sub23_wyscout,767.0,0.0,0.51,0.0,,91.65
+Ginés Sorroche,4,M. Diakité,2025-26,Cádiz CF,Pako Ayestarán,Centrocampista,22.0,sub23_wyscout,2985.0,2.0,0.88,0.0,,88.75
+Ginés Sorroche,5,Marcelo Expósito,2024-25,Burgos CF,José Alberto,Centrocampista,21.0,sub23_wyscout,892.0,2.0,0.38,0.0,,87.92
+Ginés Sorroche,6,Damián Rodríguez,2025-26,Racing Santander,,Centrocampista,22.0,cesion,1045.0,0.0,0.17,2000000.0,,87.91
+Ginés Sorroche,7,Iván Martín,2021-22,Girona FC,Michel,Centrocampista,22.0,cesion,1193.0,0.0,1.65,800000.0,,87.69
+Ginés Sorroche,8,L. Amatucci,2025-26,UD Las Palmas,,Centrocampista,22.0,sub23_wyscout,3632.0,0.0,1.14,0.0,,87.56
+Ginés Sorroche,9,Dani Lorenzo,2021-22,Málaga CF,José Alberto,Centrocampista,22.0,sub23_wyscout,362.0,0.0,0.05,0.0,,87.52
+Ginés Sorroche,10,Antonio Blanco,2022-23,Deportivo Alavés,Luis García Plaza,Centrocampista,22.0,cesion,1485.0,0.0,0.22,3500000.0,,86.93
+Jorge Luis,1,J. Dómina,2025-26,Cádiz CF,Pako Ayestarán,Delantero,20.0,sub23_wyscout,250.0,0.0,0.21,0.0,,88.96
+Jorge Luis,2,K. Sánchez,2024-25,FC Cartagena,,Delantero,20.0,sub23_wyscout,160.0,0.0,0.67,0.0,,87.12
+Jorge Luis,3,Baba Diocou,2025-26,Granada CF,,Delantero,20.0,cesion,565.0,1.0,1.69,200000.0,,86.81
+Jorge Luis,4,Pau Sans,2022-23,Real Zaragoza,Lluís Carreras,Delantero,20.0,sub23_wyscout,147.0,0.0,0.5,0.0,,86.56
+Jorge Luis,5,Chupe,2024-25,Málaga CF,,Delantero,20.0,sub23_wyscout,1054.0,4.0,2.98,0.0,,86.55
+Jorge Luis,6,Adam Boayar,2024-25,Elche CF,,Delantero,20.0,sub23_wyscout,104.0,1.0,0.53,0.0,,83.62
+Jorge Luis,7,Iker Bravo,2025-26,UD Las Palmas,,Delantero,21.0,cesion,488.0,0.0,0.9,5000000.0,,83.5
+Jorge Luis,8,Dani Lorenzo,2024-25,Málaga CF,,Delantero,22.0,sub23_wyscout,533.0,1.0,1.2,0.0,,83.18
+Jorge Luis,9,Salim El Jebari,2024-25,CD Mirandés,Míchel Alonso,Delantero,22.0,sub23_wyscout,896.0,2.0,0.97,0.0,,82.79
+Jorge Luis,10,Ayman Arguigue,2024-25,Villarreal CF B,,Delantero,21.0,sub23_wyscout,135.0,0.0,1.12,0.0,,82.03
+F. Embalo Muñoz,1,Marc Bombardó,2025-26,FC Andorra,,Central,20.0,sub23_wyscout,1437.0,0.0,0.64,0.0,,92.14
+F. Embalo Muñoz,2,Y. Saidu,2025-26,Real Zaragoza,,Central,20.0,sub23_wyscout,2159.0,1.0,0.96,0.0,,88.59
+F. Embalo Muñoz,3,Jorge Cabello,2023-24,CD Mirandés,Sergio Pellicer,Central,21.0,sub23_wyscout,542.0,0.0,0.01,0.0,,88.09
+F. Embalo Muñoz,4,Matia Barzic,2024-25,Cultural Leonesa,,Central,21.0,sub23_wyscout,1839.0,0.0,0.37,0.0,,86.47
+F. Embalo Muñoz,5,B. Kovačević,2025-26,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2004.0,0.0,0.57,0.0,,86.16
+F. Embalo Muñoz,6,Oscar Naasei,2024-25,Granada CF,Fran Escribá,Central,21.0,sub23_wyscout,359.0,0.0,0.0,0.0,,86.03
+F. Embalo Muñoz,7,A. Furtado,2025-26,Real Zaragoza,,Central,18.0,sub23_wyscout,802.0,0.0,0.0,0.0,,85.66
+F. Embalo Muñoz,8,Unax Ayo,2025-26,Real Sociedad B,,Central,18.0,sub23_wyscout,901.0,0.0,0.37,0.0,,85.66
+F. Embalo Muñoz,9,Juanma Herzog,2025-26,UD Las Palmas,,Central,22.0,sub23_wyscout,665.0,0.0,0.15,0.0,,84.85
+F. Embalo Muñoz,10,B. Kovačević,2024-25,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2521.0,0.0,0.93,0.0,,84.71
+K. Sosu,1,Chupe,2024-25,Málaga CF,,Delantero,20.0,sub23_wyscout,1054.0,4.0,2.98,0.0,,91.33
+K. Sosu,2,J. Díaz Peregrina,2025-26,Cádiz CF,Pako Ayestarán,Lateral,20.0,sub23_wyscout,935.0,0.0,0.05,0.0,,90.28
+K. Sosu,3,Jon Eceizabarrena,2025-26,Real Sociedad B,,Mediapunta,20.0,sub23_wyscout,1224.0,0.0,0.75,0.0,,89.52
+K. Sosu,4,Aarón Ochoa,2025-26,Málaga CF,,Extremo,19.0,sub23_wyscout,847.0,2.0,1.32,0.0,,89.32
+K. Sosu,5,E. Akman,2025-26,FC Andorra,,Centrocampista,20.0,sub23_wyscout,1585.0,1.0,0.51,0.0,,89.28
+K. Sosu,6,José De La Rosa,2024-25,Cádiz CF,Pako Ayestarán,Extremo,21.0,sub23_wyscout,935.0,1.0,2.41,0.0,,89.13
+K. Sosu,7,David Mella,2025-26,Deportivo de La Coruña,Óscar Gilsanz,Mediapunta,20.0,sub23_wyscout,1747.0,4.0,2.19,0.0,,88.94
+K. Sosu,8,H. San Modesto,2025-26,Real Valladolid CF,Diego Cocca,Lateral,20.0,sub23_wyscout,651.0,0.0,0.18,0.0,,88.93
+K. Sosu,9,Marcelo Expósito,2024-25,Burgos CF,José Alberto,Centrocampista,21.0,sub23_wyscout,892.0,2.0,0.38,0.0,,88.8
+K. Sosu,10,Marc Bombardó,2025-26,FC Andorra,,Central,20.0,sub23_wyscout,1437.0,0.0,0.64,0.0,,88.63
+G. Bouare Samake,1,Antal Yaakobishvili,2025-26,FC Andorra,,Portero,21.0,cesion,2053.0,0.0,0.0,0.0,,94.7
+G. Bouare Samake,2,S. Džodić,2025-26,UD Almería,,Centrocampista,21.0,sub23_wyscout,2364.0,1.0,0.85,0.0,,92.36
+G. Bouare Samake,3,L. Noubi,2025-26,Deportivo de La Coruña,Óscar Gilsanz,Central,21.0,sub23_wyscout,2274.0,1.0,2.17,0.0,,92.22
+G. Bouare Samake,4,José De La Rosa,2025-26,Cádiz CF,Pako Ayestarán,Extremo,21.0,sub23_wyscout,1541.0,2.0,1.97,0.0,,91.69
+G. Bouare Samake,5,B. Kovačević,2024-25,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2521.0,0.0,0.93,0.0,,91.5
+G. Bouare Samake,6,B. Kovačević,2025-26,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2004.0,0.0,0.57,0.0,,90.05
+G. Bouare Samake,7,M. Diakité,2025-26,Cádiz CF,Pako Ayestarán,Centrocampista,22.0,sub23_wyscout,2985.0,2.0,0.88,0.0,,89.72
+G. Bouare Samake,8,Matia Barzic,2024-25,Cultural Leonesa,,Central,21.0,sub23_wyscout,1839.0,0.0,0.37,0.0,,89.45
+G. Bouare Samake,9,Matia Barzic,2025-26,Cultural Leonesa,,Central,21.0,cesion,3093.0,2.0,1.25,500000.0,,89.23
+G. Bouare Samake,10,Dani Requena,2025-26,Córdoba CF,,Centrocampista,21.0,cesion,2735.0,2.0,2.78,400000.0,,88.88
+José Morante,1,Antonio Cordero,2024-25,Cádiz CF,Pako Ayestarán,Extremo,19.0,sub23_wyscout,2303.0,6.0,7.07,0.0,,88.35
+José Morante,2,David Mella,2024-25,Deportivo de La Coruña,Óscar Gilsanz,Extremo,20.0,sub23_wyscout,2886.0,6.0,7.03,0.0,,82.88
+José Morante,3,Lander Astiazaran,2025-26,Real Sociedad B,,Extremo,19.0,sub23_wyscout,2809.0,6.0,4.86,150000.0,,79.2
+José Morante,4,Aarón Ochoa,2025-26,Málaga CF,,Extremo,19.0,sub23_wyscout,847.0,2.0,1.32,0.0,,78.11
+José Morante,5,Antoñito Cordero,2025-26,Cádiz CF,Pako Ayestarán,Extremo,19.0,cesion,1407.0,3.0,2.12,2000000.0,,77.56
+José Morante,6,Dani Fernández,2024-25,CD Tenerife,Óscar Cano,Extremo,18.0,sub23_wyscout,361.0,1.0,0.35,0.0,,76.17
+José Morante,7,Javi Hernández,2025-26,CD Mirandés,,Extremo,21.0,cesion,2023.0,7.0,5.71,500000.0,,74.08
+José Morante,8,José De La Rosa,2025-26,Cádiz CF,Pako Ayestarán,Extremo,21.0,sub23_wyscout,1541.0,2.0,1.97,0.0,,72.89
+José Morante,9,Alberto Moleiro,2021-22,Villarreal CF B,Miguel Álvarez,Extremo,22.0,sub23_wyscout,2182.0,3.0,3.58,0.0,,72.84
+José Morante,10,Jastin García Lopez,2025-26,FC Andorra,,Extremo,22.0,sub23_wyscout,1518.0,3.0,4.32,0.0,,71.65
+Manu González,1,Antal Yaakobishvili,2025-26,FC Andorra,,Portero,21.0,cesion,2053.0,0.0,0.0,0.0,,88.87
+Manu González,2,Áron Yaakobishvili,2025-26,FC Andorra,,Portero,19.0,cesion,2053.0,0.0,0.0,300000.0,,87.62
+Manu González,3,S. Eriksson,2025-26,Racing Santander,,Portero,20.0,sub23_wyscout,613.0,0.0,0.0,0.0,,82.2
+Manu González,4,Dani Martín,2025-26,SD Huesca,,Portero,19.0,cesion,410.0,0.0,0.0,300000.0,,79.57
+Manu González,5,L. Gómez,2025-26,Racing Santander,,Portero,19.0,sub23_wyscout,104.0,0.0,0.0,0.0,,77.75
+Manu González,6,Ander Astralaga,2025-26,Granada CF,,Portero,21.0,cesion,1423.0,0.0,0.0,800000.0,,77.03
+Manu González,7,Victor Aznar,2025-26,Cádiz CF,Pako Ayestarán,Portero,22.0,sub23_wyscout,3367.0,0.0,0.0,100000.0,,71.79
+Manu González,8,Carlos López,2024-25,Málaga CF,,Portero,21.0,sub23_wyscout,97.0,0.0,0.0,0.0,,68.65
+Manu González,9,Rubén Gómez,2023-24,Villarreal CF B,,Portero,21.0,sub23_wyscout,97.0,0.0,0.0,0.0,,68.65
+Manu González,10,Guilherme Fernandes,2025-26,Real Valladolid CF,Diego Cocca,Portero,24.0,cesion,3097.0,0.0,0.0,150000.0,,67.8
+Jorge Oreiro,1,Y. Saidu,2025-26,Real Zaragoza,,Central,20.0,sub23_wyscout,2159.0,1.0,0.96,0.0,,93.1
+Jorge Oreiro,2,Marc Bombardó,2025-26,FC Andorra,,Central,20.0,sub23_wyscout,1437.0,0.0,0.64,0.0,,92.05
+Jorge Oreiro,3,B. Kovačević,2024-25,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2521.0,0.0,0.93,0.0,,90.01
+Jorge Oreiro,4,B. Kovačević,2025-26,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2004.0,0.0,0.57,0.0,,89.28
+Jorge Oreiro,5,Matia Barzic,2024-25,Cultural Leonesa,,Central,21.0,sub23_wyscout,1839.0,0.0,0.37,0.0,,88.68
+Jorge Oreiro,6,L. Noubi,2025-26,Deportivo de La Coruña,Óscar Gilsanz,Central,21.0,sub23_wyscout,2274.0,1.0,2.17,0.0,,88.44
+Jorge Oreiro,7,Jorge Cabello,2025-26,CD Mirandés,,Central,21.0,cesion,2078.0,0.0,0.45,900000.0,,84.36
+Jorge Oreiro,8,David Torres,2023-24,Real Valladolid CF,Paulo Pezzolano,Central,20.0,sub23_wyscout,2024.0,0.0,0.33,50000.0,,83.5
+Jorge Oreiro,9,Jorge Cabello,2024-25,CD Mirandés,Míchel Alonso,Central,22.0,sub23_wyscout,1642.0,0.0,0.03,0.0,,83.46
+Jorge Oreiro,10,Iker Córdoba,2025-26,CD Mirandés,,Central,19.0,cesion,1463.0,0.0,0.89,100000.0,,82.97
+German García,1,Antal Yaakobishvili,2025-26,FC Andorra,,Portero,21.0,cesion,2053.0,0.0,0.0,0.0,,88.81
+German García,2,S. Eriksson,2025-26,Racing Santander,,Portero,20.0,sub23_wyscout,613.0,0.0,0.0,0.0,,85.48
+German García,3,Carlos López,2024-25,Málaga CF,,Portero,21.0,sub23_wyscout,97.0,0.0,0.0,0.0,,82.22
+German García,4,Rubén Gómez,2023-24,Villarreal CF B,,Portero,21.0,sub23_wyscout,97.0,0.0,0.0,0.0,,82.22
+German García,5,Ander Astralaga,2025-26,Granada CF,,Portero,21.0,cesion,1423.0,0.0,0.0,800000.0,,80.65
+German García,6,Álvaro Aceves,2023-24,Real Valladolid CF,Paulo Pezzolano,Portero,22.0,sub23_wyscout,1416.0,0.0,0.0,600000.0,,80.05
+German García,7,Adrián Rodríguez,2025-26,Real Zaragoza,,Portero,24.0,cesion,1467.0,0.0,0.0,200000.0,,76.12
+German García,8,Victor Aznar,2025-26,Cádiz CF,Pako Ayestarán,Portero,22.0,sub23_wyscout,3367.0,0.0,0.0,100000.0,,75.72
+German García,9,Dani Martín,2025-26,SD Huesca,,Portero,19.0,cesion,410.0,0.0,0.0,300000.0,,75.64
+German García,10,Álvaro Aceves,2024-25,Real Valladolid CF,Diego Cocca,Portero,22.0,sub23_wyscout,70.0,0.0,0.0,600000.0,,74.99
+Pablo Busto,1,J. Díaz Peregrina,2025-26,Cádiz CF,Pako Ayestarán,Lateral,20.0,sub23_wyscout,935.0,0.0,0.05,0.0,,94.74
+Pablo Busto,2,H. San Modesto,2025-26,Real Valladolid CF,Diego Cocca,Lateral,20.0,sub23_wyscout,651.0,0.0,0.18,0.0,,93.35
+Pablo Busto,3,Jon Garro,2025-26,Real Sociedad B,,Lateral,20.0,sub23_wyscout,1414.0,0.0,0.28,0.0,,92.58
+Pablo Busto,4,Hodei Arrillaga,2024-25,SD Eibar,Gaizka Garitano,Lateral,20.0,sub23_wyscout,1737.0,0.0,0.21,0.0,,91.61
+Pablo Busto,5,Toni Tamarit,2025-26,CD Mirandés,,Lateral,19.0,cesion,1844.0,0.0,1.35,0.0,,90.99
+Pablo Busto,6,César Álvarez,2024-25,CD Tenerife,Óscar Cano,Lateral,22.0,sub23_wyscout,793.0,0.0,0.57,0.0,,85.26
+Pablo Busto,7,Raúl Pereira,2025-26,Cádiz CF,Pako Ayestarán,Lateral,20.0,sub23_wyscout,830.0,0.0,0.15,100000.0,,84.58
+Pablo Busto,8,Álex López,2024-25,Córdoba CF,Iván Ania,Lateral,20.0,sub23_wyscout,102.0,0.0,0.0,0.0,,84.09
+Pablo Busto,9,Mario García,2025-26,Racing Santander,,Lateral,22.0,sub23_wyscout,1353.0,0.0,0.44,0.0,,83.92
+Pablo Busto,10,Iván Garriel,2025-26,Real Valladolid CF,Diego Cocca,Lateral,20.0,sub23_wyscout,617.0,0.0,0.19,200000.0,,83.07
+R. Marina,1,G. Petit,2025-26,Granada CF,,Delantero,19.0,sub23_wyscout,1675.0,7.0,4.03,0.0,,88.58
+R. Marina,2,M. Kim,2025-26,FC Andorra,,Delantero,20.0,sub23_wyscout,2600.0,6.0,6.51,0.0,,86.16
+R. Marina,3,Joel Roca,2024-25,Girona FC,,Delantero,20.0,sub23_wyscout,2033.0,6.0,6.63,0.0,,86.09
+R. Marina,4,Carlos Espí,2024-25,Levante UD,Julián Calero,Delantero,18.0,sub23_wyscout,724.0,6.0,8.4,0.0,,82.41
+R. Marina,5,Chuki,2025-26,Real Valladolid CF,Diego Cocca,Delantero,22.0,sub23_wyscout,2552.0,8.0,7.6,0.0,,78.41
+R. Marina,6,Chupe,2024-25,Málaga CF,,Delantero,20.0,sub23_wyscout,1054.0,4.0,2.98,0.0,,77.27
+R. Marina,7,B. Nsongo Tonfack,2025-26,Deportivo Alavés,,Delantero,21.0,sub23_wyscout,997.0,6.0,3.81,0.0,,75.81
+R. Marina,8,Rafa Rodríguez,2025-26,Málaga CF,,Delantero,21.0,sub23_wyscout,1513.0,4.0,2.28,0.0,,74.11
+R. Marina,9,Jon Karrikaburu,2021-22,Real Sociedad B,,Delantero,18.0,sub23_wyscout,2280.0,11.0,11.77,100000.0,,73.8
+R. Marina,10,Jorge Pascual,2023-24,Granada CF,,Delantero,22.0,sub23_wyscout,2708.0,4.0,5.03,0.0,,73.48
+D. Bladi,1,Toni Tamarit,2025-26,CD Mirandés,,Lateral,19.0,cesion,1844.0,0.0,1.35,0.0,,88.39
+D. Bladi,2,Hodei Arrillaga,2024-25,SD Eibar,Gaizka Garitano,Lateral,20.0,sub23_wyscout,1737.0,0.0,0.21,0.0,,87.47
+D. Bladi,3,Marcos Luna,2024-25,UD Almería,Rubén Albés,Lateral,22.0,sub23_wyscout,1597.0,2.0,0.69,0.0,,87.45
+D. Bladi,4,Jon Garro,2025-26,Real Sociedad B,,Lateral,20.0,sub23_wyscout,1414.0,0.0,0.28,0.0,,86.5
+D. Bladi,5,Mario García,2025-26,Racing Santander,,Lateral,22.0,sub23_wyscout,1353.0,0.0,0.44,0.0,,86.41
+D. Bladi,6,Mario García,2024-25,Racing Santander,,Lateral,22.0,sub23_wyscout,2915.0,3.0,2.06,0.0,,85.9
+D. Bladi,7,J. Díaz Peregrina,2025-26,Cádiz CF,Pako Ayestarán,Lateral,20.0,sub23_wyscout,935.0,0.0,0.05,0.0,,84.24
+D. Bladi,8,Roger Hinojo,2025-26,Cultural Leonesa,,Lateral,20.0,cesion,3249.0,1.0,0.77,50000.0,,83.92
+D. Bladi,9,César Álvarez,2024-25,CD Tenerife,Óscar Cano,Lateral,22.0,sub23_wyscout,793.0,0.0,0.57,0.0,,83.85
+D. Bladi,10,Hugo Novoa,2025-26,CD Mirandés,,Lateral,22.0,cesion,1969.0,0.0,0.72,1500000.0,,83.52
+E. Zidane,1,Marc Bombardó,2025-26,FC Andorra,,Central,20.0,sub23_wyscout,1437.0,0.0,0.64,0.0,,94.23
+E. Zidane,2,Y. Saidu,2025-26,Real Zaragoza,,Central,20.0,sub23_wyscout,2159.0,1.0,0.96,0.0,,92.15
+E. Zidane,3,Matia Barzic,2024-25,Cultural Leonesa,,Central,21.0,sub23_wyscout,1839.0,0.0,0.37,0.0,,89.94
+E. Zidane,4,B. Kovačević,2025-26,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2004.0,0.0,0.57,0.0,,89.68
+E. Zidane,5,B. Kovačević,2024-25,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2521.0,0.0,0.93,0.0,,88.28
+E. Zidane,6,L. Noubi,2025-26,Deportivo de La Coruña,Óscar Gilsanz,Central,21.0,sub23_wyscout,2274.0,1.0,2.17,0.0,,86.51
+E. Zidane,7,Jorge Cabello,2024-25,CD Mirandés,Míchel Alonso,Central,22.0,sub23_wyscout,1642.0,0.0,0.03,0.0,,85.7
+E. Zidane,8,Iker Córdoba,2025-26,CD Mirandés,,Central,19.0,cesion,1463.0,0.0,0.89,100000.0,,84.73
+E. Zidane,9,Jorge Cabello,2023-24,CD Mirandés,Sergio Pellicer,Central,21.0,sub23_wyscout,542.0,0.0,0.01,0.0,,84.52
+E. Zidane,10,Jorge Cabello,2025-26,CD Mirandés,,Central,21.0,cesion,2078.0,0.0,0.45,900000.0,,84.4
+Òscar Masqué,1,Toni Tamarit,2025-26,CD Mirandés,,Lateral,19.0,cesion,1844.0,0.0,1.35,0.0,,96.47
+Òscar Masqué,2,Jon Garro,2025-26,Real Sociedad B,,Lateral,20.0,sub23_wyscout,1414.0,0.0,0.28,0.0,,89.05
+Òscar Masqué,3,Hodei Arrillaga,2024-25,SD Eibar,Gaizka Garitano,Lateral,20.0,sub23_wyscout,1737.0,0.0,0.21,0.0,,87.96
+Òscar Masqué,4,J. Salinas,2025-26,Racing Santander,,Lateral,19.0,sub23_wyscout,2869.0,0.0,2.95,0.0,,87.93
+Òscar Masqué,5,J. Díaz Peregrina,2025-26,Cádiz CF,Pako Ayestarán,Lateral,20.0,sub23_wyscout,935.0,0.0,0.05,0.0,,87.17
+Òscar Masqué,6,H. San Modesto,2025-26,Real Valladolid CF,Diego Cocca,Lateral,20.0,sub23_wyscout,651.0,0.0,0.18,0.0,,85.48
+Òscar Masqué,7,Dani Bernabéu,2025-26,Albacete Balompié,,Lateral,18.0,sub23_wyscout,280.0,0.0,0.01,0.0,,81.12
+Òscar Masqué,8,Roger Hinojo,2025-26,Cultural Leonesa,,Lateral,20.0,cesion,3249.0,1.0,0.77,50000.0,,81.0
+Òscar Masqué,9,Mario García,2025-26,Racing Santander,,Lateral,22.0,sub23_wyscout,1353.0,0.0,0.44,0.0,,80.6
+Òscar Masqué,10,Diego Sánchez,2022-23,Sporting Gijón,David Gallego,Lateral,18.0,sub23_wyscout,1469.0,1.0,0.16,600000.0,,80.01
+Dani Pérez,1,T. Helguera,2025-26,CD Mirandés,,Centrocampista,20.0,sub23_wyscout,2524.0,0.0,0.66,0.0,,94.04
+Dani Pérez,2,Izan Merino,2025-26,Málaga CF,,Centrocampista,20.0,sub23_wyscout,2903.0,0.0,0.8,0.0,,93.22
+Dani Pérez,3,E. Akman,2025-26,FC Andorra,,Centrocampista,20.0,sub23_wyscout,1585.0,1.0,0.51,0.0,,92.26
+Dani Pérez,4,S. Džodić,2025-26,UD Almería,,Centrocampista,21.0,sub23_wyscout,2364.0,1.0,0.85,0.0,,88.58
+Dani Pérez,5,Manu Rodríguez,2025-26,Sporting Gijón,,Centrocampista,19.0,sub23_wyscout,1539.0,1.0,0.36,0.0,,87.61
+Dani Pérez,6,Selvi Clua,2025-26,CD Mirandés,,Centrocampista,20.0,cesion,1247.0,0.0,0.99,300000.0,,87.13
+Dani Pérez,7,A. Martin Luis,2024-25,CD Mirandés,Míchel Alonso,Centrocampista,19.0,sub23_wyscout,1770.0,2.0,1.31,0.0,,86.74
+Dani Pérez,8,Ali Houary,2025-26,CD Mirandés,,Centrocampista,20.0,cesion,848.0,0.0,1.03,300000.0,,85.17
+Dani Pérez,9,A. Martin Luis,2025-26,CD Mirandés,,Centrocampista,19.0,sub23_wyscout,605.0,0.0,0.22,0.0,,84.08
+Dani Pérez,10,Silvi Clúa,2024-25,CD Mirandés,Míchel Alonso,Centrocampista,21.0,sub23_wyscout,569.0,0.0,0.37,0.0,,83.9
+Aitor Gismera,1,Jorge Cabello,2024-25,CD Mirandés,Míchel Alonso,Central,22.0,sub23_wyscout,1642.0,0.0,0.03,0.0,,94.71
+Aitor Gismera,2,Antal Yaakobishvili,2025-26,FC Andorra,,Portero,21.0,cesion,2053.0,0.0,0.0,0.0,,94.2
+Aitor Gismera,3,Mario García,2025-26,Racing Santander,,Lateral,22.0,sub23_wyscout,1353.0,0.0,0.44,0.0,,93.98
+Aitor Gismera,4,M. Diakité,2024-25,Cádiz CF,Pako Ayestarán,Centrocampista,22.0,sub23_wyscout,1572.0,2.0,0.25,0.0,,92.3
+Aitor Gismera,5,Marcos Luna,2024-25,UD Almería,Rubén Albés,Lateral,22.0,sub23_wyscout,1597.0,2.0,0.69,0.0,,91.85
+Aitor Gismera,6,Dani Requena,2023-24,Córdoba CF,,Extremo,22.0,sub23_wyscout,1549.0,1.0,2.79,0.0,,91.45
+Aitor Gismera,7,Javi Hernández,2024-25,CD Mirandés,Míchel Alonso,Centrocampista,22.0,sub23_wyscout,1478.0,1.0,2.73,0.0,,91.26
+Aitor Gismera,8,César Álvarez,2024-25,CD Tenerife,Óscar Cano,Lateral,22.0,sub23_wyscout,793.0,0.0,0.57,0.0,,91.2
+Aitor Gismera,9,M. Mensah,2025-26,Real Zaragoza,,Centrocampista,22.0,sub23_wyscout,767.0,0.0,0.51,0.0,,91.08
+Aitor Gismera,10,Juanma Herzog,2025-26,UD Las Palmas,,Central,22.0,sub23_wyscout,665.0,0.0,0.15,0.0,,90.67
+Ian Forns,1,Mario García,2025-26,Racing Santander,,Lateral,22.0,sub23_wyscout,1353.0,0.0,0.44,0.0,,91.67
+Ian Forns,2,Marcos Luna,2024-25,UD Almería,Rubén Albés,Lateral,22.0,sub23_wyscout,1597.0,2.0,0.69,0.0,,90.21
+Ian Forns,3,Mario García,2024-25,Racing Santander,,Lateral,22.0,sub23_wyscout,2915.0,3.0,2.06,0.0,,89.39
+Ian Forns,4,César Álvarez,2024-25,CD Tenerife,Óscar Cano,Lateral,22.0,sub23_wyscout,793.0,0.0,0.57,0.0,,89.11
+Ian Forns,5,Hugo Novoa,2025-26,CD Mirandés,,Lateral,22.0,cesion,1969.0,0.0,0.72,1500000.0,,88.78
+Ian Forns,6,Juan Larios,2025-26,Real Zaragoza,,Lateral,22.0,cesion,1932.0,0.0,0.17,2000000.0,,88.23
+Ian Forns,7,Hodei Arrillaga,2025-26,SD Eibar,Gaizka Garitano,Lateral,22.0,sub23_wyscout,451.0,0.0,0.14,0.0,,85.94
+Ian Forns,8,Toni Tamarit,2025-26,CD Mirandés,,Lateral,19.0,cesion,1844.0,0.0,1.35,0.0,,85.35
+Ian Forns,9,Pablo Pérez,2025-26,CD Mirandés,,Lateral,23.0,cesion,1835.0,0.0,1.11,250000.0,,84.28
+Ian Forns,10,Marvin Park,2022-23,UD Las Palmas,García Pimienta,Lateral,22.0,cesion,1048.0,1.0,0.44,500000.0,,84.15
+Borja Alonso,1,Alberto Moleiro,2021-22,Villarreal CF B,Miguel Álvarez,Extremo,22.0,sub23_wyscout,2182.0,3.0,3.58,0.0,,87.28
+Borja Alonso,2,Jastin García Lopez,2025-26,FC Andorra,,Extremo,22.0,sub23_wyscout,1518.0,3.0,4.32,0.0,,86.08
+Borja Alonso,3,Alberto Moleiro,2022-23,Villarreal CF B,Miguel Álvarez,Extremo,22.0,sub23_wyscout,2876.0,0.0,4.87,0.0,,85.0
+Borja Alonso,4,Javi Hernández,2025-26,CD Mirandés,,Extremo,21.0,cesion,2023.0,7.0,5.71,500000.0,,84.3
+Borja Alonso,5,David Mella,2024-25,Deportivo de La Coruña,Óscar Gilsanz,Extremo,20.0,sub23_wyscout,2886.0,6.0,7.03,0.0,,83.45
+Borja Alonso,6,Carlos Álvarez,2024-25,Levante UD,Julián Calero,Extremo,22.0,sub23_wyscout,3650.0,7.0,6.15,1200000.0,,83.01
+Borja Alonso,7,Dani Requena,2023-24,Córdoba CF,,Extremo,22.0,sub23_wyscout,1549.0,1.0,2.79,0.0,,82.4
+Borja Alonso,8,Antonio Cordero,2024-25,Cádiz CF,Pako Ayestarán,Extremo,19.0,sub23_wyscout,2303.0,6.0,7.07,0.0,,78.93
+Borja Alonso,9,José De La Rosa,2025-26,Cádiz CF,Pako Ayestarán,Extremo,21.0,sub23_wyscout,1541.0,2.0,1.97,0.0,,78.57
+Borja Alonso,10,Estanis Pedrola,2025-26,UD Las Palmas,,Extremo,22.0,cesion,814.0,4.0,2.38,900000.0,,77.6
+Ruben De Sa Abreu,1,Dani Bernabéu,2025-26,Albacete Balompié,,Lateral,18.0,sub23_wyscout,280.0,0.0,0.01,0.0,,93.81
+Ruben De Sa Abreu,2,Buba Sangaré,2023-24,Elche CF,Sebastián Beccacece,Lateral,18.0,sub23_wyscout,107.0,0.0,0.0,0.0,,89.02
+Ruben De Sa Abreu,3,Toni Tamarit,2025-26,CD Mirandés,,Lateral,19.0,cesion,1844.0,0.0,1.35,0.0,,86.29
+Ruben De Sa Abreu,4,H. San Modesto,2025-26,Real Valladolid CF,Diego Cocca,Lateral,20.0,sub23_wyscout,651.0,0.0,0.18,0.0,,83.09
+Ruben De Sa Abreu,5,J. Díaz Peregrina,2025-26,Cádiz CF,Pako Ayestarán,Lateral,20.0,sub23_wyscout,935.0,0.0,0.05,0.0,,81.39
+Ruben De Sa Abreu,6,Álex López,2024-25,Córdoba CF,Iván Ania,Lateral,20.0,sub23_wyscout,102.0,0.0,0.0,0.0,,80.03
+Ruben De Sa Abreu,7,M. Timorán Paz,2025-26,Córdoba CF,,Lateral,19.0,sub23_wyscout,40.0,0.0,0.0,0.0,,79.8
+Ruben De Sa Abreu,8,Jon Garro,2025-26,Real Sociedad B,,Lateral,20.0,sub23_wyscout,1414.0,0.0,0.28,0.0,,79.13
+Ruben De Sa Abreu,9,J. Domingo Ponce,2024-25,Albacete Balompié,,Lateral,19.0,sub23_wyscout,29.0,0.0,0.0,0.0,,78.24
+Ruben De Sa Abreu,10,Hodei Arrillaga,2024-25,SD Eibar,Gaizka Garitano,Lateral,20.0,sub23_wyscout,1737.0,0.0,0.21,0.0,,78.16
+R. Oya Mesa,1,Paco Cortés,2023-24,Cultural Leonesa,,Extremo,18.0,sub23_wyscout,47.0,0.0,0.06,0.0,,91.0
+R. Oya Mesa,2,Dani Fernández,2024-25,CD Tenerife,Óscar Cano,Extremo,18.0,sub23_wyscout,361.0,1.0,0.35,0.0,,87.33
+R. Oya Mesa,3,N. Carrillo,2025-26,Deportivo Alavés,,Extremo,19.0,sub23_wyscout,203.0,1.0,0.11,0.0,,86.02
+R. Oya Mesa,4,Álex Lozano,2023-24,Sporting Gijón,David Gallego,Extremo,20.0,sub23_wyscout,109.0,0.0,0.08,0.0,,86.01
+R. Oya Mesa,5,W. Chatiliez,2024-25,FC Cartagena,,Extremo,20.0,sub23_wyscout,129.0,1.0,0.21,0.0,,83.81
+R. Oya Mesa,6,I. Álvarez,2024-25,Cádiz CF,Pako Ayestarán,Extremo,18.0,sub23_wyscout,8.0,0.0,0.03,0.0,,82.65
+R. Oya Mesa,7,Jaime Tobajas,2025-26,Real Zaragoza,,Extremo,19.0,sub23_wyscout,18.0,0.0,0.0,0.0,,82.02
+R. Oya Mesa,8,D. Sia,2025-26,CD Mirandés,,Extremo,20.0,sub23_wyscout,225.0,0.0,0.57,0.0,,82.0
+R. Oya Mesa,9,P. Osán Ascaso,2025-26,SD Huesca,,Extremo,19.0,sub23_wyscout,18.0,0.0,0.26,0.0,,81.82
+R. Oya Mesa,10,D. Díaz,2024-25,Racing Santander,,Extremo,20.0,sub23_wyscout,42.0,0.0,0.2,0.0,,81.58
+C. De Roa García,1,Buba Sangaré,2023-24,Elche CF,Sebastián Beccacece,Lateral,18.0,sub23_wyscout,107.0,0.0,0.0,0.0,,94.56
+C. De Roa García,2,Dani Bernabéu,2025-26,Albacete Balompié,,Lateral,18.0,sub23_wyscout,280.0,0.0,0.01,0.0,,90.65
+C. De Roa García,3,Álex López,2024-25,Córdoba CF,Iván Ania,Lateral,20.0,sub23_wyscout,102.0,0.0,0.0,0.0,,85.57
+C. De Roa García,4,M. Timorán Paz,2025-26,Córdoba CF,,Lateral,19.0,sub23_wyscout,40.0,0.0,0.0,0.0,,85.34
+C. De Roa García,5,J. Domingo Ponce,2024-25,Albacete Balompié,,Lateral,19.0,sub23_wyscout,29.0,0.0,0.0,0.0,,83.78
+C. De Roa García,6,Carlos Jimenez,2022-23,Levante UD,Lluís Carreras,Lateral,17.0,sub23_wyscout,27.0,0.0,0.0,0.0,,83.43
+C. De Roa García,7,Juan Carlos Sabater,2023-24,Real Zaragoza,Víctor Fernández,Lateral,20.0,sub23_wyscout,54.0,0.0,0.05,0.0,,82.39
+C. De Roa García,8,Marc Aznar,2025-26,SD Huesca,,Lateral,20.0,sub23_wyscout,45.0,0.0,0.47,0.0,,81.15
+C. De Roa García,9,Toni Tamarit,2025-26,CD Mirandés,,Lateral,19.0,cesion,1844.0,0.0,1.35,0.0,,80.75
+C. De Roa García,10,Pere Haro,2025-26,CD Lugo,,Lateral,21.0,sub23_wyscout,147.0,0.0,0.01,0.0,,80.73
+Mario Navarro,1,Carlos Jimenez,2022-23,Levante UD,Lluís Carreras,Lateral,17.0,sub23_wyscout,27.0,0.0,0.0,0.0,,95.0
+Mario Navarro,2,J. Domingo Ponce,2024-25,Albacete Balompié,,Lateral,19.0,sub23_wyscout,29.0,0.0,0.0,0.0,,85.91
+Mario Navarro,3,M. Timorán Paz,2025-26,Córdoba CF,,Lateral,19.0,sub23_wyscout,40.0,0.0,0.0,0.0,,84.34
+Mario Navarro,4,Buba Sangaré,2023-24,Elche CF,Sebastián Beccacece,Lateral,18.0,sub23_wyscout,107.0,0.0,0.0,0.0,,83.88
+Mario Navarro,5,Iván Garriel,2023-24,Real Valladolid CF,Paulo Pezzolano,Lateral,20.0,sub23_wyscout,16.0,0.0,0.0,0.0,,79.38
+Mario Navarro,6,Dani Bernabéu,2025-26,Albacete Balompié,,Lateral,18.0,sub23_wyscout,280.0,0.0,0.01,0.0,,79.09
+Mario Navarro,7,Marc Aznar,2025-26,SD Huesca,,Lateral,20.0,sub23_wyscout,45.0,0.0,0.47,0.0,,79.0
+Mario Navarro,8,Juan Carlos Sabater,2023-24,Real Zaragoza,Víctor Fernández,Lateral,20.0,sub23_wyscout,54.0,0.0,0.05,0.0,,78.46
+Mario Navarro,9,Iker Martínez,2024-25,Sporting Gijón,Rubén Albés,Lateral,21.0,sub23_wyscout,39.0,0.0,0.0,0.0,,75.72
+Mario Navarro,10,Álex López,2024-25,Córdoba CF,Iván Ania,Lateral,20.0,sub23_wyscout,102.0,0.0,0.0,0.0,,75.36
+Antonio González,1,Paco Cortés,2023-24,Cultural Leonesa,,Extremo,18.0,sub23_wyscout,47.0,0.0,0.06,0.0,,91.28
+Antonio González,2,Dani Fernández,2024-25,CD Tenerife,Óscar Cano,Extremo,18.0,sub23_wyscout,361.0,1.0,0.35,0.0,,87.03
+Antonio González,3,N. Carrillo,2025-26,Deportivo Alavés,,Extremo,19.0,sub23_wyscout,203.0,1.0,0.11,0.0,,85.72
+Antonio González,4,Álex Lozano,2023-24,Sporting Gijón,David Gallego,Extremo,20.0,sub23_wyscout,109.0,0.0,0.08,0.0,,85.71
+Antonio González,5,W. Chatiliez,2024-25,FC Cartagena,,Extremo,20.0,sub23_wyscout,129.0,1.0,0.21,0.0,,83.51
+Antonio González,6,I. Álvarez,2024-25,Cádiz CF,Pako Ayestarán,Extremo,18.0,sub23_wyscout,8.0,0.0,0.03,0.0,,82.94
+Antonio González,7,Jaime Tobajas,2025-26,Real Zaragoza,,Extremo,19.0,sub23_wyscout,18.0,0.0,0.0,0.0,,82.32
+Antonio González,8,P. Osán Ascaso,2025-26,SD Huesca,,Extremo,19.0,sub23_wyscout,18.0,0.0,0.26,0.0,,82.1
+Antonio González,9,D. Díaz,2024-25,Racing Santander,,Extremo,20.0,sub23_wyscout,42.0,0.0,0.2,0.0,,81.86
+Antonio González,10,D. Sia,2025-26,CD Mirandés,,Extremo,20.0,sub23_wyscout,225.0,0.0,0.57,0.0,,81.7
+Emmanuel,1,Pau Navarro,2023-24,Villarreal CF B,,Central,18.0,sub23_wyscout,1102.0,1.0,0.71,0.0,,89.55
+Emmanuel,2,Unax Ayo,2025-26,Real Sociedad B,,Central,18.0,sub23_wyscout,901.0,0.0,0.37,0.0,,89.05
+Emmanuel,3,A. Furtado,2025-26,Real Zaragoza,,Central,18.0,sub23_wyscout,802.0,0.0,0.0,0.0,,88.27
+Emmanuel,4,Marc Bombardó,2025-26,FC Andorra,,Central,20.0,sub23_wyscout,1437.0,0.0,0.64,0.0,,87.03
+Emmanuel,5,Iker Córdoba,2025-26,CD Mirandés,,Central,19.0,cesion,1463.0,0.0,0.89,100000.0,,86.11
+Emmanuel,6,Y. Saidu,2025-26,Real Zaragoza,,Central,20.0,sub23_wyscout,2159.0,1.0,0.96,0.0,,85.98
+Emmanuel,7,Andrés Cuenca,2025-26,Sporting Gijón,,Central,18.0,cesion,697.0,0.0,0.4,500000.0,,82.74
+Emmanuel,8,Jorge Cabello,2023-24,CD Mirandés,Sergio Pellicer,Central,21.0,sub23_wyscout,542.0,0.0,0.01,0.0,,81.95
+Emmanuel,9,Matia Barzic,2024-25,Cultural Leonesa,,Central,21.0,sub23_wyscout,1839.0,0.0,0.37,0.0,,81.65
+Emmanuel,10,B. Kovačević,2025-26,Cádiz CF,Pako Ayestarán,Central,21.0,sub23_wyscout,2004.0,0.0,0.57,0.0,,81.05
+M. Romero,1,Paco Cortés,2023-24,Cultural Leonesa,,Extremo,18.0,sub23_wyscout,47.0,0.0,0.06,0.0,,94.19
+M. Romero,2,F. Garcia Moreno,2025-26,Albacete Balompié,,Centrocampista,18.0,sub23_wyscout,48.0,0.0,0.01,0.0,,94.04
+M. Romero,3,N. Riestra,2025-26,Sporting Gijón,,Centrocampista,18.0,sub23_wyscout,28.0,0.0,0.0,0.0,,93.19
+M. Romero,4,Dani Fernández,2023-24,CD Tenerife,Luis Miguel Ramis,Mediapunta,18.0,sub23_wyscout,24.0,0.0,0.34,0.0,,92.32
+M. Romero,5,M. Timorán Paz,2025-26,Córdoba CF,,Lateral,19.0,sub23_wyscout,40.0,0.0,0.0,0.0,,90.55
+M. Romero,6,Diego Aznar,2023-24,SD Huesca,Antonio Hidalgo,Delantero,19.0,sub23_wyscout,38.0,0.0,0.0,0.0,,90.3
+M. Romero,7,J. Salinas,2024-25,Racing Santander,,Central,18.0,sub23_wyscout,105.0,0.0,0.0,0.0,,90.18
+M. Romero,8,Buba Sangaré,2023-24,Elche CF,Sebastián Beccacece,Lateral,18.0,sub23_wyscout,107.0,0.0,0.0,0.0,,90.08
+M. Romero,9,M. Domínguez Carriles,2025-26,Real Valladolid CF,Diego Cocca,Delantero,17.0,sub23_wyscout,34.0,0.0,0.0,0.0,,89.76
+M. Romero,10,Galde,2025-26,Real Valladolid CF,Diego Cocca,Central,18.0,sub23_wyscout,12.0,0.0,0.0,0.0,,89.18
+R. Gomez,1,M. Jiménez Gambín,2025-26,Granada CF,,Centrocampista,19.0,sub23_wyscout,68.0,0.0,0.0,0.0,,90.78
+R. Gomez,2,I. Alani,2025-26,Real Valladolid CF,Diego Cocca,Centrocampista,19.0,sub23_wyscout,446.0,0.0,0.09,0.0,,89.8
+R. Gomez,3,S. Martínez,2025-26,Racing Santander,,Centrocampista,19.0,sub23_wyscout,451.0,0.0,0.21,0.0,,89.65
+R. Gomez,4,L. Terrer Casas,2025-26,Real Zaragoza,,Centrocampista,20.0,sub23_wyscout,214.0,0.0,0.13,0.0,,89.06
+R. Gomez,5,A. Martin Luis,2025-26,CD Mirandés,,Centrocampista,19.0,sub23_wyscout,605.0,0.0,0.22,0.0,,88.17
+R. Gomez,6,Pablo López,2025-26,CD Mirandés,,Centrocampista,19.0,cesion,248.0,1.0,0.24,50000.0,,86.36
+R. Gomez,7,Rafel Bauzà,2023-24,CD Mirandés,Sergio Pellicer,Centrocampista,21.0,sub23_wyscout,123.0,0.0,0.0,0.0,,84.96
+R. Gomez,8,F. Garcia Moreno,2025-26,Albacete Balompié,,Centrocampista,18.0,sub23_wyscout,48.0,0.0,0.01,0.0,,84.7
+R. Gomez,9,Jan Salas,2025-26,Córdoba CF,,Centrocampista,20.0,cesion,132.0,0.0,0.0,100000.0,400000.0,84.68
+R. Gomez,10,D. Carballo,2024-25,Real Valladolid CF,Diego Cocca,Centrocampista,20.0,sub23_wyscout,36.0,0.0,0.0,0.0,,83.29
+Iván Corralejo,1,A. Martin Luis,2024-25,CD Mirandés,Míchel Alonso,Centrocampista,19.0,sub23_wyscout,1770.0,2.0,1.31,0.0,,93.16
+Iván Corralejo,2,Manu Rodríguez,2025-26,Sporting Gijón,,Centrocampista,19.0,sub23_wyscout,1539.0,1.0,0.36,0.0,,91.82
+Iván Corralejo,3,E. Akman,2025-26,FC Andorra,,Centrocampista,20.0,sub23_wyscout,1585.0,1.0,0.51,0.0,,87.42
+Iván Corralejo,4,A. Martin Luis,2025-26,CD Mirandés,,Centrocampista,19.0,sub23_wyscout,605.0,0.0,0.22,0.0,,87.13
+Iván Corralejo,5,S. Martínez,2025-26,Racing Santander,,Centrocampista,19.0,sub23_wyscout,451.0,0.0,0.21,0.0,,85.66
+Iván Corralejo,6,I. Alani,2025-26,Real Valladolid CF,Diego Cocca,Centrocampista,19.0,sub23_wyscout,446.0,0.0,0.09,0.0,,85.5
+Iván Corralejo,7,T. Helguera,2025-26,CD Mirandés,,Centrocampista,20.0,sub23_wyscout,2524.0,0.0,0.66,0.0,,83.97
+Iván Corralejo,8,Izan Merino,2025-26,Málaga CF,,Centrocampista,20.0,sub23_wyscout,2903.0,0.0,0.8,0.0,,83.39
+Iván Corralejo,9,Marcelo Expósito,2024-25,Burgos CF,José Alberto,Centrocampista,21.0,sub23_wyscout,892.0,2.0,0.38,0.0,,82.96
+Iván Corralejo,10,Selvi Clua,2025-26,CD Mirandés,,Centrocampista,20.0,cesion,1247.0,0.0,0.99,300000.0,,82.01

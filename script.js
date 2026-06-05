@@ -2440,6 +2440,7 @@ function renderScoutGPTTab() {
   // Precargar el master para consultas de desarrollo/entrenadores
   loadMasterData(() => {});
   loadLoanModelData(() => {});
+  loadDecisionModelData(() => {});
 
   const input = document.getElementById('scoutgpt-input');
   const btn   = document.getElementById('scoutgpt-send');
@@ -2452,8 +2453,9 @@ function renderScoutGPTTab() {
     addSgptTyping();
 
     let html;
-    if (isLoanDestinationQuery(norm(q))) {
+    if (isDecisionModelQuery(norm(q))) {
       await new Promise(resolve => loadLoanModelData(resolve));
+      await new Promise(resolve => loadDecisionModelData(resolve));
       html = processScoutQuery(q);
     } else if (_aiEnabled && !isDirectTMQuery(q)) {
       html = await processWithAI(q);
@@ -2739,12 +2741,22 @@ function processScoutQuery(raw) {
   const isActivo   = /activ|operacion|movimiento|m[aá]s.*fich/.test(q);
   const isRanking  = /ranking|top|m[aá]s|mayor|mejor/.test(q);
   const isLoanDestination = isLoanDestinationQuery(q);
+  const isDecisionModel = isDecisionModelQuery(q);
 
   // --- Routing ---
+
+  // Modelo RF para decision/operacion recomendada de jugadores Betis Deportivo
+  if (isDecisionModel) {
+    const betisPlayer = detectBetisPlayerInQuery(q);
+    if (betisPlayer) return sgptDecisionForBetisPlayer(betisPlayer.jugador);
+    if (detectedPos) return sgptDecisionForPosition(detectedPos, topLimit);
+    return sgptDecisionOverview(topLimit);
+  }
 
   // Modelo explicable de destinos de cesión para jugadores del Betis Deportivo
   if (isLoanDestination) {
     const betisPlayer = detectBetisPlayerInQuery(q);
+    if (betisPlayer && RF_DESTINATION_RECOMMENDATIONS.length) return sgptDecisionForBetisPlayer(betisPlayer.jugador);
     if (betisPlayer) return sgptLoanDestinationsForPlayer(betisPlayer.jugador, topLimit);
     if (detectedPos) return sgptLoanDestinationsForPosition(detectedPos, topLimit);
     return sgptLoanDestinationsOverview(topLimit);
@@ -3394,6 +3406,10 @@ function renderWyTablaResumen(data) {
 let MASTER_DATA = [];
 let LOAN_MODEL_DATA = [];
 let BETIS_PLAYERS_DATA = [];
+let RF_PLAYER_RECOMMENDATIONS = [];
+let RF_DESTINATION_RECOMMENDATIONS = [];
+let RF_SIMILAR_EVENTS = [];
+let BETIS_DECISIONS = [];          // betis_decision_recommendations.csv (operation_success_score)
 
 function loadMasterData(callback) {
   if (MASTER_DATA.length) { callback(MASTER_DATA); return; }
@@ -3435,6 +3451,43 @@ function loadLoanModelData(callback) {
   });
 }
 
+function loadDecisionModelData(callback) {
+  if (RF_PLAYER_RECOMMENDATIONS.length && RF_DESTINATION_RECOMMENDATIONS.length && RF_SIMILAR_EVENTS.length && BETIS_DECISIONS.length) {
+    callback(RF_PLAYER_RECOMMENDATIONS);
+    return;
+  }
+
+  let pending = 4;
+  const done = () => {
+    pending -= 1;
+    if (pending === 0) callback(RF_PLAYER_RECOMMENDATIONS);
+  };
+
+  Papa.parse('data/final/betis_decision_recommendations.csv', {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => { BETIS_DECISIONS = r.data.filter(d => d.jugador); done(); },
+    error: () => { BETIS_DECISIONS = []; done(); }
+  });
+
+  Papa.parse('data/final/betis_rf_player_recommendations.csv', {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => { RF_PLAYER_RECOMMENDATIONS = r.data.filter(d => d.jugador); done(); },
+    error: () => { RF_PLAYER_RECOMMENDATIONS = []; done(); }
+  });
+
+  Papa.parse('data/final/betis_rf_destination_recommendations.csv', {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => { RF_DESTINATION_RECOMMENDATIONS = r.data.filter(d => d.jugador && d.club); done(); },
+    error: () => { RF_DESTINATION_RECOMMENDATIONS = []; done(); }
+  });
+
+  Papa.parse('data/final/betis_similar_historical_events.csv', {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => { RF_SIMILAR_EVENTS = r.data.filter(d => d.jugador_betis); done(); },
+    error: () => { RF_SIMILAR_EVENTS = []; done(); }
+  });
+}
+
 const SEGUNDA_CLUBS_SET = new Set([
   'AD Alcorcón','AD Ceuta FC','Albacete Balompié','Burgos CF','CD Castellón','CD Eldense',
   'CD Leganés','CD Lugo','CD Mirandés','CD Tenerife','CF Fuenlabrada','Cultural Leonesa',
@@ -3464,6 +3517,10 @@ function isLoanDestinationQuery(q) {
   return /destin|cesi[oó]n|ceder|cedido|prestam|d[oó]nde|mejor.*club|mejor.*equipo|encaje/.test(q);
 }
 
+function isDecisionModelQuery(q) {
+  return /recomend|operaci[oó]n|decision|decidir|salida|ceder|cesi[oó]n|destin|renovar|recompra|porcentaje|modelo|random|forest|ideal|encaje/.test(q);
+}
+
 function detectBetisPlayerInQuery(q) {
   if (!BETIS_PLAYERS_DATA.length) return null;
   const exact = BETIS_PLAYERS_DATA.find(p => q.includes(norm(p.jugador)));
@@ -3478,6 +3535,125 @@ function loanRowsForPlayer(playerName) {
   return LOAN_MODEL_DATA
     .filter(d => norm(d.jugador) === norm(playerName))
     .sort((a, b) => num(a.ranking_destino) - num(b.ranking_destino));
+}
+
+function rfRowsForPlayer(playerName) {
+  return RF_DESTINATION_RECOMMENDATIONS
+    .filter(d => norm(d.jugador) === norm(playerName))
+    .sort((a, b) => num(a.ranking_destino_rf) - num(b.ranking_destino_rf));
+}
+
+function rfSummaryForPlayer(playerName) {
+  return RF_PLAYER_RECOMMENDATIONS.find(d => norm(d.jugador) === norm(playerName)) || null;
+}
+
+function pct(v) {
+  return `${Math.round(num(v) * 100)}%`;
+}
+
+function sgptDecisionForBetisPlayer(playerName) {
+  if (!RF_PLAYER_RECOMMENDATIONS.length || !RF_DESTINATION_RECOMMENDATIONS.length) {
+    return 'El modelo RF de decisiones todavía se está cargando. Vuelve a lanzar la pregunta en unos segundos.';
+  }
+  const summary = rfSummaryForPlayer(playerName);
+  const rows = rfRowsForPlayer(playerName).slice(0, 8);
+  const similar = RF_SIMILAR_EVENTS
+    .filter(d => norm(d.jugador_betis) === norm(playerName))
+    .sort((a, b) => num(a.ranking_similar) - num(b.ranking_similar))
+    .slice(0, 6);
+
+  if (!summary) return `No encuentro recomendación RF para <strong>${playerName}</strong>.`;
+
+  // Bloque de decisión con operation_success_score (formato solicitado)
+  const dec = BETIS_DECISIONS.find(d => norm(d.jugador) === norm(playerName));
+  let decisionBlock = '';
+  if (dec) {
+    const prob = num(dec.probabilidad_exito);
+    const probColor = prob >= 55 ? 'var(--success)' : prob >= 35 ? 'var(--warning)' : 'var(--danger)';
+    decisionBlock = `
+    <div style="margin:10px 0;padding:14px;border:2px solid var(--primary);border-radius:10px;background:var(--primary-light)">
+      <div style="font-size:1.05rem;font-weight:800;color:var(--primary-dark);margin-bottom:6px">
+        🎯 Operación recomendada: ${dec.operacion_recomendada}
+      </div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px">
+        <div><span class="muted">Probabilidad de éxito</span><br><strong style="font-size:1.2rem;color:${probColor}">${prob.toFixed(0)}/100</strong></div>
+        <div><span class="muted">Revalorización esperada</span><br><strong style="font-size:1.1rem" class="green">${dec.revalorizacion_esperada || '—'}</strong></div>
+      </div>
+      ${dec.clubes_ideales ? `<div style="margin-top:6px"><strong>🏟️ Clubes ideales:</strong> ${dec.clubes_ideales}</div>` : ''}
+      ${dec.entrenadores_ideales ? `<div style="margin-top:4px"><strong>👔 Entrenadores ideales:</strong> ${dec.entrenadores_ideales}</div>` : ''}
+      ${dec.casos_similares ? `<div style="margin-top:4px"><strong>📋 Casos similares:</strong> ${dec.casos_similares}</div>` : ''}
+      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:6px">
+        ${dec.justificacion || ''}
+      </div>
+    </div>`;
+  }
+
+  return `<strong>Modelo de decisión para ${summary.jugador}</strong><br>
+    <span class="muted">operation_success_score (RF) + evidencia histórica: cesiones, traspasos, Sub23 Wyscout, revalorización, demanda club-posición, entrenadores y casos similares.</span><br>
+    ${decisionBlock}
+    <div style="margin:10px 0;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <strong>Operación sugerida:</strong> ${summary.operacion_sugerida || '—'} ·
+      <strong>Confianza:</strong> ${summary.confianza_modelo || '—'} ·
+      <strong>Revalorización esperada top5:</strong> <span class="green">${formatM(num(summary.revalorizacion_esperada_media_top5))}</span> ·
+      <strong>Prob. revalorización positiva:</strong> ${pct(summary.prob_revalorizacion_positiva_media_top5)}<br>
+      <span class="muted">${summary.razonamiento || ''}</span>
+    </div>
+    ${rows.length ? `<strong>Clubes y entrenadores ideales:</strong><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score RF</th><th>Reval. esp.</th><th>Prob +</th><th>Demanda</th><th>Razonamiento</th></tr></thead>
+    <tbody>${rows.map(d => `<tr>
+      <td>${num(d.ranking_destino_rf)}</td>
+      <td class="bold">${d.club}</td>
+      <td>${d.entrenador || '—'}</td>
+      <td class="green">${num(d.score_destino_rf).toFixed(2)}</td>
+      <td>${formatM(num(d.rf_revalorizacion_esperada))}</td>
+      <td>${pct(d.rf_prob_revalorizacion_positiva)}</td>
+      <td>${num(d.demand_score).toFixed(1)}</td>
+      <td class="muted">${d.razonamiento_rf || '—'}</td>
+    </tr>`).join('')}</tbody></table>` : ''}
+    ${similar.length ? `<br><strong>Sucesos históricos similares:</strong><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Club</th><th>Tipo</th><th>Edad</th><th>Min</th><th>Goles</th><th>Rev.</th><th>Similitud</th></tr></thead>
+    <tbody>${similar.map(d => `<tr>
+      <td>${num(d.ranking_similar)}</td><td class="bold">${d.jugador_historico}</td><td>${d.club}</td>
+      <td>${d.tipo_suceso}</td><td>${num(d.edad).toFixed(0)}</td><td>${fmt(num(d.minutos))}</td>
+      <td>${num(d.goles).toFixed(0)}</td><td>${num(d.revalorizacion) ? formatM(num(d.revalorizacion)) : '—'}</td>
+      <td>${num(d.similaridad_score).toFixed(1)}</td>
+    </tr>`).join('')}</tbody></table>` : ''}`;
+}
+
+function sgptDecisionForPosition(pos, n) {
+  if (!RF_PLAYER_RECOMMENDATIONS.length) {
+    return 'El modelo RF de decisiones todavía se está cargando. Vuelve a lanzar la pregunta en unos segundos.';
+  }
+  const rows = RF_PLAYER_RECOMMENDATIONS
+    .filter(d => devPosMatch({ posicion_normalizada: d.posicion }, pos))
+    .sort((a, b) => num(b.score_destino_medio_top5) - num(a.score_destino_medio_top5))
+    .slice(0, n);
+  if (!rows.length) return `No encuentro jugadores Betis Deportivo para <strong>${pos}</strong> en el modelo RF.`;
+  return `<strong>Operaciones sugeridas por modelo RF para ${pos}</strong><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Edad</th><th>Operación</th><th>Confianza</th><th>Score top5</th><th>Prob +</th><th>Clubes ideales</th></tr></thead>
+    <tbody>${rows.map((d, i) => `<tr>
+      <td>${i + 1}</td><td class="bold">${d.jugador}</td><td>${num(d.edad).toFixed(0)}</td>
+      <td>${d.operacion_sugerida}</td><td>${d.confianza_modelo}</td>
+      <td>${num(d.score_destino_medio_top5).toFixed(1)}</td><td>${pct(d.prob_revalorizacion_positiva_media_top5)}</td>
+      <td class="muted">${d.clubes_ideales || '—'}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function sgptDecisionOverview(n) {
+  if (!RF_PLAYER_RECOMMENDATIONS.length) {
+    return 'El modelo RF de decisiones todavía se está cargando. Vuelve a lanzar la pregunta en unos segundos.';
+  }
+  const rows = [...RF_PLAYER_RECOMMENDATIONS]
+    .sort((a, b) => num(b.score_destino_medio_top5) - num(a.score_destino_medio_top5))
+    .slice(0, n);
+  return `<strong>Resumen de operaciones sugeridas — Betis Deportivo</strong><br>
+    <span class="muted">Pregunta por un jugador concreto para ver clubes, entrenadores y sucesos similares.</span><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Pos.</th><th>Edad</th><th>Operación</th><th>Confianza</th><th>Score top5</th><th>Reval. esp.</th></tr></thead>
+    <tbody>${rows.map((d, i) => `<tr>
+      <td>${i + 1}</td><td class="bold">${d.jugador}</td><td>${d.posicion}</td><td>${num(d.edad).toFixed(0)}</td>
+      <td>${d.operacion_sugerida}</td><td>${d.confianza_modelo}</td>
+      <td>${num(d.score_destino_medio_top5).toFixed(1)}</td><td>${formatM(num(d.revalorizacion_esperada_media_top5))}</td>
+    </tr>`).join('')}</tbody></table>`;
 }
 
 function sgptLoanDestinationsForPlayer(playerName, n) {
@@ -3776,6 +3952,25 @@ function buildQueryContext(question) {
   const M = MASTER_DATA;
   const isSub23 = d => d.es_sub23 === true || d.es_sub23 === 'True' || (+d.edad > 0 && +d.edad < 23);
   const posMatch = (d, kw) => devPosMatch(d, POSITION_QUERY_ALIASES[kw] || kw);
+
+  // Modelo RF de decisiones Betis Deportivo
+  if (RF_PLAYER_RECOMMENDATIONS.length && isDecisionModelQuery(q)) {
+    const player = detectBetisPlayerInQuery(q);
+    if (player) {
+      const summary = rfSummaryForPlayer(player.jugador);
+      const rows = rfRowsForPlayer(player.jugador).slice(0, 8);
+      const similar = RF_SIMILAR_EVENTS
+        .filter(d => norm(d.jugador_betis) === norm(player.jugador))
+        .sort((a, b) => num(a.ranking_similar) - num(b.ranking_similar))
+        .slice(0, 8);
+      return `Modelo RF de decision para ${player.jugador}. No es decision automatica, es evidencia:\n` +
+        `Resumen: operacion:${summary?.operacion_sugerida||''}|confianza:${summary?.confianza_modelo||''}|reval_media_top5:${summary?.revalorizacion_esperada_media_top5||''}|prob_rev_positiva:${summary?.prob_revalorizacion_positiva_media_top5||''}|razonamiento:${summary?.razonamiento||''}\n` +
+        `Destinos:\n` +
+        rows.map(d => `${d.ranking_destino_rf}|${d.club}|entrenador:${d.entrenador||''}|score_rf:${d.score_destino_rf}|reval_esperada:${d.rf_revalorizacion_esperada}|prob_rev_pos:${d.rf_prob_revalorizacion_positiva}|demanda:${d.demand_score}|razon:${d.razonamiento_rf||''}`).join('\n') +
+        `\nSucesos similares:\n` +
+        similar.map(d => `${d.ranking_similar}|${d.jugador_historico}|${d.club}|${d.tipo_suceso}|edad:${d.edad}|min:${d.minutos}|goles:${d.goles}|rev:${d.revalorizacion}|sim:${d.similaridad_score}`).join('\n');
+    }
+  }
 
   // Modelo de destinos de cesión Betis Deportivo
   if (LOAN_MODEL_DATA.length && isLoanDestinationQuery(q)) {
