@@ -8,6 +8,63 @@
 /* ===================== CONSTANTS ===================== */
 const CHART_COLORS = ['#009a44','#1d6fa4','#e07b39','#8b5cf6','#d4a017','#0891b2','#be185d','#059669','#7c3aed','#b45309'];
 
+/* ============================================================
+   REGISTRO DE LIGAS (multi-liga)
+   ------------------------------------------------------------
+   Cada liga es una entrada con su carpeta de datos. El código de
+   "main" es agnóstico: lee siempre dataPath(archivo), que resuelve
+   a la carpeta de la liga activa.
+
+   Para AÑADIR una liga (sin tocar funciones de main):
+     1. Genera sus CSV con la misma estructura en data/leagues/<id>/
+        (o deja Segunda en data/final, que es su carpeta por defecto).
+     2. Añade una entrada aquí con { nombre, dataDir, temporadaActual }.
+     3. Aparecerá automáticamente en el selector de liga de la cabecera.
+   ============================================================ */
+const LEAGUES = {
+  segunda: {
+    nombre: 'Segunda División',
+    pais: 'España',
+    dataDir: 'data/final',          // Segunda vive en su carpeta histórica
+    temporadaActual: '2025-26',
+    fichajesFile: 'segunda_division_fichajes_2021_2026.csv',
+  },
+  // Ejemplo para el futuro (descomentar y crear data/leagues/primera/):
+  // primera: { nombre: 'Primera División', pais: 'España', dataDir: 'data/leagues/primera', temporadaActual: '2025-26' },
+};
+
+// Liga activa: se recuerda entre recargas; por defecto Segunda
+let ACTIVE_LEAGUE = (() => {
+  try {
+    const saved = sessionStorage.getItem('activeLeague');
+    return saved && LEAGUES[saved] ? saved : 'segunda';
+  } catch { return 'segunda'; }
+})();
+
+// Resuelve el nombre de un CSV a la carpeta de la liga activa
+function dataPath(file) {
+  const dir = (LEAGUES[ACTIVE_LEAGUE] || LEAGUES.segunda).dataDir;
+  return `${dir}/${file}`;
+}
+
+// Pobla el selector de liga y conecta el cambio (recarga limpia)
+function setupLeagueSelector() {
+  const sel = document.getElementById('league-global');
+  if (!sel) return;
+  sel.innerHTML = Object.entries(LEAGUES)
+    .map(([id, lg]) => `<option value="${id}">${lg.nombre}</option>`).join('');
+  sel.value = ACTIVE_LEAGUE;
+  // Reflejar la liga activa en el título de la cabecera
+  const titleSpan = document.querySelector('.header-title span');
+  if (titleSpan) titleSpan.textContent = (LEAGUES[ACTIVE_LEAGUE] || LEAGUES.segunda).nombre;
+  // Si solo hay una liga, el selector queda informativo (sin cambios posibles)
+  sel.disabled = Object.keys(LEAGUES).length < 2;
+  sel.addEventListener('change', () => {
+    try { sessionStorage.setItem('activeLeague', sel.value); } catch {}
+    location.reload();   // recarga con la liga nueva → estado limpio, sin caches
+  });
+}
+
 const CLUB_IDS = {
   "AD Alcorcón":"11596","AD Ceuta FC":"8568","Albacete Balompié":"1532",
   "Burgos CF":"1536","CD Castellón":"2502","CD Eldense":"12567",
@@ -204,7 +261,8 @@ function loadAll() {
   let loaded = 0;
   const check = () => { if (++loaded === 2) onAllLoaded(); };
 
-  Papa.parse('data/final/segunda_division_fichajes_2021_2026.csv', {
+  const fichajesFile = (LEAGUES[ACTIVE_LEAGUE] || LEAGUES.segunda).fichajesFile;
+  Papa.parse(dataPath(fichajesFile), {
     header: true,
     dynamicTyping: true,
     download: true,
@@ -217,7 +275,7 @@ function loadAll() {
     }
   });
 
-  Papa.parse('data/final/revalorizacion.csv', {
+  Papa.parse(dataPath('revalorizacion.csv'), {
     header: true,
     dynamicTyping: true,
     download: true,
@@ -371,6 +429,7 @@ function onAllLoaded() {
   hideLoading();
   enrichRevData();
   populateFilters();
+  setupLeagueSelector();
   renderCurrentTab();
   setupEventListeners();
 }
@@ -2881,7 +2940,7 @@ function fmtMv(n) {
 
 /* --- Carga opcional de jugador_ids.csv para match por ID --- */
 (function loadJugadorIds() {
-  Papa.parse('data/final/jugador_ids.csv', {
+  Papa.parse(dataPath('jugador_ids.csv'), {
     header: true, download: true,
     complete: r => { window._jugadorIds = r.data.filter(d => d.jugador && d.spieler_id); },
     error: () => {}
@@ -3603,7 +3662,7 @@ let CLUB_DEMAND_DATA = [];     // club_position_demand.csv
 
 function loadWyscoutData(callback) {
   if (WY_DATA.length) { callback(WY_DATA); return; }
-  Papa.parse('data/final/master_wyscout_players.csv', {
+  Papa.parse(dataPath('master_wyscout_players.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => {
       WY_DATA = r.data.filter(d => d.jugador);
@@ -3619,13 +3678,13 @@ function loadOperationContext(callback) {
   const done = () => { if (--pending === 0) callback(); };
   loadWyscoutData(() => done());
   if (CLUB_EVIDENCE_DATA.length) { done(); }
-  else Papa.parse('data/final/development_club_evidence.csv', {
+  else Papa.parse(dataPath('development_club_evidence.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => { CLUB_EVIDENCE_DATA = r.data.filter(d => d.club); done(); },
     error: () => { CLUB_EVIDENCE_DATA = []; done(); }
   });
   if (CLUB_DEMAND_DATA.length) { done(); }
-  else Papa.parse('data/final/club_position_demand.csv', {
+  else Papa.parse(dataPath('club_position_demand.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => { CLUB_DEMAND_DATA = r.data.filter(d => d.club); done(); },
     error: () => { CLUB_DEMAND_DATA = []; done(); }
@@ -3776,7 +3835,7 @@ let BETIS_DECISIONS = [];          // betis_decision_recommendations.csv (operat
 
 function loadMasterData(callback) {
   if (MASTER_DATA.length) { callback(MASTER_DATA); return; }
-  Papa.parse('data/final/master_player_development.csv', {
+  Papa.parse(dataPath('master_player_development.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => {
       MASTER_DATA = r.data.filter(d => d.nombre);
@@ -3795,7 +3854,7 @@ function loadLoanModelData(callback) {
     if (pending === 0) callback(LOAN_MODEL_DATA);
   };
 
-  Papa.parse('data/final/betis_loan_destination_model.csv', {
+  Papa.parse(dataPath('betis_loan_destination_model.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => {
       LOAN_MODEL_DATA = r.data.filter(d => d.jugador && d.club_destino);
@@ -3804,7 +3863,7 @@ function loadLoanModelData(callback) {
     error: () => { LOAN_MODEL_DATA = []; done(); }
   });
 
-  Papa.parse('data/final/betis_deportivo_players.csv', {
+  Papa.parse(dataPath('betis_deportivo_players.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => {
       BETIS_PLAYERS_DATA = r.data.filter(d => d.jugador);
@@ -3826,25 +3885,25 @@ function loadDecisionModelData(callback) {
     if (pending === 0) callback(RF_PLAYER_RECOMMENDATIONS);
   };
 
-  Papa.parse('data/final/betis_decision_recommendations.csv', {
+  Papa.parse(dataPath('betis_decision_recommendations.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => { BETIS_DECISIONS = r.data.filter(d => d.jugador); done(); },
     error: () => { BETIS_DECISIONS = []; done(); }
   });
 
-  Papa.parse('data/final/betis_rf_player_recommendations.csv', {
+  Papa.parse(dataPath('betis_rf_player_recommendations.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => { RF_PLAYER_RECOMMENDATIONS = r.data.filter(d => d.jugador); done(); },
     error: () => { RF_PLAYER_RECOMMENDATIONS = []; done(); }
   });
 
-  Papa.parse('data/final/betis_rf_destination_recommendations.csv', {
+  Papa.parse(dataPath('betis_rf_destination_recommendations.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => { RF_DESTINATION_RECOMMENDATIONS = r.data.filter(d => d.jugador && d.club); done(); },
     error: () => { RF_DESTINATION_RECOMMENDATIONS = []; done(); }
   });
 
-  Papa.parse('data/final/betis_similar_historical_events.csv', {
+  Papa.parse(dataPath('betis_similar_historical_events.csv'), {
     header: true, dynamicTyping: true, download: true,
     complete: r => { RF_SIMILAR_EVENTS = r.data.filter(d => d.jugador_betis); done(); },
     error: () => { RF_SIMILAR_EVENTS = []; done(); }

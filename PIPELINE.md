@@ -92,3 +92,35 @@ y reejecuta los pasos 6→9. Así el sistema nunca recomienda clubes que han asc
 - **Dashboard:** https://juankibenitez57.github.io/segunda-division-dashboard/
 - **Proxy IA/Transfermarkt:** https://segunda-division-dashboard.onrender.com
   - Variable de entorno en Render: `GEMINI_API_KEY` (NO se commitea nunca)
+
+---
+
+## Arquitectura multi-liga (preparada)
+
+El dashboard está preparado para alojar **varias ligas que conviven** y se pueden
+comparar, manteniendo la experiencia de trabajar una liga en profundidad.
+
+### Cómo funciona
+- `script.js` define un **registro `LEAGUES`** (id → nombre, carpeta de datos, temporada).
+- Todo el código de "main" usa `dataPath(archivo)`, que resuelve a la carpeta de la
+  **liga activa** (`ACTIVE_LEAGUE`). No hay rutas de datos hardcodeadas.
+- El **selector "Liga"** de la cabecera se puebla solo desde `LEAGUES`. Al cambiar,
+  recarga con estado limpio (recuerda la elección en sessionStorage).
+- Segunda vive en `data/final/` (su carpeta histórica). Nuevas ligas van en
+  `data/leagues/<id>/`.
+
+### Añadir una liga nueva (sin tocar funciones de main)
+1. Genera sus CSV con la **misma estructura** en `data/leagues/<id>/`
+   (mismos nombres de archivo que Segunda: master_wyscout_players.csv,
+   development_club_evidence.csv, club_position_demand.csv, etc.).
+2. Añade una entrada al registro `LEAGUES` en `script.js`:
+   ```js
+   primera: { nombre: 'Primera División', pais: 'España',
+              dataDir: 'data/leagues/primera', temporadaActual: '2025-26',
+              fichajesFile: 'primera_division_fichajes.csv' },
+   ```
+3. Listo: aparece en el selector. El código de main no se toca.
+
+### Para comparar entre ligas (fase futura)
+Cuando haya 2+ ligas, se podrá cargar el master de cada una y cruzarlas. La capa de
+datos ya es agnóstica; solo faltará la UI de comparación.
