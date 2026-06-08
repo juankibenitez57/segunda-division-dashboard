@@ -7,7 +7,7 @@
 
 /* ===================== CONSTANTS ===================== */
 const CHART_COLORS = ['#009a44','#1d6fa4','#e07b39','#8b5cf6','#d4a017','#0891b2','#be185d','#059669','#7c3aed','#b45309'];
-const DATA_VERSION = '2026-06-08-f675267';
+const DATA_VERSION = '2026-06-08-ml-benchmark';
 
 /* ============================================================
    REGISTRO DE LIGAS (multi-liga)
@@ -2733,6 +2733,7 @@ function renderScoutGPTTab() {
   loadDecisionModelData(() => {});
   loadOperationContext(() => {});
   loadOperationModelReport(() => {});
+  loadOperationBenchmarkReport(() => {});
 
   const input = document.getElementById('scoutgpt-input');
   const btn   = document.getElementById('scoutgpt-send');
@@ -2746,10 +2747,11 @@ function renderScoutGPTTab() {
 
     let html;
     const qn = norm(q);
-    if (isDecisionModelQuery(qn) || isLocalStatsQuery(qn) || isOperationModelQualityQuery(qn)) {
+    if (isDecisionModelQuery(qn) || isLocalStatsQuery(qn) || isOperationModelQualityQuery(qn) || isModelBenchmarkQuery(qn)) {
       await new Promise(resolve => loadLoanModelData(resolve));
       await new Promise(resolve => loadDecisionModelData(resolve));
       await new Promise(resolve => loadOperationModelReport(resolve));
+      await new Promise(resolve => loadOperationBenchmarkReport(resolve));
       await new Promise(resolve => loadMasterData(resolve));
       html = processScoutQuery(q);
     } else {
@@ -3052,6 +3054,7 @@ function processScoutQuery(raw) {
 
   // --- Routing ---
 
+  if (isModelBenchmarkQuery(q)) return sgptOperationBenchmarkReport();
   if (isOperationModelQualityQuery(q)) return sgptOperationModelReport();
 
   // Evaluación DIRIGIDA: jugador Betis + club destino concreto + operación
@@ -3864,6 +3867,7 @@ let V2_DESTINATION_RECOMMENDATIONS = [];
 let RF_SIMILAR_EVENTS = [];
 let BETIS_DECISIONS = [];          // betis_decision_recommendations.csv (operation_success_score)
 let OPERATION_MODEL_REPORT = null; // player_operation_model_report.json
+let OPERATION_BENCHMARK_REPORT = null; // operation_model_benchmark_report.json
 
 function loadMasterData(callback) {
   if (MASTER_DATA.length) { callback(MASTER_DATA); return; }
@@ -3962,6 +3966,20 @@ function loadOperationModelReport(callback) {
     });
 }
 
+function loadOperationBenchmarkReport(callback) {
+  if (OPERATION_BENCHMARK_REPORT) { callback(OPERATION_BENCHMARK_REPORT); return; }
+  fetch(dataPath('operation_model_benchmark_report.json'))
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      OPERATION_BENCHMARK_REPORT = d || null;
+      callback(OPERATION_BENCHMARK_REPORT);
+    })
+    .catch(() => {
+      OPERATION_BENCHMARK_REPORT = null;
+      callback(null);
+    });
+}
+
 const SEGUNDA_CLUBS_SET = new Set([
   'AD Alcorcón','AD Ceuta FC','Albacete Balompié','Burgos CF','CD Castellón','CD Eldense',
   'CD Leganés','CD Lugo','CD Mirandés','CD Tenerife','CF Fuenlabrada','Cultural Leonesa',
@@ -4055,6 +4073,40 @@ function pct(v) {
 
 function isOperationModelQualityQuery(q) {
   return /exact|precision|fiab|validaci[oó]n|m[eé]trica|r2|mae|auc|calidad|dataset|entren|machine|learning|modelo.*operaci|operaci.*modelo/.test(q);
+}
+
+function isModelBenchmarkQuery(q) {
+  return /f1|f1.?score|random.?forest|rainforest|extra.?trees|gradient|boost|logistic|regresi[oó]n|mejor.*modelo|modelo.*indicado|compar.*modelo|benchmark/.test(q);
+}
+
+function sgptOperationBenchmarkReport() {
+  if (!OPERATION_BENCHMARK_REPORT) {
+    return 'El benchmark de modelos todavía se está cargando. Vuelve a preguntar en unos segundos.';
+  }
+  const best = OPERATION_BENCHMARK_REPORT.best_models || {};
+  const ds = OPERATION_BENCHMARK_REPORT.dataset || {};
+  const row = (key, label) => {
+    const b = best[key] || {};
+    const metric = b.task === 'regression'
+      ? `R² CV ${num(b.cv_r2_mean).toFixed(3)} · MAE ${num(b.cv_mae_mean).toFixed(2)}`
+      : `F1 CV ${num(b.cv_f1_mean).toFixed(3)} · AUC ${num(b.cv_roc_auc_mean).toFixed(3)} · AP ${num(b.cv_average_precision_mean).toFixed(3)}`;
+    return `<tr><td>${label}</td><td class="bold">${b.model || '—'}</td><td>${metric}</td><td>${fmt(num(b.rows))}</td><td>${b.positive_rows !== undefined ? fmt(num(b.positive_rows)) : '—'}</td></tr>`;
+  };
+
+  return `<strong>Benchmark ML de operaciones</strong><br>
+    <span class="muted">Comparación sobre operaciones históricas usando solo variables disponibles antes de decidir. Dataset: ${fmt(num(ds.rows))} filas.</span><br>
+    <table><thead><tr><th>Objetivo</th><th>Modelo más indicado</th><th>Métricas</th><th>Filas</th><th>Éxitos</th></tr></thead>
+    <tbody>
+      ${row('loan_success_label', 'Cesión exitosa')}
+      ${row('sale_success_label', 'Venta exitosa')}
+      ${row('global_success_label', 'Éxito global')}
+      ${row('operation_success_score_v2', 'Score 0-100')}
+    </tbody></table>
+    <div style="margin:10px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <strong>Conclusión:</strong><br>
+      <span class="muted">Para decisiones de cesión y venta, el modelo más indicado ahora mismo es <strong>Random Forest</strong>. Para éxito global, <strong>Extra Trees</strong> gana por poco en F1. Para el score continuo 0-100 vuelve a ganar <strong>Random Forest</strong>. Por eso mantenemos Random Forest como motor principal de decisiones, con benchmark guardado para revisarlo cuando entren nuevos datos.</span>
+    </div>
+    <span class="muted">Nota: cesiones y ventas tienen pocos positivos históricos, así que F1 y average precision importan más que accuracy.</span>`;
 }
 
 function sgptOperationModelReport() {

@@ -36,8 +36,9 @@ Ejecuta en este orden cuando actualices datos. Cada script genera entradas del s
 | 6 | `python3 build_loan_destination_model.py` | JUGADORES BETIS + evidencia | `betis_deportivo_players.csv`, `betis_loan_destination_model.csv` |
 | 7 | `python3 build_rf_decision_model.py` | master + betis + evidencia | `historical_operation_events.csv`, `club_position_demand.csv`, `betis_rf_*.csv` |
 | 8 | `python3 build_operation_model_dataset.py` | master + `historical_operation_events.csv` | `player_operation_model_dataset.csv`, `player_operation_model_report.json`, **`operation_success_v2_model.joblib`** |
-| 9 | `python3 build_success_score.py` | `historical_operation_events.csv` | `historical_success_cases.csv`, `success_score_report.json`, **`success_score_model.joblib`** |
-| 10 | `python3 build_betis_decisions.py` | success model + loan + demand + cases + modelo v2 | `betis_decision_recommendations.csv/json`, `betis_v2_destination_recommendations.csv` |
+| 9 | `python3 benchmark_operation_models.py` | `player_operation_model_dataset.csv` | `operation_model_benchmark.csv`, `operation_model_benchmark_report.json` |
+| 10 | `python3 build_success_score.py` | `historical_operation_events.csv` | `historical_success_cases.csv`, `success_score_report.json`, **`success_score_model.joblib`** |
+| 11 | `python3 build_betis_decisions.py` | success model + loan + demand + cases + modelo v2 | `betis_decision_recommendations.csv/json`, `betis_v2_destination_recommendations.csv` |
 
 Después: `git add -A && git commit && git push` para que el dashboard lea los nuevos CSV.
 
@@ -92,6 +93,26 @@ minutos/goles/xG/revalorización de la temporada de destino. Por eso sus métric
 más realistas y menos infladas que un modelo que aprende del resultado ya observado.
 
 Definición completa en `data/final/player_operation_model_report.json`.
+
+### Benchmark de modelos ML
+
+`benchmark_operation_models.py` compara varios métodos sobre el mismo dataset y
+las mismas variables pre-operación:
+
+- Dummy baseline
+- Regresión logística / Ridge
+- Random Forest
+- Extra Trees
+- HistGradientBoosting
+
+Para clasificación se prioriza `F1-score` porque los casos positivos son pocos
+(especialmente cesiones y ventas exitosas). También se guardan balanced accuracy,
+ROC-AUC, average precision, precision y recall.
+
+El resultado completo queda en:
+
+- `data/final/operation_model_benchmark.csv`
+- `data/final/operation_model_benchmark_report.json`
 
 ### Contexto deportivo Betis Deportivo
 
