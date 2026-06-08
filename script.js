@@ -242,9 +242,33 @@ function layout(overrides = {}, data = []) {
 
 function plot(id, data, layoutOverrides, config = {}) {
   try {
-    Plotly.purge(id);
-    Plotly.newPlot(id, data, layout(layoutOverrides, data), Object.assign({ responsive: true, displayModeBar: false }, config));
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const render = () => {
+      Plotly.purge(el);
+      Plotly.newPlot(el, data, layout(layoutOverrides, data), Object.assign({ responsive: true, displayModeBar: false }, config))
+        .then(() => {
+          requestAnimationFrame(() => Plotly.Plots.resize(el));
+          setTimeout(() => Plotly.Plots.resize(el), 120);
+        })
+        .catch(e => console.warn('plot error', id, e));
+    };
+
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      requestAnimationFrame(render);
+    } else {
+      render();
+    }
   } catch(e) { console.warn('plot error', id, e); }
+}
+
+function resizeVisibleCharts() {
+  if (typeof Plotly === 'undefined') return;
+  document.querySelectorAll('.tab-content.active .js-plotly-plot').forEach(el => {
+    Plotly.Plots.resize(el);
+  });
 }
 
 /* ===================== GLOBAL STATE ===================== */
@@ -511,6 +535,7 @@ function switchTab(tabId) {
 
   currentTab = tabId;
   renderCurrentTab();
+  requestAnimationFrame(resizeVisibleCharts);
 }
 
 function renderCurrentTab() {
@@ -518,19 +543,19 @@ function renderCurrentTab() {
 
   switch (currentTab) {
     case 'tab-inicio':       renderInicioTab(); break;
-    case 'tab-mercado':      if (!chartsRendered['tab-mercado']) { renderMercadoTab(); chartsRendered['tab-mercado'] = true; } break;
-    case 'tab-clubes':       if (!chartsRendered['tab-clubes']) { renderClubesTab(); chartsRendered['tab-clubes'] = true; } break;
-    case 'tab-posiciones':   if (!chartsRendered['tab-posiciones']) { renderPosicionesTab(); chartsRendered['tab-posiciones'] = true; } break;
-    case 'tab-jugadores':    if (!chartsRendered['tab-jugadores']) { renderJugadoresTab(); chartsRendered['tab-jugadores'] = true; } break;
-    case 'tab-revalorizacion': if (!chartsRendered['tab-revalorizacion']) { renderRevalorizacionTab(); chartsRendered['tab-revalorizacion'] = true; } break;
+    case 'tab-mercado':      renderMercadoTab(); break;
+    case 'tab-clubes':       renderClubesTab(); break;
+    case 'tab-posiciones':   renderPosicionesTab(); break;
+    case 'tab-jugadores':    renderJugadoresTab(); break;
+    case 'tab-revalorizacion': renderRevalorizacionTab(); break;
     case 'tab-temporadas':   renderTemporadasTab(); break;
     case 'tab-sub23':        renderSub23Tab(); break;
     case 'tab-buscador':     if (!chartsRendered['tab-buscador']) { renderBuscadorTab(); chartsRendered['tab-buscador'] = true; } break;
     case 'tab-scoutgpt':     if (!chartsRendered['tab-scoutgpt']) { renderScoutGPTTab(); chartsRendered['tab-scoutgpt'] = true; } break;
-    case 'tab-wyscout':      if (!chartsRendered['tab-wyscout'])  { renderWyscoutTab();  chartsRendered['tab-wyscout']  = true; } break;
+    case 'tab-wyscout':      renderWyscoutTab(); break;
     case 'tab-clubes-dev':   renderClubesDevTab(); break;
-    case 'tab-entrenadores': if (!chartsRendered['tab-entrenadores']) { renderEntrenadoresTab(); chartsRendered['tab-entrenadores'] = true; } break;
-    case 'tab-pos-dev':      if (!chartsRendered['tab-pos-dev']) { renderPosDevTab(); chartsRendered['tab-pos-dev'] = true; } break;
+    case 'tab-entrenadores': renderEntrenadoresTab(); break;
+    case 'tab-pos-dev':      renderPosDevTab(); break;
     case 'tab-bbdd':         if (!chartsRendered['tab-bbdd']) { renderBBDDTab(); chartsRendered['tab-bbdd'] = true; } break;
   }
 }
