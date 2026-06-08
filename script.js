@@ -7,6 +7,7 @@
 
 /* ===================== CONSTANTS ===================== */
 const CHART_COLORS = ['#009a44','#1d6fa4','#e07b39','#8b5cf6','#d4a017','#0891b2','#be185d','#059669','#7c3aed','#b45309'];
+const DATA_VERSION = '2026-06-08-f675267';
 
 /* ============================================================
    REGISTRO DE LIGAS (multi-liga)
@@ -44,7 +45,7 @@ let ACTIVE_LEAGUE = (() => {
 // Resuelve el nombre de un CSV a la carpeta de la liga activa
 function dataPath(file) {
   const dir = (LEAGUES[ACTIVE_LEAGUE] || LEAGUES.segunda).dataDir;
-  return `${dir}/${file}`;
+  return `${dir}/${file}?v=${DATA_VERSION}`;
 }
 
 // Pobla el selector de liga y conecta el cambio (recarga limpia)
