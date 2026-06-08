@@ -3859,6 +3859,7 @@ let LOAN_MODEL_DATA = [];
 let BETIS_PLAYERS_DATA = [];
 let RF_PLAYER_RECOMMENDATIONS = [];
 let RF_DESTINATION_RECOMMENDATIONS = [];
+let V2_DESTINATION_RECOMMENDATIONS = [];
 let RF_SIMILAR_EVENTS = [];
 let BETIS_DECISIONS = [];          // betis_decision_recommendations.csv (operation_success_score)
 let OPERATION_MODEL_REPORT = null; // player_operation_model_report.json
@@ -3904,12 +3905,12 @@ function loadLoanModelData(callback) {
 }
 
 function loadDecisionModelData(callback) {
-  if (RF_PLAYER_RECOMMENDATIONS.length && RF_DESTINATION_RECOMMENDATIONS.length && RF_SIMILAR_EVENTS.length && BETIS_DECISIONS.length) {
+  if (RF_PLAYER_RECOMMENDATIONS.length && RF_DESTINATION_RECOMMENDATIONS.length && RF_SIMILAR_EVENTS.length && BETIS_DECISIONS.length && V2_DESTINATION_RECOMMENDATIONS.length) {
     callback(RF_PLAYER_RECOMMENDATIONS);
     return;
   }
 
-  let pending = 4;
+  let pending = 5;
   const done = () => {
     pending -= 1;
     if (pending === 0) callback(RF_PLAYER_RECOMMENDATIONS);
@@ -3931,6 +3932,12 @@ function loadDecisionModelData(callback) {
     header: true, dynamicTyping: true, download: true,
     complete: r => { RF_DESTINATION_RECOMMENDATIONS = r.data.filter(d => d.jugador && d.club); done(); },
     error: () => { RF_DESTINATION_RECOMMENDATIONS = []; done(); }
+  });
+
+  Papa.parse(dataPath('betis_v2_destination_recommendations.csv'), {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => { V2_DESTINATION_RECOMMENDATIONS = r.data.filter(d => d.jugador && d.club); done(); },
+    error: () => { V2_DESTINATION_RECOMMENDATIONS = []; done(); }
   });
 
   Papa.parse(dataPath('betis_similar_historical_events.csv'), {
@@ -4029,6 +4036,12 @@ function rfRowsForPlayer(playerName) {
   return RF_DESTINATION_RECOMMENDATIONS
     .filter(d => norm(d.jugador) === norm(playerName))
     .sort((a, b) => num(a.ranking_destino_rf) - num(b.ranking_destino_rf));
+}
+
+function v2RowsForPlayer(playerName) {
+  return V2_DESTINATION_RECOMMENDATIONS
+    .filter(d => norm(d.jugador) === norm(playerName))
+    .sort((a, b) => num(a.ranking_destino_v2) - num(b.ranking_destino_v2));
 }
 
 function rfSummaryForPlayer(playerName) {
@@ -4348,7 +4361,8 @@ function sgptDecisionForBetisPlayer(playerName) {
     return 'El modelo RF de decisiones todavía se está cargando. Vuelve a lanzar la pregunta en unos segundos.';
   }
   const summary = rfSummaryForPlayer(playerName);
-  const rows = rfRowsForPlayer(playerName).slice(0, 5);
+  const v2Rows = v2RowsForPlayer(playerName).slice(0, 5);
+  const rows = v2Rows.length ? v2Rows : rfRowsForPlayer(playerName).slice(0, 5);
   const similar = RF_SIMILAR_EVENTS
     .filter(d => norm(d.jugador_betis) === norm(playerName))
     .sort((a, b) => num(a.ranking_similar) - num(b.ranking_similar))
@@ -4364,6 +4378,7 @@ function sgptDecisionForBetisPlayer(playerName) {
   const justificacion = dec?.justificacion || summary.razonamiento || '';
   const clubesText = dec?.clubes_ideales || summary.clubes_ideales || '';
   const entrenadoresText = dec?.entrenadores_ideales || summary.entrenadores_ideales || '';
+  const modeloDecision = dec?.modelo_decision || (v2Rows.length ? 'operation_success_v2' : 'RF histórico');
   const stats = getPlayerSeasonStats(playerName);
   const totals = summarizePlayerStats(stats);
   const lectura = justificacion
@@ -4380,6 +4395,7 @@ function sgptDecisionForBetisPlayer(playerName) {
         <div>
           <div class="muted" style="font-size:0.78rem">Score / confianza</div>
           <div style="font-size:1.15rem;font-weight:900;color:${probColor}">${prob.toFixed(0)}/100</div>
+          <div class="muted" style="font-size:0.68rem">${modeloDecision}</div>
         </div>
         <div>
           <div class="muted" style="font-size:0.78rem">Revalorización esperada</div>
@@ -4400,7 +4416,13 @@ function sgptDecisionForBetisPlayer(playerName) {
     </div>
     ${clubesText ? `<div style="margin-bottom:6px"><strong>Clubes ideales:</strong> <span class="muted">${clubesText}</span></div>` : ''}
     ${entrenadoresText ? `<div style="margin-bottom:10px"><strong>Entrenadores ideales:</strong> <span class="muted">${entrenadoresText}</span></div>` : ''}
-    ${rows.length ? `<strong>Destinos calculados</strong><br>
+    ${rows.length && v2Rows.length ? `<strong>Destinos calculados — modelo v2</strong><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score v2</th><th>Cesión</th><th>Venta</th><th>Demanda</th></tr></thead>
+    <tbody>${rows.map(d => `<tr>
+      <td>${num(d.ranking_destino_v2)}</td><td class="bold">${d.club}</td><td>${d.entrenador || '—'}</td>
+      <td class="green">${num(d.score_destino_v2).toFixed(1)}</td><td>${num(d.score_v2_cesion).toFixed(1)}</td>
+      <td>${num(d.score_v2_traspaso).toFixed(1)}</td><td>${num(d.demanda).toFixed(0)}/100</td>
+    </tr>`).join('')}</tbody></table>` : rows.length ? `<strong>Destinos calculados</strong><br>
     <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score</th><th>Reval.</th><th>Prob +</th><th>Demanda</th></tr></thead>
     <tbody>${rows.map(d => `<tr>
       <td>${num(d.ranking_destino_rf)}</td><td class="bold">${d.club}</td><td>${d.entrenador || '—'}</td>

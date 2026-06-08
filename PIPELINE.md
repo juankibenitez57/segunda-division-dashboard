@@ -37,7 +37,7 @@ Ejecuta en este orden cuando actualices datos. Cada script genera entradas del s
 | 7 | `python3 build_rf_decision_model.py` | master + betis + evidencia | `historical_operation_events.csv`, `club_position_demand.csv`, `betis_rf_*.csv` |
 | 8 | `python3 build_operation_model_dataset.py` | master + `historical_operation_events.csv` | `player_operation_model_dataset.csv`, `player_operation_model_report.json`, **`operation_success_v2_model.joblib`** |
 | 9 | `python3 build_success_score.py` | `historical_operation_events.csv` | `historical_success_cases.csv`, `success_score_report.json`, **`success_score_model.joblib`** |
-| 10 | `python3 build_betis_decisions.py` | success model + loan + demand + cases | `betis_decision_recommendations.csv/json` |
+| 10 | `python3 build_betis_decisions.py` | success model + loan + demand + cases + modelo v2 | `betis_decision_recommendations.csv/json`, `betis_v2_destination_recommendations.csv` |
 
 Después: `git add -A && git commit && git push` para que el dashboard lea los nuevos CSV.
 

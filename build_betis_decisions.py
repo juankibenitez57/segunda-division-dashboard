@@ -8,6 +8,7 @@ Combina TODA la evidencia en una recomendación explicable por jugador:
   · development_coach_evidence                       → entrenadores que usan jóvenes
   · club_position_demand                             → clubes que NECESITAN la posición
   · historical_success_cases                         → casos similares reales
+  · operation_success_v2_model                       → modelo honesto pre-operación
 
 NO es una caja negra: cada recomendación incluye el desglose de por qué.
 
@@ -37,16 +38,44 @@ COACH_PATH = DATA_FINAL / "development_coach_evidence.csv"
 DEMAND_PATH = DATA_FINAL / "club_position_demand.csv"
 CASES_PATH = DATA_FINAL / "historical_success_cases.csv"
 MODEL_PATH = DATA_FINAL / "success_score_model.joblib"
+MODEL_V2_PATH = DATA_FINAL / "operation_success_v2_model.joblib"
+CLUB_EVIDENCE_PATH = DATA_FINAL / "development_club_evidence.csv"
 PLAYER_RECS_PATH = DATA_FINAL / "betis_rf_player_recommendations.csv"
 
 OUT_PATH = DATA_FINAL / "betis_decision_recommendations.csv"
 OUT_JSON = DATA_FINAL / "betis_decision_recommendations.json"
+OUT_V2_DEST_PATH = DATA_FINAL / "betis_v2_destination_recommendations.csv"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)-8s  %(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger("betis_decisions")
 
 NUMERIC_FEATURES = ["edad", "valor_mercado", "minutos", "goles", "xg", "goles_por_90", "xg_por_90"]
 CATEGORICAL_FEATURES = ["posicion_normalizada", "club", "entrenador", "tipo_operacion"]
+
+V2_NUMERIC_FEATURES = [
+    "edad", "pre_edad", "pre_valor_mercado", "pre_partidos", "pre_minutos",
+    "pre_goles", "pre_xg", "pre_goles_por_90", "pre_xg_por_90",
+    "valor_mercado", "valor_llegada", "club_pos_minutos_sub23",
+    "club_pos_jugadores_sub23", "club_pos_pct_minutos",
+    "club_total_minutos_sub23", "club_total_jugadores_sub23",
+    "coach_total_minutos_sub23", "coach_total_jugadores_sub23",
+    "coach_pos_minutos_sub23", "demand_total_altas", "demand_cesiones",
+    "demand_traspasos", "demand_sub23", "demand_recent", "demand_score",
+]
+V2_CATEGORICAL_FEATURES = [
+    "posicion_normalizada", "tipo_suceso", "tipo_operacion",
+    "origen_desarrollo", "club", "entrenador", "pre_club",
+]
+
+POSITION_MINUTES_COL = {
+    "Delantero": "minutos_sub23_delanteros",
+    "Extremo": "minutos_sub23_extremos",
+    "Mediocentro": "minutos_sub23_mediocentros",
+    "Centrocampista": "minutos_sub23_mediocentros",
+    "Central": "minutos_sub23_centrales",
+    "Lateral": "minutos_sub23_laterales",
+    "Portero": "minutos_sub23_porteros",
+}
 
 
 def fmt_money(v: float) -> str:
@@ -68,6 +97,24 @@ def num(v, default=0.0):
         return default
 
 
+def minmax(v: float, low: float, high: float) -> float:
+    if high <= low:
+        return 0.0
+    return max(0.0, min((num(v) - low) / (high - low), 1.0))
+
+
+def lookup_row(df: pd.DataFrame, **criteria) -> pd.Series | None:
+    if df.empty:
+        return None
+    mask = pd.Series([True] * len(df), index=df.index)
+    for col, value in criteria.items():
+        if col not in df.columns:
+            return None
+        mask &= df[col].astype(str).eq(str(value))
+    hit = df[mask]
+    return hit.iloc[0] if not hit.empty else None
+
+
 def predict_success(model, player: pd.Series, tipo_operacion: str, club: str, entrenador: str) -> float:
     """Predice operation_success_score (0-100) para un escenario hipotético."""
     row = {
@@ -85,6 +132,91 @@ def predict_success(model, player: pd.Series, tipo_operacion: str, club: str, en
     }
     X = pd.DataFrame([row])[NUMERIC_FEATURES + CATEGORICAL_FEATURES]
     return float(model.predict(X)[0])
+
+
+def coach_pos_minutes(coach_row: pd.Series | None, pos: str) -> float:
+    if coach_row is None:
+        return 0.0
+    col = POSITION_MINUTES_COL.get(pos, "")
+    return num(coach_row.get(col)) if col else 0.0
+
+
+def scenario_row_v2(
+    player: pd.Series,
+    tipo_operacion: str,
+    club: str,
+    entrenador: str = "",
+    dest: pd.Series | None = None,
+    demand_row: pd.Series | None = None,
+    club_row: pd.Series | None = None,
+    coach_row: pd.Series | None = None,
+) -> dict:
+    pos = player.get("posicion_normalizada", "")
+    return {
+        "edad": num(player.get("edad")),
+        "pre_edad": num(player.get("edad")),
+        "pre_valor_mercado": num(player.get("valor_mercado")),
+        "pre_partidos": num(player.get("partidos_jugados")),
+        "pre_minutos": num(player.get("minutos_jugados")),
+        "pre_goles": num(player.get("goles")),
+        "pre_xg": num(player.get("xg")),
+        "pre_goles_por_90": num(player.get("goles_por_90")),
+        "pre_xg_por_90": num(player.get("xg_por_90")),
+        "valor_mercado": num(player.get("valor_mercado")),
+        "valor_llegada": num(player.get("valor_mercado")),
+        "club_pos_minutos_sub23": num(dest.get("minutos_sub23_destino")) if dest is not None else 0.0,
+        "club_pos_jugadores_sub23": num(dest.get("jugadores_sub23_destino")) if dest is not None else 0.0,
+        "club_pos_pct_minutos": num(dest.get("pct_minutos_sub23_club")) if dest is not None else 0.0,
+        "club_total_minutos_sub23": num(club_row.get("minutos_sub23")) if club_row is not None else 0.0,
+        "club_total_jugadores_sub23": num(club_row.get("jugadores_sub23_utilizados")) if club_row is not None else 0.0,
+        "coach_total_minutos_sub23": num(coach_row.get("minutos_sub23")) if coach_row is not None else 0.0,
+        "coach_total_jugadores_sub23": num(coach_row.get("jugadores_sub23_utilizados")) if coach_row is not None else 0.0,
+        "coach_pos_minutos_sub23": coach_pos_minutes(coach_row, pos),
+        "demand_total_altas": num(demand_row.get("demand_total_altas")) if demand_row is not None else 0.0,
+        "demand_cesiones": num(demand_row.get("demand_cesiones")) if demand_row is not None else 0.0,
+        "demand_traspasos": num(demand_row.get("demand_traspasos")) if demand_row is not None else 0.0,
+        "demand_sub23": num(demand_row.get("demand_sub23")) if demand_row is not None else 0.0,
+        "demand_recent": num(demand_row.get("demand_recent")) if demand_row is not None else 0.0,
+        "demand_score": num(demand_row.get("demand_score")) if demand_row is not None else 0.0,
+        "posicion_normalizada": pos,
+        "tipo_suceso": tipo_operacion,
+        "tipo_operacion": tipo_operacion,
+        "origen_desarrollo": "Betis Deportivo",
+        "club": club,
+        "entrenador": entrenador,
+        "pre_club": player.get("equipo", "Real Betis B"),
+    }
+
+
+def predict_success_v2(model, row: dict) -> float:
+    X = pd.DataFrame([row])
+    return float(predict_success_v2_batch(model, X)[0])
+
+
+def predict_success_v2_batch(model, rows: list[dict] | pd.DataFrame) -> np.ndarray:
+    X = pd.DataFrame(rows)
+    for col in V2_NUMERIC_FEATURES:
+        if col not in X.columns:
+            X[col] = 0.0
+    for col in V2_CATEGORICAL_FEATURES:
+        if col not in X.columns:
+            X[col] = ""
+    return model.predict(X[V2_NUMERIC_FEATURES + V2_CATEGORICAL_FEATURES])
+
+
+def current_development_score(player: pd.Series) -> float:
+    minutes = num(player.get("minutos_jugados"))
+    goals90 = num(player.get("goles_por_90"))
+    xg90 = num(player.get("xg_por_90"))
+    age = num(player.get("edad"), 21)
+    age_fit = 1.0 if age <= 20 else 0.75 if age <= 22 else 0.45
+    score = (
+        45 * minmax(minutes, 0, 2600)
+        + 25 * (0.6 * minmax(goals90, 0, 0.55) + 0.4 * minmax(xg90, 0, 0.55))
+        + 20 * age_fit
+        + 10 * minmax(num(player.get("partidos_jugados")), 0, 30)
+    )
+    return round(score, 1)
 
 
 def similar_cases(cases: pd.DataFrame, player: pd.Series, top_n: int = 3) -> list[dict]:
@@ -108,11 +240,14 @@ def similar_cases(cases: pd.DataFrame, player: pd.Series, top_n: int = 3) -> lis
 
 
 def best_destinations(loan: pd.DataFrame, demand: pd.DataFrame, coach: pd.DataFrame,
-                      jugador: str, posicion: str, top_n: int = 5) -> tuple[list[dict], list[str]]:
+                      club_ev: pd.DataFrame, player: pd.Series, top_n: int = 5,
+                      model_v2=None) -> tuple[list[dict], list[str]]:
     """
     Ranking de clubes combinando: desarrollo (score_evidencia) + demanda (demand_score)
     + uso de jóvenes del entrenador. Devuelve (clubes, entrenadores_ideales).
     """
+    jugador = player.get("jugador", "")
+    posicion = player.get("posicion_normalizada", "")
     dl = loan[loan["jugador"] == jugador].copy()
     if dl.empty:
         return [], []
@@ -134,22 +269,52 @@ def best_destinations(loan: pd.DataFrame, demand: pd.DataFrame, coach: pd.DataFr
     sev_max = sev.max() or 1
 
     rows = []
+    scenario_cesion_rows = []
+    scenario_traspaso_rows = []
     for _, dest in dl.iterrows():
         club = dest["club_destino"]
         pos_dest = dest.get("posicion_destino", posicion)
         ent = dest.get("entrenador_principal", "")
         desarrollo = num(dest.get("score_evidencia")) / sev_max * 100
-        demanda = dem_lookup.get((club, pos_dest), dem_lookup.get((club, posicion), 0.0))
+        demand_row = lookup_row(demand, club=club, posicion=pos_dest)
+        if demand_row is None:
+            demand_row = lookup_row(demand, club=club, posicion=posicion)
+        club_row = lookup_row(club_ev, club=club)
+        coach_row = lookup_row(coach, entrenador=ent)
+        demanda = num(demand_row.get("demand_score")) if demand_row is not None else dem_lookup.get((club, pos_dest), dem_lookup.get((club, posicion), 0.0))
         uso_coach = coach_minutos.get(ent, 0.0)
-        # Combinación: 50% desarrollo + 30% demanda + 20% uso de jóvenes del coach
-        combinado = 0.50 * desarrollo + 0.30 * demanda + 0.20 * uso_coach
         rows.append({
             "club": club, "entrenador": ent, "posicion": pos_dest,
-            "score_combinado": round(combinado, 1),
+            "score_combinado": np.nan,
+            "score_v2_cesion": np.nan,
+            "score_v2_traspaso": np.nan,
             "desarrollo": round(desarrollo, 1), "demanda": round(demanda, 1),
             "uso_jovenes_coach": round(uso_coach, 1),
             "revalorizacion_media": fmt_money(num(dest.get("revalorizacion_media_destino"))),
         })
+        if model_v2 is not None:
+            scenario_cesion_rows.append(scenario_row_v2(player, "cesion", club, ent, dest, demand_row, club_row, coach_row))
+            scenario_traspaso_rows.append(scenario_row_v2(player, "traspaso", club, ent, dest, demand_row, club_row, coach_row))
+
+    if model_v2 is not None and rows:
+        cesion_scores = predict_success_v2_batch(model_v2, scenario_cesion_rows)
+        traspaso_scores = predict_success_v2_batch(model_v2, scenario_traspaso_rows)
+        for row, v2_cesion, v2_traspaso in zip(rows, cesion_scores, traspaso_scores):
+            row["score_v2_cesion"] = round(float(v2_cesion), 1)
+            row["score_v2_traspaso"] = round(float(v2_traspaso), 1)
+            row["score_combinado"] = round(
+                0.45 * float(v2_cesion)
+                + 0.25 * row["desarrollo"]
+                + 0.20 * row["demanda"]
+                + 0.10 * row["uso_jovenes_coach"],
+                1,
+            )
+    else:
+        for row in rows:
+            row["score_combinado"] = round(
+                0.50 * row["desarrollo"] + 0.30 * row["demanda"] + 0.20 * row["uso_jovenes_coach"],
+                1,
+            )
     rows.sort(key=lambda r: r["score_combinado"], reverse=True)
     top = rows[:top_n]
     entrenadores = list(dict.fromkeys(
@@ -158,7 +323,7 @@ def best_destinations(loan: pd.DataFrame, demand: pd.DataFrame, coach: pd.DataFr
     return top, entrenadores
 
 
-def decide_operation(player: pd.Series, model, loan: pd.DataFrame) -> tuple[str, float]:
+def decide_operation(player: pd.Series, model, loan: pd.DataFrame, dests: list[dict]) -> tuple[str, float, dict]:
     """
     Decide la operación recomendada comparando el success score esperado
     en CESIÓN (a su mejor destino) vs PERMANENCIA (seguir en el Betis B).
@@ -166,37 +331,49 @@ def decide_operation(player: pd.Series, model, loan: pd.DataFrame) -> tuple[str,
     pos = player.get("posicion_normalizada", "")
     jugador = player.get("jugador", "")
 
-    # Escenario cesión: usar el mejor destino histórico del jugador
-    dl = loan[loan["jugador"] == jugador]
-    if not dl.empty:
-        best = dl.sort_values("score_evidencia", ascending=False).iloc[0]
-        club_ces, ent_ces = best["club_destino"], best.get("entrenador_principal", "")
-    else:
-        club_ces, ent_ces = "", ""
+    best_dest = dests[0] if dests else {}
+    club_ces = best_dest.get("club", "")
+    ent_ces = best_dest.get("entrenador", "")
 
-    score_cesion = predict_success(model, player, "cesion", club_ces, ent_ces)
+    score_cesion = num(best_dest.get("score_v2_cesion"), np.nan)
+    if pd.isna(score_cesion):
+        score_cesion = predict_success(model, player, "cesion", club_ces, ent_ces)
     score_permanencia = predict_success(model, player, "otro", "Real Betis B", "")
-    score_traspaso = predict_success(model, player, "traspaso", club_ces, ent_ces)
+    score_mantener_actual = current_development_score(player)
+    score_mantener = 0.55 * score_mantener_actual + 0.45 * score_permanencia
+    score_traspaso = num(best_dest.get("score_v2_traspaso"), np.nan)
+    if pd.isna(score_traspaso):
+        score_traspaso = predict_success(model, player, "traspaso", club_ces, ent_ces)
 
     edad = num(player.get("edad"), 21)
     minutos = num(player.get("minutos_jugados"))
 
     # Lógica de decisión explicable
-    if edad <= 21 and minutos < 900:
-        # joven con pocos minutos → ceder para que juegue
+    if edad <= 20 and minutos < 1000 and score_cesion >= 30:
         op = "CEDER"
         prob = score_cesion
-    elif edad >= 23 and score_traspaso >= score_cesion and score_traspaso > 45:
+    elif edad <= 21 and minutos < 1200 and score_cesion >= max(score_traspaso, score_mantener - 8):
+        op = "CEDER"
+        prob = score_cesion
+    elif edad >= 22 and score_traspaso >= score_cesion + 6 and score_traspaso >= score_mantener + 4:
         op = "VENDER"
         prob = score_traspaso
-    elif score_permanencia >= max(score_cesion, score_traspaso):
+    elif score_mantener >= max(score_cesion, score_traspaso):
         op = "MANTENER"
-        prob = score_permanencia
+        prob = score_mantener
     else:
         op = "CEDER"
         prob = score_cesion
 
-    return op, round(prob, 1)
+    audit = {
+        "score_v2_cesion": round(float(score_cesion), 1),
+        "score_mantener": round(float(score_mantener), 1),
+        "score_mantener_actual": round(float(score_mantener_actual), 1),
+        "score_traspaso": round(float(score_traspaso), 1),
+        "club_modelo": club_ces,
+        "entrenador_modelo": ent_ces,
+    }
+    return op, round(prob, 1), audit
 
 
 def build(top_n_dest: int = 5, top_n_sim: int = 3) -> pd.DataFrame:
@@ -210,19 +387,26 @@ def build(top_n_dest: int = 5, top_n_sim: int = 3) -> pd.DataFrame:
     loan = pd.read_csv(LOAN_PATH)
     demand = pd.read_csv(DEMAND_PATH)
     coach = pd.read_csv(COACH_PATH) if COACH_PATH.exists() else pd.DataFrame()
+    club_ev = pd.read_csv(CLUB_EVIDENCE_PATH) if CLUB_EVIDENCE_PATH.exists() else pd.DataFrame()
     cases = pd.read_csv(CASES_PATH)
     model = joblib.load(MODEL_PATH)
+    model_v2 = joblib.load(MODEL_V2_PATH) if MODEL_V2_PATH.exists() else None
+    if model_v2 is not None:
+        logger.info("Modelo v2 de operaciones cargado: %s", MODEL_V2_PATH.name)
+    else:
+        logger.warning("No existe %s; usando fallback anterior", MODEL_V2_PATH.name)
     recs = pd.read_csv(PLAYER_RECS_PATH) if PLAYER_RECS_PATH.exists() else pd.DataFrame()
     rec_lookup = recs.set_index("jugador").to_dict("index") if not recs.empty else {}
 
     logger.info(f"Jugadores Betis Deportivo: {len(players)}")
 
     out_rows = []
+    out_dest_rows = []
     for _, player in players.iterrows():
         jugador = player["jugador"]
         pos = player.get("posicion_normalizada", "")
-        op, prob = decide_operation(player, model, loan)
-        dests, entrenadores = best_destinations(loan, demand, coach, jugador, pos, top_n_dest)
+        dests, entrenadores = best_destinations(loan, demand, coach, club_ev, player, top_n_dest, model_v2=model_v2)
+        op, prob, audit = decide_operation(player, model, loan, dests)
         sims = similar_cases(cases, player, top_n_sim)
 
         rec = rec_lookup.get(jugador, {})
@@ -232,7 +416,23 @@ def build(top_n_dest: int = 5, top_n_sim: int = 3) -> pd.DataFrame:
         entrenadores_str = " | ".join(entrenadores)
         sims_str = " | ".join(f"{s['jugador']} ({s['club']}, {s['score']:.0f})" for s in sims)
 
-        justificacion = build_justification(player, op, prob, dests, sims, rev_esperada)
+        justificacion = build_justification(player, op, prob, dests, sims, rev_esperada, audit)
+
+        for rank, dest in enumerate(dests, start=1):
+            out_dest_rows.append({
+                "jugador": jugador,
+                "ranking_destino_v2": rank,
+                "club": dest["club"],
+                "entrenador": dest["entrenador"],
+                "posicion": dest["posicion"],
+                "score_destino_v2": dest["score_combinado"],
+                "score_v2_cesion": dest["score_v2_cesion"],
+                "score_v2_traspaso": dest["score_v2_traspaso"],
+                "desarrollo": dest["desarrollo"],
+                "demanda": dest["demanda"],
+                "uso_jovenes_coach": dest["uso_jovenes_coach"],
+                "revalorizacion_media": dest["revalorizacion_media"],
+            })
 
         out_rows.append({
             "jugador": jugador,
@@ -243,6 +443,12 @@ def build(top_n_dest: int = 5, top_n_sim: int = 3) -> pd.DataFrame:
             "goles_actuales": int(num(player.get("goles"))),
             "operacion_recomendada": op,
             "probabilidad_exito": prob,
+            "modelo_decision": "operation_success_v2" if model_v2 is not None else "operation_success_v1",
+            "score_v2_cesion": audit["score_v2_cesion"],
+            "score_mantener": audit["score_mantener"],
+            "score_traspaso": audit["score_traspaso"],
+            "club_modelo": audit["club_modelo"],
+            "entrenador_modelo": audit["entrenador_modelo"],
             "revalorizacion_esperada": fmt_money(num(rev_esperada)) if pd.notna(rev_esperada) else "-",
             "clubes_ideales": clubes_str,
             "entrenadores_ideales": entrenadores_str,
@@ -251,16 +457,20 @@ def build(top_n_dest: int = 5, top_n_sim: int = 3) -> pd.DataFrame:
         })
 
     df = pd.DataFrame(out_rows).sort_values("probabilidad_exito", ascending=False)
+    dest_df = pd.DataFrame(out_dest_rows)
     df.to_csv(OUT_PATH, index=False, encoding="utf-8-sig")
+    dest_df.to_csv(OUT_V2_DEST_PATH, index=False, encoding="utf-8-sig")
     # JSON estructurado para ScoutGPT
     OUT_JSON.write_text(json.dumps(df.to_dict("records"), ensure_ascii=False, indent=2), encoding="utf-8")
 
     logger.info(f"✓ {OUT_PATH.name} ({len(df)} jugadores)")
+    logger.info(f"✓ {OUT_V2_DEST_PATH.name} ({len(dest_df)} destinos)")
     logger.info(f"✓ {OUT_JSON.name}")
     return df
 
 
-def build_justification(player, op, prob, dests, sims, rev_esperada) -> str:
+def build_justification(player, op, prob, dests, sims, rev_esperada, audit=None) -> str:
+    audit = audit or {}
     edad = int(num(player.get("edad"), 0))
     minutos = int(num(player.get("minutos_jugados")))
     pos = player.get("posicion_normalizada", "")
@@ -277,7 +487,15 @@ def build_justification(player, op, prob, dests, sims, rev_esperada) -> str:
 
     if dests:
         d = dests[0]
-        parts.append(f"Mejor destino: {d['club']} (desarrollo {d['desarrollo']:.0f}, demanda {d['demanda']:.0f}, uso jóvenes coach {d['uso_jovenes_coach']:.0f}).")
+        if pd.notna(d.get("score_v2_cesion", np.nan)):
+            parts.append(f"Mejor destino: {d['club']} (score v2 cesión {d['score_v2_cesion']:.0f}, desarrollo {d['desarrollo']:.0f}, demanda {d['demanda']:.0f}).")
+        else:
+            parts.append(f"Mejor destino: {d['club']} (desarrollo {d['desarrollo']:.0f}, demanda {d['demanda']:.0f}, uso jóvenes coach {d['uso_jovenes_coach']:.0f}).")
+    if audit:
+        parts.append(
+            f"Comparativa interna: cesión {audit.get('score_v2_cesion', 0):.0f}, "
+            f"mantener {audit.get('score_mantener', 0):.0f}, venta {audit.get('score_traspaso', 0):.0f}."
+        )
     if sims:
         parts.append(f"Casos similares: {', '.join(s['jugador'] for s in sims)}.")
     if pd.notna(rev_esperada) and num(rev_esperada) != 0:
