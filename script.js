@@ -2646,6 +2646,7 @@ function renderScoutGPTTab() {
   loadMasterData(() => {});
   loadLoanModelData(() => {});
   loadDecisionModelData(() => {});
+  loadOperationContext(() => {});
 
   const input = document.getElementById('scoutgpt-input');
   const btn   = document.getElementById('scoutgpt-send');
@@ -2667,9 +2668,14 @@ function renderScoutGPTTab() {
     } else {
       await new Promise(resolve => loadLoanModelData(resolve));
       await new Promise(resolve => loadDecisionModelData(resolve));
+      await new Promise(resolve => loadOperationContext(resolve));
       const betisPlayer = detectBetisPlayerInQuery(qn);
+      const opClub = detectSegundaActualInQuery(qn);
       if (betisPlayer) {
         html = processScoutQuery(q);
+      } else if (opClub && detectAnyPlayerInQuery(qn, opClub)) {
+        // Análisis de operación jugador→club (cualquier jugador de Segunda)
+        html = sgptAnalyzeOperation(detectAnyPlayerInQuery(qn, opClub), opClub);
       } else if (_aiEnabled && !isDirectTMQuery(q)) {
         html = await processWithAI(q);
       } else if (isDirectTMQuery(q)) {
@@ -2967,6 +2973,16 @@ function processScoutQuery(raw) {
     if (betisPlayer && destClub) {
       const operacion = /vend|traspas|vent/.test(q) ? 'venta' : 'cesion';
       return sgptEvaluateMove(betisPlayer.jugador, destClub, operacion);
+    }
+  }
+
+  // ANÁLISIS DE OPERACIÓN general: cualquier jugador + club de Segunda 2025-26
+  // Ej: "¿cómo ves a Pablo García en el Cádiz?" · "X al Sporting" · "encaje de X en Y"
+  if (WY_DATA.length) {
+    const segClub = detectSegundaActualInQuery(q);
+    if (segClub) {
+      const anyPlayer = detectAnyPlayerInQuery(q, segClub);
+      if (anyPlayer) return sgptAnalyzeOperation(anyPlayer, segClub);
     }
   }
 
@@ -3582,6 +3598,8 @@ function sgptDefault(raw) {
    ============================================================ */
 
 let WY_DATA = [];
+let CLUB_EVIDENCE_DATA = [];   // development_club_evidence.csv
+let CLUB_DEMAND_DATA = [];     // club_position_demand.csv
 
 function loadWyscoutData(callback) {
   if (WY_DATA.length) { callback(WY_DATA); return; }
@@ -3592,6 +3610,25 @@ function loadWyscoutData(callback) {
       callback(WY_DATA);
     },
     error: () => callback([])
+  });
+}
+
+// Carga datos de encaje club-posición (para análisis de operaciones)
+function loadOperationContext(callback) {
+  let pending = 3;
+  const done = () => { if (--pending === 0) callback(); };
+  loadWyscoutData(() => done());
+  if (CLUB_EVIDENCE_DATA.length) { done(); }
+  else Papa.parse('data/final/development_club_evidence.csv', {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => { CLUB_EVIDENCE_DATA = r.data.filter(d => d.club); done(); },
+    error: () => { CLUB_EVIDENCE_DATA = []; done(); }
+  });
+  if (CLUB_DEMAND_DATA.length) { done(); }
+  else Papa.parse('data/final/club_position_demand.csv', {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => { CLUB_DEMAND_DATA = r.data.filter(d => d.club); done(); },
+    error: () => { CLUB_DEMAND_DATA = []; done(); }
   });
 }
 
@@ -3824,6 +3861,24 @@ const SEGUNDA_CLUBS_SET = new Set([
   'UD Almería','UD Ibiza','UD Las Palmas','Villarreal CF B','Real Betis','Real Betis B'
 ]);
 
+// Clubes que militan EN Segunda 2025-26 (espejo de SEGUNDA_2025_26 en normalizer.py)
+const SEGUNDA_ACTUAL = new Set([
+  'AD Ceuta FC','Albacete Balompié','Burgos CF','CD Castellón','CD Leganés','CD Mirandés',
+  'Cultural Leonesa','Cádiz CF','Córdoba CF','Deportivo de La Coruña','FC Andorra','Granada CF',
+  'Málaga CF','Racing Santander','Real Sociedad B','Real Valladolid CF','Real Zaragoza','SD Eibar',
+  'SD Huesca','Sporting Gijón','UD Almería','UD Las Palmas'
+]);
+
+// posición normalizada → columna de minutos Sub-23 en development_club_evidence
+const POS_TO_EVIDENCE_COL = {
+  'Delantero': 'minutos_sub23_delanteros', 'Mediapunta': 'minutos_sub23_delanteros',
+  'Extremo': 'minutos_sub23_extremos',
+  'Mediocentro': 'minutos_sub23_mediocentros', 'Centrocampista': 'minutos_sub23_mediocentros',
+  'Central': 'minutos_sub23_centrales',
+  'Lateral': 'minutos_sub23_laterales', 'Carrilero': 'minutos_sub23_laterales',
+  'Portero': 'minutos_sub23_porteros',
+};
+
 function isTrue(v) { return v === true || v === 'True' || v === 'true'; }
 function num(v) { const n = +v; return isNaN(n) ? 0 : n; }
 function normDevPos(p) {
@@ -3977,6 +4032,164 @@ function sgptEvaluateMove(playerName, clubName, operacion) {
       </ul>
     </div>
     ${summary ? `<span class="muted">Operación que el modelo sugiere de forma global para ${playerName}: <strong>${summary.operacion_sugerida || '—'}</strong>. Pregúntame "destinos de ${playerName}" para ver el ranking completo.</span>` : ''}`;
+}
+
+/* ============================================================
+   ANÁLISIS DE OPERACIÓN — cualquier jugador → club de Segunda
+   "¿Cómo ves a [jugador] en el [club]?"
+   ============================================================ */
+
+// Busca el perfil de un jugador en Wyscout (plantillas completas) + master
+function findPlayerProfile(playerName) {
+  const qn = norm(playerName);
+
+  // 0. Jugador del Betis Deportivo (datos propios, evita colisión de nombres comunes)
+  const betis = BETIS_PLAYERS_DATA.find(d => norm(d.jugador) === qn);
+  if (betis) {
+    return {
+      nombre: betis.jugador,
+      posicion: betis.posicion_normalizada,
+      edad: num(betis.edad), minutos: num(betis.minutos_jugados),
+      goles: num(betis.goles), xg: num(betis.xg), valor: num(betis.valor_mercado),
+      equipo: 'Real Betis B', temporada: '2025-26',
+      pie: betis.pie || '', altura: num(betis.altura),
+      rev: MASTER_DATA.find(d => norm(d.nombre) === qn && d.revalorizacion_absoluta != null),
+    };
+  }
+
+  // 1. Wyscout (plantilla completa) — registro más reciente
+  let wyRows = WY_DATA.filter(d => norm(d.jugador) === qn);
+  if (!wyRows.length) wyRows = WY_DATA.filter(d => norm(d.jugador).includes(qn) || qn.includes(norm(d.jugador)));
+  const order = ['2021-22','2022-23','2023-24','2024-25','2025-26'];
+  wyRows.sort((a,b) => order.indexOf(b.temporada) - order.indexOf(a.temporada));
+  const wy = wyRows[0];
+
+  // 2. Revalorización (master)
+  const rev = MASTER_DATA.find(d => norm(d.nombre) === qn && d.revalorizacion_absoluta != null);
+
+  if (!wy && !rev) return null;
+  return {
+    nombre: wy ? wy.jugador : playerName,
+    posicion: wy ? wy.posicion_normalizada : (rev?.posicion_normalizada || ''),
+    edad: wy ? num(wy.edad) : num(rev?.edad),
+    minutos: wy ? num(wy.minutos_jugados) : num(rev?.minutos),
+    goles: wy ? num(wy.goles) : num(rev?.goles),
+    xg: wy ? num(wy.xg) : num(rev?.xg),
+    valor: wy ? num(wy.valor_mercado) : num(rev?.valor_mercado),
+    equipo: wy ? wy.equipo : (rev?.club || ''),
+    temporada: wy ? wy.temporada : (rev?.temporada || ''),
+    pie: wy?.pie || '', altura: wy ? num(wy.altura) : 0,
+    rev,
+  };
+}
+
+// Detecta un club de Segunda 2025-26 en la pregunta
+function detectSegundaActualInQuery(q) {
+  const clubs = [...SEGUNDA_ACTUAL];
+  const exact = clubs.find(c => q.includes(norm(c)));
+  if (exact) return exact;
+  return clubs.find(c => {
+    const words = norm(c).split(/\s+/).filter(w => w.length >= 4 &&
+      !['real','club','union','deportivo','balompie'].includes(w));
+    return words.some(w => q.includes(w));
+  }) || null;
+}
+
+// Detecta cualquier jugador (Betis o Wyscout) mencionado, excluyendo el club
+function detectAnyPlayerInQuery(q, excludeClub) {
+  // 1. Jugadores del Betis Deportivo (prioridad)
+  const betis = detectBetisPlayerInQuery(q);
+  if (betis) return betis.jugador;
+  if (!WY_DATA.length) return null;
+
+  // 2. Quitar el nombre del club del texto para no confundir
+  let qClean = q;
+  if (excludeClub) norm(excludeClub).split(/\s+/).forEach(w => { if (w.length >= 4) qClean = qClean.replace(w, ' '); });
+
+  // 3. Buscar jugador de Wyscout: nombre completo, o apellido distintivo (≥5 chars)
+  const names = [...new Set(WY_DATA.map(d => d.jugador))].filter(Boolean);
+  // Coincidencia de nombre completo normalizado
+  let hit = names.find(n => qClean.includes(norm(n)) && norm(n).length >= 5);
+  if (hit) return hit;
+  // Coincidencia por 2+ palabras significativas del nombre
+  hit = names.find(n => {
+    const words = norm(n).split(/\s+/).filter(w => w.length >= 4);
+    if (words.length < 2) return false;
+    const matches = words.filter(w => qClean.includes(w)).length;
+    return matches >= 2;
+  });
+  return hit || null;
+}
+
+function sgptAnalyzeOperation(playerName, clubName) {
+  if (!WY_DATA.length) return 'Cargando datos de plantillas… vuelve a preguntar en unos segundos.';
+
+  const p = findPlayerProfile(playerName);
+  if (!p) return `No encuentro datos de rendimiento para <strong>${playerName}</strong>.`;
+  if (!SEGUNDA_ACTUAL.has(clubName)) {
+    return `<strong>${clubName}</strong> no milita en Segunda División 2025-26, así que no puedo analizar el encaje en esta categoría.`;
+  }
+
+  const pos = p.posicion;
+  const esSub23 = p.edad > 0 && p.edad < 23;
+
+  // --- Contexto del club en esa posición ---
+  // 1. Demanda
+  const demandRow = CLUB_DEMAND_DATA.find(d => d.club === clubName && normDevPos(d.posicion) === normDevPos(pos));
+  const demand = demandRow ? num(demandRow.demand_score) : 0;
+
+  // 2. Evidencia de desarrollo (minutos Sub-23 dados a esa posición)
+  const evRow = CLUB_EVIDENCE_DATA.find(d => d.club === clubName);
+  const evCol = POS_TO_EVIDENCE_COL[normDevPos(pos)] || '';
+  const minDevPos = evRow && evCol ? num(evRow[evCol]) : 0;
+  const sub23Club = evRow ? num(evRow.jugadores_sub23_utilizados) : 0;
+
+  // 3. Profundidad de plantilla actual en esa posición (Wyscout 2025-26)
+  const squad = WY_DATA.filter(d => d.equipo === clubName && d.temporada === '2025-26' &&
+    normDevPos(d.posicion_normalizada) === normDevPos(pos));
+  const competidores = squad.filter(d => norm(d.jugador) !== norm(p.nombre));
+  const titulares = competidores.filter(d => num(d.minutos_jugados) > 1500);
+
+  // --- Veredicto ---
+  let veredicto, color, emoji;
+  const buenDesarrollo = minDevPos >= 1500;
+  const necesita = demand >= 45 || titulares.length <= 1;
+  if (buenDesarrollo && necesita) { veredicto = 'Encaje fuerte'; color = 'var(--success)'; emoji = '✅'; }
+  else if (buenDesarrollo || necesita) { veredicto = 'Encaje con matices'; color = 'var(--warning)'; emoji = '🟡'; }
+  else { veredicto = 'Encaje difícil'; color = 'var(--danger)'; emoji = '🔻'; }
+
+  // --- Justificación analista ---
+  const just = [];
+  just.push(`Perfil: ${pos}${esSub23 ? ' (Sub-23)' : ''}, ${p.edad} años, ${fmt(p.minutos)} min y ${p.goles} goles esta temporada en ${p.equipo}${p.valor ? `, valor ${formatM(p.valor)}` : ''}.`);
+  just.push(buenDesarrollo
+    ? `El ${clubName} ha dado <strong>${fmt(minDevPos)} min</strong> a jóvenes en ${pos}: club que apuesta por ese perfil.`
+    : `El ${clubName} ha dado pocos minutos a jóvenes en ${pos} (<strong>${fmt(minDevPos)} min</strong>): no es su patrón habitual.`);
+  just.push(`Profundidad actual del club en ${pos}: <strong>${competidores.length} jugadores</strong> (${titulares.length} con +1500 min). ${titulares.length <= 1 ? 'Hay hueco real.' : 'Posición ya cubierta, habría competencia.'}`);
+  just.push(demand >= 45
+    ? `Demanda histórica del club en la posición <strong>alta</strong> (${demand.toFixed(0)}/100).`
+    : `Demanda histórica <strong>moderada/baja</strong> (${demand.toFixed(0)}/100).`);
+
+  // Competencia concreta (nombres)
+  const compList = competidores
+    .sort((a,b) => num(b.minutos_jugados) - num(a.minutos_jugados))
+    .slice(0, 5)
+    .map(d => `${d.jugador} (${num(d.edad)}a, ${fmt(num(d.minutos_jugados))}min)`);
+
+  return `<strong>¿Cómo encaja ${p.nombre} en el ${clubName}?</strong>
+    <span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;margin-left:6px">📊 Análisis de operación</span><br>
+    <div style="margin:10px 0;padding:14px;border:2px solid ${color};border-radius:10px;background:var(--bg)">
+      <div style="font-size:1.05rem;font-weight:800;color:${color};margin-bottom:8px">${emoji} ${veredicto}</div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px;font-size:0.85rem">
+        <div><span class="muted">Demanda club</span><br><strong>${demand.toFixed(0)}/100</strong></div>
+        <div><span class="muted">Min. jóvenes en ${pos}</span><br><strong>${fmt(minDevPos)}</strong></div>
+        <div><span class="muted">Profundidad ${pos}</span><br><strong>${competidores.length} jug.</strong></div>
+      </div>
+      <ul style="margin:6px 0 0;padding-left:18px;font-size:0.85rem;line-height:1.6">
+        ${just.map(j => `<li>${j}</li>`).join('')}
+      </ul>
+    </div>
+    ${compList.length ? `<strong>Competencia en ${pos} en el ${clubName}:</strong><br>
+    <span class="muted" style="font-size:0.82rem">${compList.join(' · ')}</span>` : ''}`;
 }
 
 function sgptDecisionForBetisPlayer(playerName) {
