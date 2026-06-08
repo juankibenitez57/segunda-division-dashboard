@@ -77,6 +77,11 @@ POSITION_MINUTES_COL = {
     "Portero": "minutos_sub23_porteros",
 }
 
+BETIS_DEPORTIVO_DESCENDED = True
+STAY_RELEGATION_PENALTY = 18.0
+LOAN_HIGHER_LEVEL_BONUS = 10.0
+YOUNG_SALE_PENALTY = 6.0
+
 
 def fmt_money(v: float) -> str:
     if pd.isna(v) or v == 0:
@@ -335,24 +340,35 @@ def decide_operation(player: pd.Series, model, loan: pd.DataFrame, dests: list[d
     club_ces = best_dest.get("club", "")
     ent_ces = best_dest.get("entrenador", "")
 
-    score_cesion = num(best_dest.get("score_v2_cesion"), np.nan)
-    if pd.isna(score_cesion):
-        score_cesion = predict_success(model, player, "cesion", club_ces, ent_ces)
+    score_cesion_raw = num(best_dest.get("score_v2_cesion"), np.nan)
+    if pd.isna(score_cesion_raw):
+        score_cesion_raw = predict_success(model, player, "cesion", club_ces, ent_ces)
     score_permanencia = predict_success(model, player, "otro", "Real Betis B", "")
     score_mantener_actual = current_development_score(player)
-    score_mantener = 0.55 * score_mantener_actual + 0.45 * score_permanencia
-    score_traspaso = num(best_dest.get("score_v2_traspaso"), np.nan)
-    if pd.isna(score_traspaso):
-        score_traspaso = predict_success(model, player, "traspaso", club_ces, ent_ces)
+    score_mantener_raw = 0.55 * score_mantener_actual + 0.45 * score_permanencia
+    score_traspaso_raw = num(best_dest.get("score_v2_traspaso"), np.nan)
+    if pd.isna(score_traspaso_raw):
+        score_traspaso_raw = predict_success(model, player, "traspaso", club_ces, ent_ces)
 
     edad = num(player.get("edad"), 21)
     minutos = num(player.get("minutos_jugados"))
+    competitive_loan_available = bool(dests) and num(best_dest.get("desarrollo")) >= 45 and num(best_dest.get("demanda")) >= 35
+    relegation_penalty = STAY_RELEGATION_PENALTY if BETIS_DEPORTIVO_DESCENDED else 0.0
+    loan_level_bonus = LOAN_HIGHER_LEVEL_BONUS if BETIS_DEPORTIVO_DESCENDED and competitive_loan_available else 0.0
+    young_sale_penalty = YOUNG_SALE_PENALTY if edad <= 21 else 0.0
+
+    score_cesion = min(score_cesion_raw + loan_level_bonus, 100.0)
+    score_mantener = max(score_mantener_raw - relegation_penalty, 0.0)
+    score_traspaso = max(score_traspaso_raw - young_sale_penalty, 0.0)
 
     # Lógica de decisión explicable
     if edad <= 20 and minutos < 1000 and score_cesion >= 30:
         op = "CEDER"
         prob = score_cesion
-    elif edad <= 21 and minutos < 1200 and score_cesion >= max(score_traspaso, score_mantener - 8):
+    elif edad <= 21 and score_cesion >= max(score_traspaso, score_mantener - 8):
+        op = "CEDER"
+        prob = score_cesion
+    elif edad <= 22 and BETIS_DEPORTIVO_DESCENDED and competitive_loan_available and score_cesion >= score_mantener - 6:
         op = "CEDER"
         prob = score_cesion
     elif edad >= 22 and score_traspaso >= score_cesion + 6 and score_traspaso >= score_mantener + 4:
@@ -366,12 +382,19 @@ def decide_operation(player: pd.Series, model, loan: pd.DataFrame, dests: list[d
         prob = score_cesion
 
     audit = {
-        "score_v2_cesion": round(float(score_cesion), 1),
+        "score_v2_cesion": round(float(score_cesion_raw), 1),
+        "score_cesion_ajustado": round(float(score_cesion), 1),
         "score_mantener": round(float(score_mantener), 1),
+        "score_mantener_raw": round(float(score_mantener_raw), 1),
         "score_mantener_actual": round(float(score_mantener_actual), 1),
-        "score_traspaso": round(float(score_traspaso), 1),
+        "score_traspaso": round(float(score_traspaso_raw), 1),
+        "score_traspaso_ajustado": round(float(score_traspaso), 1),
         "club_modelo": club_ces,
         "entrenador_modelo": ent_ces,
+        "contexto_descenso_filial": BETIS_DEPORTIVO_DESCENDED,
+        "penalizacion_mantener_descenso": round(float(relegation_penalty), 1),
+        "bonus_cesion_categoria_superior": round(float(loan_level_bonus), 1),
+        "penalizacion_venta_joven": round(float(young_sale_penalty), 1),
     }
     return op, round(prob, 1), audit
 
@@ -445,8 +468,14 @@ def build(top_n_dest: int = 5, top_n_sim: int = 3) -> pd.DataFrame:
             "probabilidad_exito": prob,
             "modelo_decision": "operation_success_v2" if model_v2 is not None else "operation_success_v1",
             "score_v2_cesion": audit["score_v2_cesion"],
+            "score_cesion_ajustado": audit["score_cesion_ajustado"],
             "score_mantener": audit["score_mantener"],
+            "score_mantener_raw": audit["score_mantener_raw"],
             "score_traspaso": audit["score_traspaso"],
+            "score_traspaso_ajustado": audit["score_traspaso_ajustado"],
+            "contexto_descenso_filial": audit["contexto_descenso_filial"],
+            "penalizacion_mantener_descenso": audit["penalizacion_mantener_descenso"],
+            "bonus_cesion_categoria_superior": audit["bonus_cesion_categoria_superior"],
             "club_modelo": audit["club_modelo"],
             "entrenador_modelo": audit["entrenador_modelo"],
             "revalorizacion_esperada": fmt_money(num(rev_esperada)) if pd.notna(rev_esperada) else "-",
@@ -492,9 +521,15 @@ def build_justification(player, op, prob, dests, sims, rev_esperada, audit=None)
         else:
             parts.append(f"Mejor destino: {d['club']} (desarrollo {d['desarrollo']:.0f}, demanda {d['demanda']:.0f}, uso jóvenes coach {d['uso_jovenes_coach']:.0f}).")
     if audit:
+        if audit.get("contexto_descenso_filial"):
+            parts.append(
+                "Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial "
+                f"se penaliza (-{audit.get('penalizacion_mantener_descenso', 0):.0f}) y una cesión a categoría superior "
+                f"con destino competitivo recibe bonus (+{audit.get('bonus_cesion_categoria_superior', 0):.0f})."
+            )
         parts.append(
-            f"Comparativa interna: cesión {audit.get('score_v2_cesion', 0):.0f}, "
-            f"mantener {audit.get('score_mantener', 0):.0f}, venta {audit.get('score_traspaso', 0):.0f}."
+            f"Comparativa interna ajustada: cesión {audit.get('score_cesion_ajustado', 0):.0f}, "
+            f"mantener {audit.get('score_mantener', 0):.0f}, venta {audit.get('score_traspaso_ajustado', 0):.0f}."
         )
     if sims:
         parts.append(f"Casos similares: {', '.join(s['jugador'] for s in sims)}.")

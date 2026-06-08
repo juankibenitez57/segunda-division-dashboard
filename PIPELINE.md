@@ -93,6 +93,23 @@ más realistas y menos infladas que un modelo que aprende del resultado ya obser
 
 Definición completa en `data/final/player_operation_model_report.json`.
 
+### Contexto deportivo Betis Deportivo
+
+`build_betis_decisions.py` incorpora una regla contextual explícita:
+si el Betis Deportivo ha descendido de categoría, la opción **mantener** se penaliza
+porque el entorno competitivo pierde valor de desarrollo/revalorización, y una
+**cesión a categoría superior** con destino de evidencia alta recibe un bonus.
+
+Ese ajuste queda auditado en las columnas:
+
+- `contexto_descenso_filial`
+- `score_v2_cesion`
+- `score_cesion_ajustado`
+- `score_mantener_raw`
+- `score_mantener`
+- `penalizacion_mantener_descenso`
+- `bonus_cesion_categoria_superior`
+
 ---
 
 ## Clubes válidos de Segunda (actualizar cada temporada)
