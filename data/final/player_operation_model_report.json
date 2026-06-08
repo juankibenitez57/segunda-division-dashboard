@@ -1,0 +1,209 @@
+{
+  "dataset": {
+    "rows": 1963,
+    "columns": 77,
+    "with_pre_history": 573,
+    "with_post_history": 681,
+    "with_wyscout": 568,
+    "label_confidence": {
+      "Baja": 1030,
+      "Media": 697,
+      "Alta": 236
+    },
+    "operation_types": {
+      "libre": 754,
+      "cesion": 572,
+      "otro": 247,
+      "sub23_wyscout": 243,
+      "traspaso": 147
+    }
+  },
+  "target_definition": {
+    "operation_success_score_v2": "0-100 weighted target: opportunity 35%, market 25%, offensive production 15%, development context 15%, follow-up 10%; missing dimensions are reweighted.",
+    "loan_success_label": "Only for cesion rows: 1 if same-season minutes >=900 and score_v2 >=45.",
+    "sale_success_label": "Only for traspaso rows: 1 if revaluation or next observed market value is positive.",
+    "label_confidence": "Alta/Media/Baja based on pre-history, post-history, Wyscout and market evidence availability."
+  },
+  "operation_success_regressor": {
+    "train_rows": 1472,
+    "test_rows": 491,
+    "mae": 11.7,
+    "r2_holdout": 0.2718,
+    "r2_cv_mean": 0.1592,
+    "r2_cv_std": 0.0257,
+    "target_mean": 23.64,
+    "target_std": 18.12,
+    "feature_policy": "pre_operation_only: excludes same-season minutes, matches, goals, xG, revaluation and follow-up outcomes to avoid leakage.",
+    "feature_importances": [
+      {
+        "feature": "num__club_pos_minutos_sub23",
+        "importance": 0.087
+      },
+      {
+        "feature": "num__club_total_minutos_sub23",
+        "importance": 0.0706
+      },
+      {
+        "feature": "num__club_pos_pct_minutos",
+        "importance": 0.06877
+      },
+      {
+        "feature": "num__demand_score",
+        "importance": 0.05479
+      },
+      {
+        "feature": "num__club_total_jugadores_sub23",
+        "importance": 0.05313
+      },
+      {
+        "feature": "num__club_pos_jugadores_sub23",
+        "importance": 0.05061
+      },
+      {
+        "feature": "num__demand_recent",
+        "importance": 0.04414
+      },
+      {
+        "feature": "num__valor_llegada",
+        "importance": 0.04291
+      },
+      {
+        "feature": "num__valor_mercado",
+        "importance": 0.03471
+      },
+      {
+        "feature": "num__edad",
+        "importance": 0.02968
+      },
+      {
+        "feature": "num__coach_total_minutos_sub23",
+        "importance": 0.02768
+      },
+      {
+        "feature": "num__demand_total_altas",
+        "importance": 0.02758
+      },
+      {
+        "feature": "num__demand_sub23",
+        "importance": 0.0272
+      },
+      {
+        "feature": "num__pre_edad",
+        "importance": 0.02547
+      },
+      {
+        "feature": "num__coach_total_jugadores_sub23",
+        "importance": 0.02507
+      },
+      {
+        "feature": "num__coach_pos_minutos_sub23",
+        "importance": 0.02454
+      },
+      {
+        "feature": "cat__pre_club_Real Oviedo",
+        "importance": 0.02116
+      },
+      {
+        "feature": "cat__entrenador_Julián Calero",
+        "importance": 0.02065
+      },
+      {
+        "feature": "cat__origen_desarrollo_Extranjero",
+        "importance": 0.01983
+      },
+      {
+        "feature": "num__demand_cesiones",
+        "importance": 0.01774
+      }
+    ]
+  },
+  "global_success_classifier": {
+    "train_rows": 1472,
+    "test_rows": 491,
+    "accuracy": 0.8941,
+    "roc_auc": 0.8082,
+    "positive_rate": 0.0958,
+    "feature_importances": [
+      {
+        "feature": "num__valor_llegada",
+        "importance": 0.07827
+      },
+      {
+        "feature": "num__club_total_minutos_sub23",
+        "importance": 0.07746
+      },
+      {
+        "feature": "num__club_pos_minutos_sub23",
+        "importance": 0.05408
+      },
+      {
+        "feature": "num__club_total_jugadores_sub23",
+        "importance": 0.05245
+      },
+      {
+        "feature": "num__coach_total_minutos_sub23",
+        "importance": 0.04035
+      },
+      {
+        "feature": "num__demand_score",
+        "importance": 0.03934
+      },
+      {
+        "feature": "num__club_pos_pct_minutos",
+        "importance": 0.03758
+      },
+      {
+        "feature": "num__valor_mercado",
+        "importance": 0.03734
+      },
+      {
+        "feature": "num__edad",
+        "importance": 0.03699
+      },
+      {
+        "feature": "num__coach_total_jugadores_sub23",
+        "importance": 0.03505
+      },
+      {
+        "feature": "num__demand_recent",
+        "importance": 0.03375
+      },
+      {
+        "feature": "num__demand_total_altas",
+        "importance": 0.03048
+      },
+      {
+        "feature": "cat__entrenador_Gaizka Garitano",
+        "importance": 0.0301
+      },
+      {
+        "feature": "num__pre_edad",
+        "importance": 0.02781
+      },
+      {
+        "feature": "num__coach_pos_minutos_sub23",
+        "importance": 0.02658
+      },
+      {
+        "feature": "num__demand_cesiones",
+        "importance": 0.02419
+      },
+      {
+        "feature": "num__club_pos_jugadores_sub23",
+        "importance": 0.02407
+      },
+      {
+        "feature": "num__demand_sub23",
+        "importance": 0.02385
+      },
+      {
+        "feature": "cat__pre_club_CD Mirandés",
+        "importance": 0.02359
+      },
+      {
+        "feature": "num__pre_valor_mercado",
+        "importance": 0.02101
+      }
+    ]
+  }
+}

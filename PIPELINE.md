@@ -35,8 +35,9 @@ Ejecuta en este orden cuando actualices datos. Cada script genera entradas del s
 | 5 | `python3 build_development_evidence.py` | master | `development_*_evidence.csv` |
 | 6 | `python3 build_loan_destination_model.py` | JUGADORES BETIS + evidencia | `betis_deportivo_players.csv`, `betis_loan_destination_model.csv` |
 | 7 | `python3 build_rf_decision_model.py` | master + betis + evidencia | `historical_operation_events.csv`, `club_position_demand.csv`, `betis_rf_*.csv` |
-| 8 | `python3 build_success_score.py` | `historical_operation_events.csv` | `historical_success_cases.csv`, `success_score_report.json`, **`success_score_model.joblib`** |
-| 9 | `python3 build_betis_decisions.py` | success model + loan + demand + cases | `betis_decision_recommendations.csv/json` |
+| 8 | `python3 build_operation_model_dataset.py` | master + `historical_operation_events.csv` | `player_operation_model_dataset.csv`, `player_operation_model_report.json`, **`operation_success_v2_model.joblib`** |
+| 9 | `python3 build_success_score.py` | `historical_operation_events.csv` | `historical_success_cases.csv`, `success_score_report.json`, **`success_score_model.joblib`** |
+| 10 | `python3 build_betis_decisions.py` | success model + loan + demand + cases | `betis_decision_recommendations.csv/json` |
 
 Después: `git add -A && git commit && git push` para que el dashboard lea los nuevos CSV.
 
@@ -69,6 +70,28 @@ dimensión, su peso se reparte entre las disponibles):
 | Progresión (rev. positiva + bonus) | 15% | Transfermarkt |
 
 Definición completa e importancias del Random Forest en `data/final/success_score_report.json`.
+
+---
+
+## player_operation_model_dataset.csv (dataset ML de operaciones)
+
+Es la tabla de entrenamiento más completa para estudiar operaciones históricas.
+Cada fila representa **jugador + temporada + club + operación** e incorpora:
+
+| Bloque | Ejemplos |
+|---|---|
+| Foto previa | club anterior, temporada previa, edad, valor, minutos, goles, xG |
+| Contexto destino | club, entrenador, demanda club-posición, minutos Sub23 en esa posición |
+| Resultado misma temporada | partidos, minutos, goles, xG, revalorización |
+| Seguimiento posterior | club siguiente, minutos siguientes, delta de valor, delta de minutos |
+| Etiquetas | `loan_success_label`, `sale_success_label`, `operation_success_score_v2`, `label_confidence` |
+
+La validación del modelo v2 evita fuga de información: el entrenamiento usa solo
+variables disponibles **antes** de tomar la decisión (`pre_operation_only`) y excluye
+minutos/goles/xG/revalorización de la temporada de destino. Por eso sus métricas son
+más realistas y menos infladas que un modelo que aprende del resultado ya observado.
+
+Definición completa en `data/final/player_operation_model_report.json`.
 
 ---
 

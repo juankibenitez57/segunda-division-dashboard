@@ -2731,6 +2731,7 @@ function renderScoutGPTTab() {
   loadLoanModelData(() => {});
   loadDecisionModelData(() => {});
   loadOperationContext(() => {});
+  loadOperationModelReport(() => {});
 
   const input = document.getElementById('scoutgpt-input');
   const btn   = document.getElementById('scoutgpt-send');
@@ -2744,9 +2745,10 @@ function renderScoutGPTTab() {
 
     let html;
     const qn = norm(q);
-    if (isDecisionModelQuery(qn) || isLocalStatsQuery(qn)) {
+    if (isDecisionModelQuery(qn) || isLocalStatsQuery(qn) || isOperationModelQualityQuery(qn)) {
       await new Promise(resolve => loadLoanModelData(resolve));
       await new Promise(resolve => loadDecisionModelData(resolve));
+      await new Promise(resolve => loadOperationModelReport(resolve));
       await new Promise(resolve => loadMasterData(resolve));
       html = processScoutQuery(q);
     } else {
@@ -3048,6 +3050,8 @@ function processScoutQuery(raw) {
   const isDecisionModel = isDecisionModelQuery(q);
 
   // --- Routing ---
+
+  if (isOperationModelQualityQuery(q)) return sgptOperationModelReport();
 
   // Evaluación DIRIGIDA: jugador Betis + club destino concreto + operación
   // Ej: "¿sería buena la cesión de Rodrigo Marina al Ceuta?" / "¿vender a Morante al Andorra?"
@@ -3857,6 +3861,7 @@ let RF_PLAYER_RECOMMENDATIONS = [];
 let RF_DESTINATION_RECOMMENDATIONS = [];
 let RF_SIMILAR_EVENTS = [];
 let BETIS_DECISIONS = [];          // betis_decision_recommendations.csv (operation_success_score)
+let OPERATION_MODEL_REPORT = null; // player_operation_model_report.json
 
 function loadMasterData(callback) {
   if (MASTER_DATA.length) { callback(MASTER_DATA); return; }
@@ -3933,6 +3938,20 @@ function loadDecisionModelData(callback) {
     complete: r => { RF_SIMILAR_EVENTS = r.data.filter(d => d.jugador_betis); done(); },
     error: () => { RF_SIMILAR_EVENTS = []; done(); }
   });
+}
+
+function loadOperationModelReport(callback) {
+  if (OPERATION_MODEL_REPORT) { callback(OPERATION_MODEL_REPORT); return; }
+  fetch(dataPath('player_operation_model_report.json'))
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      OPERATION_MODEL_REPORT = d || null;
+      callback(OPERATION_MODEL_REPORT);
+    })
+    .catch(() => {
+      OPERATION_MODEL_REPORT = null;
+      callback(null);
+    });
 }
 
 const SEGUNDA_CLUBS_SET = new Set([
@@ -4018,6 +4037,54 @@ function rfSummaryForPlayer(playerName) {
 
 function pct(v) {
   return `${Math.round(num(v) * 100)}%`;
+}
+
+function isOperationModelQualityQuery(q) {
+  return /exact|precision|fiab|validaci[oó]n|m[eé]trica|r2|mae|auc|calidad|dataset|entren|machine|learning|modelo.*operaci|operaci.*modelo/.test(q);
+}
+
+function sgptOperationModelReport() {
+  if (!OPERATION_MODEL_REPORT) {
+    return 'El informe del modelo de operaciones todavía se está cargando. Vuelve a preguntar en unos segundos.';
+  }
+  const ds = OPERATION_MODEL_REPORT.dataset || {};
+  const reg = OPERATION_MODEL_REPORT.operation_success_regressor || {};
+  const clf = OPERATION_MODEL_REPORT.global_success_classifier || {};
+  const defs = OPERATION_MODEL_REPORT.target_definition || {};
+  const labels = ds.label_confidence || {};
+  const ops = ds.operation_types || {};
+  const topFeatures = (reg.feature_importances || []).slice(0, 8);
+
+  return `<strong>Modelo ML de operaciones — estado actual</strong><br>
+    <span class="muted">Nueva capa: <strong>player_operation_model_dataset.csv</strong>. Una fila representa jugador + temporada + club + operación.</span><br>
+    <div style="margin:10px 0;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <strong>Volumen de entrenamiento</strong><br>
+      <table><thead><tr><th>Filas</th><th>Columnas</th><th>Hist. previa</th><th>Seguimiento posterior</th><th>Wyscout</th></tr></thead>
+      <tbody><tr>
+        <td>${fmt(ds.rows || 0)}</td><td>${fmt(ds.columns || 0)}</td>
+        <td>${fmt(ds.with_pre_history || 0)}</td><td>${fmt(ds.with_post_history || 0)}</td><td>${fmt(ds.with_wyscout || 0)}</td>
+      </tr></tbody></table>
+    </div>
+    <strong>Calidad de etiquetas</strong><br>
+    <span class="muted">Alta: ${fmt(labels.Alta || 0)} · Media: ${fmt(labels.Media || 0)} · Baja: ${fmt(labels.Baja || 0)}</span><br><br>
+    <strong>Tipos de operación observados</strong><br>
+    <span class="muted">Cesiones: ${fmt(ops.cesion || 0)} · Traspasos: ${fmt(ops.traspaso || 0)} · Libres: ${fmt(ops.libre || 0)} · Otros/Sub23: ${fmt((ops.otro || 0) + (ops.sub23_wyscout || 0))}</span><br><br>
+    <strong>Validación honesta</strong><br>
+    <table><thead><tr><th>Modelo</th><th>Métrica</th><th>Valor</th><th>Lectura</th></tr></thead>
+    <tbody>
+      <tr><td>Regresor score operación</td><td>MAE</td><td>${reg.mae ?? '—'}</td><td>Error medio en puntos sobre 100</td></tr>
+      <tr><td>Regresor score operación</td><td>R² CV</td><td>${reg.r2_cv_mean ?? '—'}</td><td>Poder predictivo fuera de muestra</td></tr>
+      <tr><td>Clasificador éxito global</td><td>AUC</td><td>${clf.roc_auc ?? '—'}</td><td>Separación éxito/no éxito</td></tr>
+    </tbody></table>
+    <div style="margin:10px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <strong>Lectura deportiva:</strong><br>
+      <span class="muted">El modelo ya detecta señales útiles, sobre todo contexto club-posición, minutos Sub23 históricos, demanda y valor. La precisión todavía está limitada porque solo ${fmt(ds.with_pre_history || 0)} filas tienen historial previo y ${fmt(ds.with_post_history || 0)} seguimiento posterior. Es una base seria para apoyar decisiones, no una predicción cerrada.</span>
+    </div>
+    ${reg.feature_policy ? `<span class="muted"><strong>Control anti-fuga:</strong> ${reg.feature_policy}</span><br><br>` : ''}
+    ${topFeatures.length ? `<strong>Variables que más pesan</strong><br>
+    <table><thead><tr><th>#</th><th>Variable</th><th>Importancia</th></tr></thead>
+    <tbody>${topFeatures.map((f, i) => `<tr><td>${i + 1}</td><td>${String(f.feature).replace(/^num__|^cat__/, '')}</td><td>${num(f.importance).toFixed(3)}</td></tr>`).join('')}</tbody></table>` : ''}
+    <span class="muted">${defs.operation_success_score_v2 || ''}</span>`;
 }
 
 // Traduce tipos de suceso crudos a etiquetas legibles para el usuario
