@@ -24,6 +24,7 @@ import argparse
 import json
 import logging
 import sys
+import unicodedata
 from pathlib import Path
 
 import numpy as np
@@ -82,6 +83,21 @@ STAY_RELEGATION_PENALTY = 18.0
 LOAN_HIGHER_LEVEL_BONUS = 10.0
 YOUNG_SALE_PENALTY = 6.0
 
+ROLE_NAME_OVERRIDES = {
+    "r marina": {
+        "role": "delantero referencia",
+        "needs": ["centros laterales", "presencia de área", "minutos reales para delanteros jóvenes"],
+    },
+    "rodrigo marina": {
+        "role": "delantero referencia",
+        "needs": ["centros laterales", "presencia de área", "minutos reales para delanteros jóvenes"],
+    },
+    "pablo garcia": {
+        "role": "extremo encarador",
+        "needs": ["juego por banda", "duelos exteriores", "espacio para recibir abierto"],
+    },
+}
+
 
 def fmt_money(v: float) -> str:
     if pd.isna(v) or v == 0:
@@ -102,10 +118,163 @@ def num(v, default=0.0):
         return default
 
 
+def norm_text(value: str) -> str:
+    text = unicodedata.normalize("NFKD", str(value or ""))
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    return " ".join(text.lower().replace(".", " ").split())
+
+
 def minmax(v: float, low: float, high: float) -> float:
     if high <= low:
         return 0.0
     return max(0.0, min((num(v) - low) / (high - low), 1.0))
+
+
+def player_tactical_profile(player: pd.Series) -> dict:
+    name_key = norm_text(player.get("jugador", ""))
+    pos = str(player.get("posicion_normalizada", "") or "")
+    original = str(player.get("posicion_original", "") or "")
+    height = num(player.get("altura"))
+    goals90 = num(player.get("goles_por_90"))
+    xg90 = num(player.get("xg_por_90"))
+
+    if name_key in ROLE_NAME_OVERRIDES:
+        base = ROLE_NAME_OVERRIDES[name_key].copy()
+    elif pos == "Delantero" and (height >= 185 or xg90 >= 0.30):
+        base = {
+            "role": "delantero referencia",
+            "needs": ["centros laterales", "presencia de área", "minutos reales para delanteros jóvenes"],
+        }
+    elif pos == "Extremo":
+        base = {
+            "role": "extremo encarador",
+            "needs": ["juego por banda", "duelos exteriores", "espacio para recibir abierto"],
+        }
+    elif pos in {"Mediocentro", "Centrocampista"}:
+        base = {
+            "role": "centrocampista de desarrollo",
+            "needs": ["volumen de balón", "continuidad competitiva", "estructura estable por dentro"],
+        }
+    elif pos == "Central":
+        base = {
+            "role": "central joven",
+            "needs": ["minutos defensivos", "equipo que use centrales sub23", "protección competitiva"],
+        }
+    elif pos == "Lateral":
+        base = {
+            "role": "lateral de recorrido",
+            "needs": ["juego exterior", "minutos para laterales jóvenes", "recorrido por banda"],
+        }
+    else:
+        base = {
+            "role": pos.lower() or "perfil por definir",
+            "needs": ["minutos reales", "demanda posicional", "contexto sub23"],
+        }
+
+    traits = []
+    if height >= 185:
+        traits.append("altura para atacar centros")
+    if goals90 >= 0.35 or xg90 >= 0.35:
+        traits.append("producción ofensiva alta")
+    if any(code in original for code in ["RW", "LW", "RWF", "LWF"]):
+        traits.append("amenaza exterior")
+    return {**base, "traits": traits}
+
+
+def club_tactical_context(club_row: pd.Series | None, demand_score: float, pos: str) -> dict:
+    if club_row is None:
+        return {
+            "wide_game_score": 0.0,
+            "cross_supply_proxy": 0.0,
+            "striker_environment": 0.0,
+            "position_minutes_score": 0.0,
+        }
+
+    total = num(club_row.get("minutos_sub23"))
+    if total <= 0:
+        total = sum(num(club_row.get(c)) for c in POSITION_MINUTES_COL.values())
+    total = max(total, 1.0)
+
+    ext = num(club_row.get("minutos_sub23_extremos"))
+    lat = num(club_row.get("minutos_sub23_laterales"))
+    fwd = num(club_row.get("minutos_sub23_delanteros"))
+    mid = num(club_row.get("minutos_sub23_mediocentros"))
+    pos_col = POSITION_MINUTES_COL.get(pos, "")
+    pos_minutes = num(club_row.get(pos_col)) if pos_col else 0.0
+
+    wide_share = (ext + lat) / total
+    wide_game_score = (
+        45 * minmax(wide_share, 0.18, 0.48)
+        + 30 * minmax(ext, 0, 6500)
+        + 25 * minmax(lat, 0, 8500)
+    )
+    cross_supply_proxy = (
+        55 * minmax(wide_share, 0.20, 0.52)
+        + 25 * minmax(lat, 0, 8500)
+        + 20 * minmax(ext, 0, 6500)
+    )
+    striker_environment = (
+        40 * minmax(fwd, 0, 9000)
+        + 25 * minmax(num(club_row.get("goles_sub23")), 0, 45)
+        + 20 * minmax(num(club_row.get("xg_sub23")), 0, 45)
+        + 15 * minmax(demand_score, 30, 95)
+    )
+    interior_environment = (
+        55 * minmax(mid, 0, 12000)
+        + 25 * minmax(total, 5000, 32000)
+        + 20 * minmax(demand_score, 30, 95)
+    )
+    return {
+        "wide_game_score": round(float(wide_game_score), 1),
+        "cross_supply_proxy": round(float(cross_supply_proxy), 1),
+        "striker_environment": round(float(striker_environment), 1),
+        "interior_environment": round(float(interior_environment), 1),
+        "position_minutes_score": round(100 * minmax(pos_minutes, 0, 8000), 1),
+        "wide_share": round(float(wide_share * 100), 1),
+        "position_minutes": round(float(pos_minutes), 0),
+    }
+
+
+def tactical_fit(player: pd.Series, club: str, club_row: pd.Series | None, demand_score: float, pos: str) -> tuple[float, str]:
+    profile = player_tactical_profile(player)
+    ctx = club_tactical_context(club_row, demand_score, pos)
+    role = profile["role"]
+
+    if role == "delantero referencia":
+        score = 0.58 * ctx["cross_supply_proxy"] + 0.22 * ctx["striker_environment"] + 0.20 * ctx["position_minutes_score"]
+        reason = (
+            f"{club}: encaje para delantero de área. El perfil necesita {', '.join(profile['needs'][:2])}; "
+            f"el club muestra proxy de centros/juego exterior {ctx['cross_supply_proxy']:.0f}/100, "
+            f"entorno de delanteros {ctx['striker_environment']:.0f}/100 y {ctx['position_minutes']:.0f} min Sub23 en la posición."
+        )
+    elif role == "extremo encarador":
+        score = 0.52 * ctx["wide_game_score"] + 0.28 * ctx["position_minutes_score"] + 0.20 * minmax(demand_score, 30, 95) * 100
+        reason = (
+            f"{club}: encaje para extremo abierto. El perfil necesita {', '.join(profile['needs'][:2])}; "
+            f"el club tiene juego exterior proxy {ctx['wide_game_score']:.0f}/100, "
+            f"{ctx['wide_share']:.0f}% de sus minutos Sub23 en perfiles de banda/lateral y demanda {demand_score:.0f}/100."
+        )
+    elif role == "centrocampista de desarrollo":
+        score = 0.55 * ctx["interior_environment"] + 0.25 * ctx["position_minutes_score"] + 0.20 * minmax(demand_score, 30, 95) * 100
+        reason = (
+            f"{club}: encaje interior. El club acumula {ctx['position_minutes']:.0f} min Sub23 en la zona y demanda {demand_score:.0f}/100."
+        )
+    elif role == "lateral de recorrido":
+        score = 0.50 * ctx["wide_game_score"] + 0.30 * ctx["position_minutes_score"] + 0.20 * minmax(demand_score, 30, 95) * 100
+        reason = (
+            f"{club}: encaje exterior para lateral. Juego por fuera {ctx['wide_game_score']:.0f}/100 y {ctx['position_minutes']:.0f} min Sub23 en laterales."
+        )
+    else:
+        score = 0.45 * ctx["position_minutes_score"] + 0.35 * minmax(demand_score, 30, 95) * 100 + 0.20 * minmax(num(club_row.get("minutos_sub23")) if club_row is not None else 0, 5000, 32000) * 100
+        reason = (
+            f"{club}: encaje por oportunidad competitiva. Demanda {demand_score:.0f}/100 y {ctx['position_minutes']:.0f} min Sub23 en la posición."
+        )
+
+    traits = profile.get("traits") or []
+    if traits:
+        reason += f" Rasgos del jugador considerados: {', '.join(traits)}."
+    reason += " Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar."
+    return round(float(max(0, min(score, 100))), 1), reason
 
 
 def lookup_row(df: pd.DataFrame, **criteria) -> pd.Series | None:
@@ -288,6 +457,7 @@ def best_destinations(loan: pd.DataFrame, demand: pd.DataFrame, coach: pd.DataFr
         coach_row = lookup_row(coach, entrenador=ent)
         demanda = num(demand_row.get("demand_score")) if demand_row is not None else dem_lookup.get((club, pos_dest), dem_lookup.get((club, posicion), 0.0))
         uso_coach = coach_minutos.get(ent, 0.0)
+        tactical_score, tactical_reason = tactical_fit(player, club, club_row, demanda, pos_dest)
         rows.append({
             "club": club, "entrenador": ent, "posicion": pos_dest,
             "score_combinado": np.nan,
@@ -295,6 +465,8 @@ def best_destinations(loan: pd.DataFrame, demand: pd.DataFrame, coach: pd.DataFr
             "score_v2_traspaso": np.nan,
             "desarrollo": round(desarrollo, 1), "demanda": round(demanda, 1),
             "uso_jovenes_coach": round(uso_coach, 1),
+            "encaje_tactico": tactical_score,
+            "explicacion_tactica": tactical_reason,
             "revalorizacion_media": fmt_money(num(dest.get("revalorizacion_media_destino"))),
         })
         if model_v2 is not None:
@@ -308,16 +480,20 @@ def best_destinations(loan: pd.DataFrame, demand: pd.DataFrame, coach: pd.DataFr
             row["score_v2_cesion"] = round(float(v2_cesion), 1)
             row["score_v2_traspaso"] = round(float(v2_traspaso), 1)
             row["score_combinado"] = round(
-                0.45 * float(v2_cesion)
-                + 0.25 * row["desarrollo"]
-                + 0.20 * row["demanda"]
-                + 0.10 * row["uso_jovenes_coach"],
+                0.40 * float(v2_cesion)
+                + 0.22 * row["desarrollo"]
+                + 0.18 * row["demanda"]
+                + 0.10 * row["uso_jovenes_coach"]
+                + 0.10 * row["encaje_tactico"],
                 1,
             )
     else:
         for row in rows:
             row["score_combinado"] = round(
-                0.50 * row["desarrollo"] + 0.30 * row["demanda"] + 0.20 * row["uso_jovenes_coach"],
+                0.45 * row["desarrollo"]
+                + 0.25 * row["demanda"]
+                + 0.15 * row["uso_jovenes_coach"]
+                + 0.15 * row["encaje_tactico"],
                 1,
             )
     rows.sort(key=lambda r: r["score_combinado"], reverse=True)
@@ -438,6 +614,7 @@ def build(top_n_dest: int = 5, top_n_sim: int = 3) -> pd.DataFrame:
         clubes_str = " | ".join(f"{d['club']} ({d['score_combinado']:.0f})" for d in dests)
         entrenadores_str = " | ".join(entrenadores)
         sims_str = " | ".join(f"{s['jugador']} ({s['club']}, {s['score']:.0f})" for s in sims)
+        tactical_str = " | ".join(d.get("explicacion_tactica", "") for d in dests[:3] if d.get("explicacion_tactica"))
 
         justificacion = build_justification(player, op, prob, dests, sims, rev_esperada, audit)
 
@@ -454,6 +631,8 @@ def build(top_n_dest: int = 5, top_n_sim: int = 3) -> pd.DataFrame:
                 "desarrollo": dest["desarrollo"],
                 "demanda": dest["demanda"],
                 "uso_jovenes_coach": dest["uso_jovenes_coach"],
+                "encaje_tactico": dest["encaje_tactico"],
+                "explicacion_tactica": dest["explicacion_tactica"],
                 "revalorizacion_media": dest["revalorizacion_media"],
             })
 
@@ -481,6 +660,7 @@ def build(top_n_dest: int = 5, top_n_sim: int = 3) -> pd.DataFrame:
             "revalorizacion_esperada": fmt_money(num(rev_esperada)) if pd.notna(rev_esperada) else "-",
             "clubes_ideales": clubes_str,
             "entrenadores_ideales": entrenadores_str,
+            "explicaciones_tacticas": tactical_str,
             "casos_similares": sims_str,
             "justificacion": justificacion,
         })
@@ -520,6 +700,8 @@ def build_justification(player, op, prob, dests, sims, rev_esperada, audit=None)
             parts.append(f"Mejor destino: {d['club']} (score v2 cesión {d['score_v2_cesion']:.0f}, desarrollo {d['desarrollo']:.0f}, demanda {d['demanda']:.0f}).")
         else:
             parts.append(f"Mejor destino: {d['club']} (desarrollo {d['desarrollo']:.0f}, demanda {d['demanda']:.0f}, uso jóvenes coach {d['uso_jovenes_coach']:.0f}).")
+        if d.get("explicacion_tactica"):
+            parts.append(f"Lectura táctica: {d['explicacion_tactica']}")
     if audit:
         if audit.get("contexto_descenso_filial"):
             parts.append(

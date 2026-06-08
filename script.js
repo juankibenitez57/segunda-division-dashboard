@@ -7,7 +7,7 @@
 
 /* ===================== CONSTANTS ===================== */
 const CHART_COLORS = ['#009a44','#1d6fa4','#e07b39','#8b5cf6','#d4a017','#0891b2','#be185d','#059669','#7c3aed','#b45309'];
-const DATA_VERSION = '2026-06-08-model-evidence';
+const DATA_VERSION = '2026-06-08-tactical-fit';
 
 /* ============================================================
    REGISTRO DE LIGAS (multi-liga)
@@ -3692,6 +3692,7 @@ function sgptDefault(raw) {
 let WY_DATA = [];
 let CLUB_EVIDENCE_DATA = [];   // development_club_evidence.csv
 let CLUB_DEMAND_DATA = [];     // club_position_demand.csv
+let CURRENT_SQUAD_EXCLUSIONS = [];
 
 function loadWyscoutData(callback) {
   if (WY_DATA.length) { callback(WY_DATA); return; }
@@ -3707,7 +3708,7 @@ function loadWyscoutData(callback) {
 
 // Carga datos de encaje club-posición (para análisis de operaciones)
 function loadOperationContext(callback) {
-  let pending = 3;
+  let pending = 4;
   const done = () => { if (--pending === 0) callback(); };
   loadWyscoutData(() => done());
   if (CLUB_EVIDENCE_DATA.length) { done(); }
@@ -3721,6 +3722,12 @@ function loadOperationContext(callback) {
     header: true, dynamicTyping: true, download: true,
     complete: r => { CLUB_DEMAND_DATA = r.data.filter(d => d.club); done(); },
     error: () => { CLUB_DEMAND_DATA = []; done(); }
+  });
+  if (CURRENT_SQUAD_EXCLUSIONS.length) { done(); }
+  else Papa.parse(dataPath('current_squad_exclusions.csv'), {
+    header: true, dynamicTyping: true, download: true,
+    complete: r => { CURRENT_SQUAD_EXCLUSIONS = r.data.filter(d => d.club && d.jugador); done(); },
+    error: () => { CURRENT_SQUAD_EXCLUSIONS = []; done(); }
   });
 }
 
@@ -4008,6 +4015,10 @@ const POS_TO_EVIDENCE_COL = {
   'Portero': 'minutos_sub23_porteros',
 };
 
+const PLAYER_ROLE_OVERRIDES = {
+  'kuki zalazar': { role: 'Mediapunta', note: '10 / segundo punta, no 9 puro' },
+};
+
 function isTrue(v) { return v === true || v === 'True' || v === 'true'; }
 function num(v) { const n = +v; return isNaN(n) ? 0 : n; }
 function normDevPos(p) {
@@ -4021,6 +4032,48 @@ function devPosMatch(row, pos) {
   const p = normDevPos(row.posicion_normalizada || row.posicion_es || tPos(row.posicion || ''));
   if (pos === 'Mediocentro') return p === 'Mediocentro' || p === 'Centrocampista';
   return p === pos;
+}
+
+function tokenSet(raw) {
+  return new Set((raw || '').toString().split(',').map(s => s.trim().toUpperCase()).filter(Boolean));
+}
+
+function tacticalRole(row) {
+  const nameKey = norm(row.jugador);
+  if (PLAYER_ROLE_OVERRIDES[nameKey]) return PLAYER_ROLE_OVERRIDES[nameKey];
+  const codes = tokenSet(row.posicion_wyscout || row.posicion_original || row.posicion_primaria || '');
+  const normalized = normDevPos(row.posicion_normalizada || row.posicion_es || '');
+  const has = (...items) => items.some(x => codes.has(x));
+
+  if (has('AMF') || has('LAMF') || has('RAMF')) {
+    if (has('RW', 'LW', 'RWF', 'LWF')) return { role: 'Extremo', note: 'perfil de banda/interior ofensivo' };
+    if (has('CF') && !has('RW', 'LW', 'RWF', 'LWF')) return { role: 'Mediapunta', note: 'segundo punta / 10' };
+    return { role: 'Mediapunta', note: 'mediapunta' };
+  }
+  if (has('RW', 'LW', 'RWF', 'LWF')) return { role: 'Extremo', note: 'banda ofensiva' };
+  if (has('CF', 'ST')) return { role: 'Delantero', note: '9 puro' };
+  if (has('RB', 'LB', 'RWB', 'LWB')) return { role: 'Lateral', note: 'lateral/carrilero' };
+  if (has('CB', 'RCB', 'LCB')) return { role: 'Central', note: 'central' };
+  if (has('DMF', 'RDMF', 'LDMF')) return { role: 'Mediocentro', note: 'pivote/mediocentro' };
+  if (has('RCMF', 'LCMF', 'CMF')) return { role: 'Centrocampista', note: 'interior' };
+  return { role: normalized || 'Sin rol', note: normalized || '' };
+}
+
+function roleMatchesCompetition(row, targetPos) {
+  const role = tacticalRole(row).role;
+  const target = normDevPos(targetPos);
+  if (target === 'Delantero') return role === 'Delantero';
+  if (target === 'Extremo') return role === 'Extremo';
+  if (target === 'Mediocentro' || target === 'Centrocampista') return role === 'Mediocentro' || role === 'Centrocampista';
+  return role === target;
+}
+
+function isCurrentSquadPlayer(row, clubName) {
+  if (row.temporada !== '2025-26') return false;
+  const removed = CURRENT_SQUAD_EXCLUSIONS.some(x =>
+    norm(x.club) === norm(clubName) && norm(x.jugador) === norm(row.jugador)
+  );
+  return !removed;
 }
 
 function isLoanDestinationQuery(q) {
@@ -4186,6 +4239,8 @@ function detectDestinationClubInQuery(q, betisPlayer) {
 function sgptEvaluateMove(playerName, clubName, operacion) {
   const row = RF_DESTINATION_RECOMMENDATIONS.find(
     d => norm(d.jugador) === norm(playerName) && norm(d.club) === norm(clubName));
+  const tacticalRow = V2_DESTINATION_RECOMMENDATIONS.find(
+    d => norm(d.jugador) === norm(playerName) && norm(d.club) === norm(clubName));
   const summary = rfSummaryForPlayer(playerName);
 
   if (!row) {
@@ -4231,6 +4286,9 @@ function sgptEvaluateMove(playerName, clubName, operacion) {
   just.push(mejorTop
     ? `Es de los <strong>mejores destinos</strong> calculados para ${playerName} (ranking ${ranking}/${total}).`
     : `No está entre los destinos óptimos de ${playerName} (ranking ${ranking}/${total}); hay opciones mejores.`);
+  if (tacticalRow?.explicacion_tactica) {
+    just.push(`<strong>Lectura táctica:</strong> ${tacticalRow.explicacion_tactica}`);
+  }
 
   const opLabel = operacion === 'venta' ? 'VENTA' : 'CESIÓN';
 
@@ -4242,6 +4300,7 @@ function sgptEvaluateMove(playerName, clubName, operacion) {
         <div><span class="muted">Score destino</span><br><strong>${score.toFixed(1)}/100</strong></div>
         <div><span class="muted">Demanda club</span><br><strong>${demand.toFixed(0)}/100</strong></div>
         <div><span class="muted">Nivel evidencia</span><br><strong>${nivel}</strong></div>
+        ${tacticalRow ? `<div><span class="muted">Encaje táctico</span><br><strong>${num(tacticalRow.encaje_tactico).toFixed(0)}/100</strong></div>` : ''}
         <div><span class="muted">Reval. esperada</span><br><strong class="green">${formatM(revEsp)}</strong></div>
       </div>
       <ul style="margin:6px 0 0;padding-left:18px;font-size:0.85rem;line-height:1.6">
@@ -4362,8 +4421,11 @@ function sgptAnalyzeOperation(playerName, clubName) {
   const sub23Club = evRow ? num(evRow.jugadores_sub23_utilizados) : 0;
 
   // 3. Profundidad de plantilla actual en esa posición (Wyscout 2025-26)
-  const squad = WY_DATA.filter(d => d.equipo === clubName && d.temporada === '2025-26' &&
-    normDevPos(d.posicion_normalizada) === normDevPos(pos));
+  const tacticalDest = V2_DESTINATION_RECOMMENDATIONS.find(d =>
+    norm(d.jugador) === norm(p.nombre) && norm(d.club) === norm(clubName)
+  );
+  const squad = WY_DATA.filter(d => d.equipo === clubName && isCurrentSquadPlayer(d, clubName) &&
+    roleMatchesCompetition(d, pos));
   const competidores = squad.filter(d => norm(d.jugador) !== norm(p.nombre));
   const titulares = competidores.filter(d => num(d.minutos_jugados) > 1500);
 
@@ -4385,12 +4447,18 @@ function sgptAnalyzeOperation(playerName, clubName) {
   just.push(demand >= 45
     ? `Demanda histórica del club en la posición <strong>alta</strong> (${demand.toFixed(0)}/100).`
     : `Demanda histórica <strong>moderada/baja</strong> (${demand.toFixed(0)}/100).`);
+  if (tacticalDest?.explicacion_tactica) {
+    just.push(`<strong>Lectura táctica:</strong> ${tacticalDest.explicacion_tactica}`);
+  }
 
   // Competencia concreta (nombres)
   const compList = competidores
     .sort((a,b) => num(b.minutos_jugados) - num(a.minutos_jugados))
     .slice(0, 5)
-    .map(d => `${d.jugador} (${num(d.edad)}a, ${fmt(num(d.minutos_jugados))}min)`);
+    .map(d => {
+      const tr = tacticalRole(d);
+      return `${d.jugador} (${num(d.edad)}a, ${fmt(num(d.minutos_jugados))}min, rol ${tr.role})`;
+    });
 
   return `<strong>¿Cómo encaja ${p.nombre} en el ${clubName}?</strong>
     <span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;margin-left:6px">📊 Análisis de operación</span><br>
@@ -4399,7 +4467,8 @@ function sgptAnalyzeOperation(playerName, clubName) {
       <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:8px;font-size:0.85rem">
         <div><span class="muted">Demanda club</span><br><strong>${demand.toFixed(0)}/100</strong></div>
         <div><span class="muted">Min. jóvenes en ${pos}</span><br><strong>${fmt(minDevPos)}</strong></div>
-        <div><span class="muted">Profundidad ${pos}</span><br><strong>${competidores.length} jug.</strong></div>
+        <div><span class="muted">Profundidad real ${pos}</span><br><strong>${competidores.length} jug.</strong></div>
+        ${tacticalDest ? `<div><span class="muted">Encaje táctico</span><br><strong>${num(tacticalDest.encaje_tactico).toFixed(0)}/100</strong></div>` : ''}
       </div>
       <ul style="margin:6px 0 0;padding-left:18px;font-size:0.85rem;line-height:1.6">
         ${just.map(j => `<li>${j}</li>`).join('')}
@@ -4431,16 +4500,11 @@ function sgptDecisionForBetisPlayer(playerName) {
   const justificacion = dec?.justificacion || summary.razonamiento || '';
   const clubesText = dec?.clubes_ideales || summary.clubes_ideales || '';
   const entrenadoresText = dec?.entrenadores_ideales || summary.entrenadores_ideales || '';
-  const modeloDecision = dec?.modelo_decision || (v2Rows.length ? 'operation_success_v2' : 'RF histórico');
-  const benchmarkBest = OPERATION_BENCHMARK_REPORT?.best_models || {};
-  const loanBest = benchmarkBest.loan_success_label || {};
-  const scoreBest = benchmarkBest.operation_success_score_v2 || {};
-  const benchmarkLine = loanBest.model
-    ? `Benchmark ML: para cesiones gana <strong>${loanBest.model}</strong> (F1 CV ${num(loanBest.cv_f1_mean).toFixed(3)}, AUC ${num(loanBest.cv_roc_auc_mean).toFixed(3)}); para score 0-100 gana <strong>${scoreBest.model || '—'}</strong>.`
-    : `Benchmark ML: compara Random Forest, Extra Trees, Gradient Boosting, regresión logística/Ridge y baseline.`;
   const descensoLine = isTrue(dec?.contexto_descenso_filial)
     ? `Ajuste deportivo aplicado: Betis Deportivo descendido, mantener se penaliza -${num(dec.penalizacion_mantener_descenso).toFixed(0)} y cesión competitiva recibe +${num(dec.bonus_cesion_categoria_superior).toFixed(0)}.`
     : '';
+  const tacticalText = dec?.explicaciones_tacticas || '';
+  const tacticalItems = tacticalText ? tacticalText.split('|').map(s => s.trim()).filter(Boolean).slice(0, 3) : [];
   const stats = getPlayerSeasonStats(playerName);
   const totals = summarizePlayerStats(stats);
   const lectura = justificacion
@@ -4457,7 +4521,6 @@ function sgptDecisionForBetisPlayer(playerName) {
         <div>
           <div class="muted" style="font-size:0.78rem">Score / confianza</div>
           <div style="font-size:1.15rem;font-weight:900;color:${probColor}">${prob.toFixed(0)}/100</div>
-          <div class="muted" style="font-size:0.68rem">${modeloDecision}</div>
         </div>
         <div>
           <div class="muted" style="font-size:0.78rem">Revalorización esperada</div>
@@ -4473,10 +4536,8 @@ function sgptDecisionForBetisPlayer(playerName) {
       <td>${pct(summary.prob_cesion_historica)}</td><td>${pct(summary.prob_traspaso_historico)}</td>
     </tr></tbody></table>
     <div style="margin:10px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
-      <strong>Modelo y evidencias utilizadas:</strong><br>
-      <span class="muted">Motor de decisión: <strong>${modeloDecision}</strong>. ${benchmarkLine}</span><br>
-      <span class="muted">Variables usadas: edad, posición, valor, minutos previos, goles/xG previos, demanda club-posición, minutos Sub23 del club, uso Sub23 del entrenador y casos históricos similares.</span>
-      ${dec ? `<br><span class="muted">Comparativa ajustada: cesión ${num(dec.score_cesion_ajustado || dec.score_v2_cesion).toFixed(1)}, mantener ${num(dec.score_mantener).toFixed(1)}, venta ${num(dec.score_traspaso_ajustado || dec.score_traspaso).toFixed(1)}.</span>` : ''}
+      <strong>Lectura deportiva:</strong><br>
+      <span class="muted">Comparativa ajustada: cesión ${num(dec?.score_cesion_ajustado || dec?.score_v2_cesion).toFixed(1)}, mantener ${num(dec?.score_mantener).toFixed(1)}, venta ${num(dec?.score_traspaso_ajustado || dec?.score_traspaso).toFixed(1)}.</span>
       ${descensoLine ? `<br><span class="muted">${descensoLine}</span>` : ''}
     </div>
     <div style="margin:10px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
@@ -4485,11 +4546,17 @@ function sgptDecisionForBetisPlayer(playerName) {
     </div>
     ${clubesText ? `<div style="margin-bottom:6px"><strong>Clubes ideales:</strong> <span class="muted">${clubesText}</span></div>` : ''}
     ${entrenadoresText ? `<div style="margin-bottom:10px"><strong>Entrenadores ideales:</strong> <span class="muted">${entrenadoresText}</span></div>` : ''}
-    ${rows.length && v2Rows.length ? `<strong>Destinos calculados — modelo v2</strong><br>
-    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score v2</th><th>Cesión</th><th>Venta</th><th>Demanda</th></tr></thead>
+    ${tacticalItems.length ? `<div style="margin:10px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <strong>Explicación táctica de destinos:</strong>
+      <ul style="margin:6px 0 0;padding-left:18px;font-size:0.85rem;line-height:1.55">
+        ${tacticalItems.map(t => `<li>${t}</li>`).join('')}
+      </ul>
+    </div>` : ''}
+    ${rows.length && v2Rows.length ? `<strong>Destinos calculados</strong><br>
+    <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score</th><th>Encaje táctico</th><th>Cesión</th><th>Venta</th><th>Demanda</th></tr></thead>
     <tbody>${rows.map(d => `<tr>
       <td>${num(d.ranking_destino_v2)}</td><td class="bold">${d.club}</td><td>${d.entrenador || '—'}</td>
-      <td class="green">${num(d.score_destino_v2).toFixed(1)}</td><td>${num(d.score_v2_cesion).toFixed(1)}</td>
+      <td class="green">${num(d.score_destino_v2).toFixed(1)}</td><td>${num(d.encaje_tactico).toFixed(0)}/100</td><td>${num(d.score_v2_cesion).toFixed(1)}</td>
       <td>${num(d.score_v2_traspaso).toFixed(1)}</td><td>${num(d.demanda).toFixed(0)}/100</td>
     </tr>`).join('')}</tbody></table>` : rows.length ? `<strong>Destinos calculados</strong><br>
     <table><thead><tr><th>#</th><th>Club</th><th>Entrenador</th><th>Score</th><th>Reval.</th><th>Prob +</th><th>Demanda</th></tr></thead>

@@ -21,10 +21,11 @@
     "club_modelo": "Málaga CF",
     "entrenador_modelo": NaN,
     "revalorizacion_esperada": "€805k",
-    "clubes_ideales": "Málaga CF (64) | Granada CF (59) | Cádiz CF (57) | Real Valladolid CF (53) | CD Leganés (53)",
-    "entrenadores_ideales": "Fran Escribá | Pako Ayestarán | Diego Cocca | Borja Jiménez",
+    "clubes_ideales": "Málaga CF (62) | Granada CF (59) | Cádiz CF (58) | CD Leganés (52) | Real Valladolid CF (52)",
+    "entrenadores_ideales": "Fran Escribá | Pako Ayestarán | Borja Jiménez | Diego Cocca",
+    "explicaciones_tacticas": "Málaga CF: encaje para delantero de área. El perfil necesita centros laterales, presencia de área; el club muestra proxy de centros/juego exterior 13/100, entorno de delanteros 100/100 y 10966 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros, producción ofensiva alta. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Granada CF: encaje para delantero de área. El perfil necesita centros laterales, presencia de área; el club muestra proxy de centros/juego exterior 37/100, entorno de delanteros 94/100 y 9496 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros, producción ofensiva alta. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje para delantero de área. El perfil necesita centros laterales, presencia de área; el club muestra proxy de centros/juego exterior 70/100, entorno de delanteros 61/100 y 5071 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros, producción ofensiva alta. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Peque Fernández (Racing Santander, 100) | G. Petit (Granada CF, 62) | Marc Domènech (AD Ceuta FC, 24)",
-    "justificacion": "R. Marina (Delantero, 19 años, 2339' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 55/100. Mejor destino: Málaga CF (score v2 cesión 45, desarrollo 100, demanda 94). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 55, mantener 59, venta 42. Casos similares: Peque Fernández, G. Petit, Marc Domènech. Revalorización esperada (modelo): €805k."
+    "justificacion": "R. Marina (Delantero, 19 años, 2339' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 55/100. Mejor destino: Málaga CF (score v2 cesión 45, desarrollo 100, demanda 94). Lectura táctica: Málaga CF: encaje para delantero de área. El perfil necesita centros laterales, presencia de área; el club muestra proxy de centros/juego exterior 13/100, entorno de delanteros 100/100 y 10966 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros, producción ofensiva alta. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 55, mantener 59, venta 42. Casos similares: Peque Fernández, G. Petit, Marc Domènech. Revalorización esperada (modelo): €805k."
   },
   {
     "jugador": "Borja Alonso",
@@ -48,10 +49,11 @@
     "club_modelo": "Cádiz CF",
     "entrenador_modelo": "Pako Ayestarán",
     "revalorizacion_esperada": "€716k",
-    "clubes_ideales": "Cádiz CF (71) | Sporting Gijón (64) | Deportivo de La Coruña (63) | FC Andorra (59) | Real Valladolid CF (55)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
+    "clubes_ideales": "Cádiz CF (72) | Sporting Gijón (66) | Deportivo de La Coruña (62) | FC Andorra (58) | Burgos CF (55)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | José Alberto",
+    "explicaciones_tacticas": "Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 85/100, 44% de sus minutos Sub23 en perfiles de banda/lateral y demanda 82/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Deportivo de La Coruña: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 38/100, 24% de sus minutos Sub23 en perfiles de banda/lateral y demanda 64/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Javi López (Burgos CF, 100) | Ilyas Chaira (CD Mirandés, 100)",
-    "justificacion": "Borja Alonso (Extremo, 22 años, 2608' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 55/100. Mejor destino: Cádiz CF (score v2 cesión 45, desarrollo 100, demanda 80). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 55, mantener 56, venta 48. Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €716k."
+    "justificacion": "Borja Alonso (Extremo, 22 años, 2608' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 55/100. Mejor destino: Cádiz CF (score v2 cesión 45, desarrollo 100, demanda 80). Lectura táctica: Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 55, mantener 56, venta 48. Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €716k."
   },
   {
     "jugador": "Carlos Reina",
@@ -75,10 +77,11 @@
     "club_modelo": "Málaga CF",
     "entrenador_modelo": NaN,
     "revalorizacion_esperada": "€680k",
-    "clubes_ideales": "Málaga CF (64) | Granada CF (59) | Cádiz CF (56) | CD Leganés (53) | Real Valladolid CF (53)",
+    "clubes_ideales": "Málaga CF (62) | Granada CF (59) | Cádiz CF (58) | CD Leganés (52) | Real Valladolid CF (51)",
     "entrenadores_ideales": "Fran Escribá | Pako Ayestarán | Borja Jiménez | Diego Cocca",
+    "explicaciones_tacticas": "Málaga CF: encaje para delantero de área. El perfil necesita centros laterales, presencia de área; el club muestra proxy de centros/juego exterior 13/100, entorno de delanteros 100/100 y 10966 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Granada CF: encaje para delantero de área. El perfil necesita centros laterales, presencia de área; el club muestra proxy de centros/juego exterior 37/100, entorno de delanteros 94/100 y 9496 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje para delantero de área. El perfil necesita centros laterales, presencia de área; el club muestra proxy de centros/juego exterior 70/100, entorno de delanteros 61/100 y 5071 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Raúl García (CD Mirandés, 100) | Fabri (Levante UD, 100) | Iker Losada (Racing Ferrol, 100)",
-    "justificacion": "Carlos Reina (Delantero, 21 años, 1653' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 55/100. Mejor destino: Málaga CF (score v2 cesión 45, desarrollo 100, demanda 94). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 55, mantener 46, venta 42. Casos similares: Raúl García, Fabri, Iker Losada. Revalorización esperada (modelo): €680k."
+    "justificacion": "Carlos Reina (Delantero, 21 años, 1653' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 55/100. Mejor destino: Málaga CF (score v2 cesión 45, desarrollo 100, demanda 94). Lectura táctica: Málaga CF: encaje para delantero de área. El perfil necesita centros laterales, presencia de área; el club muestra proxy de centros/juego exterior 13/100, entorno de delanteros 100/100 y 10966 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 55, mantener 46, venta 42. Casos similares: Raúl García, Fabri, Iker Losada. Revalorización esperada (modelo): €680k."
   },
   {
     "jugador": "José Morante",
@@ -102,10 +105,11 @@
     "club_modelo": "Cádiz CF",
     "entrenador_modelo": "Pako Ayestarán",
     "revalorizacion_esperada": "€1.1M",
-    "clubes_ideales": "Cádiz CF (71) | Sporting Gijón (63) | Deportivo de La Coruña (62) | FC Andorra (58) | Real Valladolid CF (54)",
-    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Diego Cocca",
+    "clubes_ideales": "Cádiz CF (72) | Sporting Gijón (65) | Deportivo de La Coruña (61) | FC Andorra (58) | Burgos CF (55)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | José Alberto",
+    "explicaciones_tacticas": "Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 85/100, 44% de sus minutos Sub23 en perfiles de banda/lateral y demanda 82/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Deportivo de La Coruña: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 38/100, 24% de sus minutos Sub23 en perfiles de banda/lateral y demanda 64/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Dani Fernández (CD Tenerife, 21) | I. Álvarez (Cádiz CF, 9) | Paco Cortés (Cultural Leonesa, 4)",
-    "justificacion": "José Morante (Extremo, 18 años, 2248' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 54/100. Mejor destino: Cádiz CF (score v2 cesión 44, desarrollo 100, demanda 80). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 54, mantener 53, venta 41. Casos similares: Dani Fernández, I. Álvarez, Paco Cortés. Revalorización esperada (modelo): €1.1M."
+    "justificacion": "José Morante (Extremo, 18 años, 2248' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 54/100. Mejor destino: Cádiz CF (score v2 cesión 44, desarrollo 100, demanda 80). Lectura táctica: Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 54, mantener 53, venta 41. Casos similares: Dani Fernández, I. Álvarez, Paco Cortés. Revalorización esperada (modelo): €1.1M."
   },
   {
     "jugador": "Jorge Luis",
@@ -129,10 +133,11 @@
     "club_modelo": "Málaga CF",
     "entrenador_modelo": NaN,
     "revalorizacion_esperada": "€632k",
-    "clubes_ideales": "Málaga CF (62) | Granada CF (57) | Cádiz CF (55) | CD Leganés (50) | Real Valladolid CF (50)",
-    "entrenadores_ideales": "Fran Escribá | Pako Ayestarán | Borja Jiménez | Diego Cocca",
+    "clubes_ideales": "Málaga CF (65) | Granada CF (60) | Cádiz CF (56) | CD Leganés (52) | CD Mirandés (51)",
+    "entrenadores_ideales": "Fran Escribá | Pako Ayestarán | Borja Jiménez | Míchel Alonso",
+    "explicaciones_tacticas": "Málaga CF: encaje por oportunidad competitiva. Demanda 94/100 y 10966 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Granada CF: encaje por oportunidad competitiva. Demanda 87/100 y 9496 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 63/100 y 5071 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Gorka Carrera (Real Sociedad B, 92) | M. Kim (FC Andorra, 79) | Joel Roca (Girona FC, 69)",
-    "justificacion": "Jorge Luis (Delantero, 20 años, 739' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 51/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Málaga CF (score v2 cesión 41, desarrollo 100, demanda 94). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 51, mantener 16, venta 39. Casos similares: Gorka Carrera, M. Kim, Joel Roca. Revalorización esperada (modelo): €632k."
+    "justificacion": "Jorge Luis (Delantero, 20 años, 739' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 51/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Málaga CF (score v2 cesión 41, desarrollo 100, demanda 94). Lectura táctica: Málaga CF: encaje por oportunidad competitiva. Demanda 94/100 y 10966 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 51, mantener 16, venta 39. Casos similares: Gorka Carrera, M. Kim, Joel Roca. Revalorización esperada (modelo): €632k."
   },
   {
     "jugador": "Yanis Senhadji",
@@ -156,10 +161,11 @@
     "club_modelo": "Málaga CF",
     "entrenador_modelo": NaN,
     "revalorizacion_esperada": "€588k",
-    "clubes_ideales": "Málaga CF (62) | Granada CF (57) | Cádiz CF (54) | CD Leganés (50) | Real Valladolid CF (50)",
-    "entrenadores_ideales": "Fran Escribá | Pako Ayestarán | Borja Jiménez | Diego Cocca",
+    "clubes_ideales": "Málaga CF (65) | Granada CF (60) | Cádiz CF (56) | CD Leganés (52) | CD Mirandés (51)",
+    "entrenadores_ideales": "Fran Escribá | Pako Ayestarán | Borja Jiménez | Míchel Alonso",
+    "explicaciones_tacticas": "Málaga CF: encaje por oportunidad competitiva. Demanda 94/100 y 10966 min Sub23 en la posición. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Granada CF: encaje por oportunidad competitiva. Demanda 87/100 y 9496 min Sub23 en la posición. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 63/100 y 5071 min Sub23 en la posición. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Raúl García (CD Mirandés, 100) | Fabri (Levante UD, 100) | Iker Losada (Racing Ferrol, 100)",
-    "justificacion": "Yanis Senhadji (Delantero, 21 años, 194' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 51/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Málaga CF (score v2 cesión 41, desarrollo 100, demanda 94). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 51, mantener 5, venta 40. Casos similares: Raúl García, Fabri, Iker Losada. Revalorización esperada (modelo): €588k."
+    "justificacion": "Yanis Senhadji (Delantero, 21 años, 194' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 51/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Málaga CF (score v2 cesión 41, desarrollo 100, demanda 94). Lectura táctica: Málaga CF: encaje por oportunidad competitiva. Demanda 94/100 y 10966 min Sub23 en la posición. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 51, mantener 5, venta 40. Casos similares: Raúl García, Fabri, Iker Losada. Revalorización esperada (modelo): €588k."
   },
   {
     "jugador": "Pablo Garcia",
@@ -183,10 +189,11 @@
     "club_modelo": "Cádiz CF",
     "entrenador_modelo": "Pako Ayestarán",
     "revalorizacion_esperada": "€985k",
-    "clubes_ideales": "Cádiz CF (70) | Sporting Gijón (61) | Deportivo de La Coruña (61) | FC Andorra (56) | CD Mirandés (52)",
+    "clubes_ideales": "Cádiz CF (71) | Sporting Gijón (63) | Deportivo de La Coruña (60) | FC Andorra (56) | CD Mirandés (53)",
     "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Míchel Alonso",
+    "explicaciones_tacticas": "Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: producción ofensiva alta, amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 85/100, 44% de sus minutos Sub23 en perfiles de banda/lateral y demanda 82/100. Rasgos del jugador considerados: producción ofensiva alta, amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Deportivo de La Coruña: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 38/100, 24% de sus minutos Sub23 en perfiles de banda/lateral y demanda 64/100. Rasgos del jugador considerados: producción ofensiva alta, amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Giuliano Simeone (Real Zaragoza, 100) | Rubén López (Deportivo de La Coruña, 100) | Adrián Liso (Real Zaragoza, 100)",
-    "justificacion": "Pablo Garcia (Extremo, 19 años, 839' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 51/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 41, desarrollo 100, demanda 80). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 51, mantener 39, venta 39. Casos similares: Giuliano Simeone, Rubén López, Adrián Liso. Revalorización esperada (modelo): €985k."
+    "justificacion": "Pablo Garcia (Extremo, 19 años, 839' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 51/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 41, desarrollo 100, demanda 80). Lectura táctica: Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: producción ofensiva alta, amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 51, mantener 39, venta 39. Casos similares: Giuliano Simeone, Rubén López, Adrián Liso. Revalorización esperada (modelo): €985k."
   },
   {
     "jugador": "M. Kamara Rodriguez",
@@ -210,10 +217,11 @@
     "club_modelo": "Cádiz CF",
     "entrenador_modelo": "Pako Ayestarán",
     "revalorizacion_esperada": "€688k",
-    "clubes_ideales": "Cádiz CF (69) | Sporting Gijón (61) | Deportivo de La Coruña (61) | FC Andorra (56) | CD Mirandés (52)",
+    "clubes_ideales": "Cádiz CF (70) | Sporting Gijón (63) | Deportivo de La Coruña (60) | FC Andorra (56) | CD Mirandés (53)",
     "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Míchel Alonso",
+    "explicaciones_tacticas": "Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: producción ofensiva alta, amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 85/100, 44% de sus minutos Sub23 en perfiles de banda/lateral y demanda 82/100. Rasgos del jugador considerados: producción ofensiva alta, amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Deportivo de La Coruña: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 38/100, 24% de sus minutos Sub23 en perfiles de banda/lateral y demanda 64/100. Rasgos del jugador considerados: producción ofensiva alta, amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Javi López (Burgos CF, 100) | Ilyas Chaira (CD Mirandés, 100)",
-    "justificacion": "M. Kamara Rodriguez (Extremo, 22 años, 71' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 51/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 41, desarrollo 100, demanda 80). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 51, mantener 17, venta 45. Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €688k."
+    "justificacion": "M. Kamara Rodriguez (Extremo, 22 años, 71' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 51/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 41, desarrollo 100, demanda 80). Lectura táctica: Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: producción ofensiva alta, amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 51, mantener 17, venta 45. Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €688k."
   },
   {
     "jugador": "Manu González",
@@ -237,10 +245,11 @@
     "club_modelo": "FC Andorra",
     "entrenador_modelo": NaN,
     "revalorizacion_esperada": "€106k",
-    "clubes_ideales": "FC Andorra (56) | Cádiz CF (56) | Real Valladolid CF (50) | Córdoba CF (46) | Granada CF (36)",
+    "clubes_ideales": "FC Andorra (55) | Cádiz CF (54) | Real Valladolid CF (48) | Córdoba CF (43) | Granada CF (36)",
     "entrenadores_ideales": "Pako Ayestarán | Paulo Pezzolano",
+    "explicaciones_tacticas": "FC Andorra: encaje por oportunidad competitiva. Demanda 63/100 y 4106 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 26/100 y 3571 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Real Valladolid CF: encaje por oportunidad competitiva. Demanda 49/100 y 2576 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Áron Yaakobishvili (FC Andorra, 51) | Dani Martín (SD Huesca, 10) | L. Gómez (Racing Santander, 3)",
-    "justificacion": "Manu González (Portero, 19 años, 3308' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Mejor destino: FC Andorra (score v2 cesión 40, desarrollo 100, demanda 62). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 39, venta 36. Casos similares: Áron Yaakobishvili, Dani Martín, L. Gómez. Revalorización esperada (modelo): €106k."
+    "justificacion": "Manu González (Portero, 19 años, 3308' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Mejor destino: FC Andorra (score v2 cesión 40, desarrollo 100, demanda 62). Lectura táctica: FC Andorra: encaje por oportunidad competitiva. Demanda 63/100 y 4106 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 39, venta 36. Casos similares: Áron Yaakobishvili, Dani Martín, L. Gómez. Revalorización esperada (modelo): €106k."
   },
   {
     "jugador": "Antonio Toral",
@@ -264,10 +273,11 @@
     "club_modelo": "Cádiz CF",
     "entrenador_modelo": "Pako Ayestarán",
     "revalorizacion_esperada": "€643k",
-    "clubes_ideales": "Cádiz CF (69) | Deportivo de La Coruña (60) | Sporting Gijón (60) | FC Andorra (55) | CD Mirandés (51)",
-    "entrenadores_ideales": "Pako Ayestarán | Óscar Gilsanz | David Gallego | Ferran Costa | Míchel Alonso",
+    "clubes_ideales": "Cádiz CF (70) | Sporting Gijón (62) | Deportivo de La Coruña (59) | FC Andorra (55) | CD Mirandés (52)",
+    "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Míchel Alonso",
+    "explicaciones_tacticas": "Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 85/100, 44% de sus minutos Sub23 en perfiles de banda/lateral y demanda 82/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Deportivo de La Coruña: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 38/100, 24% de sus minutos Sub23 en perfiles de banda/lateral y demanda 64/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Javi López (Burgos CF, 100) | Ilyas Chaira (CD Mirandés, 100)",
-    "justificacion": "Antonio Toral (Extremo, 22 años, 468' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 40, desarrollo 100, demanda 80). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 6, venta 44. Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €643k."
+    "justificacion": "Antonio Toral (Extremo, 22 años, 468' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 40, desarrollo 100, demanda 80). Lectura táctica: Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 6, venta 44. Casos similares: Jonathan Dubasin, Javi López, Ilyas Chaira. Revalorización esperada (modelo): €643k."
   },
   {
     "jugador": "Ginés Sorroche",
@@ -291,10 +301,11 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€148k",
-    "clubes_ideales": "Sporting Gijón (67) | CD Mirandés (64) | Racing Santander (62) | UD Almería (59) | SD Eibar (56)",
+    "clubes_ideales": "Sporting Gijón (70) | CD Mirandés (67) | Racing Santander (65) | UD Almería (60) | SD Eibar (57)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 100/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Racing Santander: encaje interior. El club acumula 13932 min Sub23 en la zona y demanda 92/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Marc Aguado (FC Andorra, 100) | Rubén Quintanilla (Burgos CF, 100) | Jon Gorrotxategi (CD Mirandés, 100)",
-    "justificacion": "Ginés Sorroche (Centrocampista, 22 años, 1124' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Mejor destino: Sporting Gijón (score v2 cesión 40, desarrollo 96, demanda 93). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 24, venta 43. Casos similares: Marc Aguado, Rubén Quintanilla, Jon Gorrotxategi. Revalorización esperada (modelo): €148k."
+    "justificacion": "Ginés Sorroche (Centrocampista, 22 años, 1124' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Mejor destino: Sporting Gijón (score v2 cesión 40, desarrollo 96, demanda 93). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 24, venta 43. Casos similares: Marc Aguado, Rubén Quintanilla, Jon Gorrotxategi. Revalorización esperada (modelo): €148k."
   },
   {
     "jugador": "I. Amores",
@@ -318,10 +329,11 @@
     "club_modelo": "Cádiz CF",
     "entrenador_modelo": "Pako Ayestarán",
     "revalorizacion_esperada": "€706k",
-    "clubes_ideales": "Cádiz CF (69) | Sporting Gijón (60) | Deportivo de La Coruña (60) | FC Andorra (55) | CD Mirandés (51)",
+    "clubes_ideales": "Cádiz CF (70) | Sporting Gijón (62) | Deportivo de La Coruña (59) | FC Andorra (55) | CD Mirandés (52)",
     "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Míchel Alonso",
+    "explicaciones_tacticas": "Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 85/100, 44% de sus minutos Sub23 en perfiles de banda/lateral y demanda 82/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Deportivo de La Coruña: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 38/100, 24% de sus minutos Sub23 en perfiles de banda/lateral y demanda 64/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Bryan Zaragoza (Granada CF, 100) | Gabri Martínez (CD Mirandés, 100) | Raúl Moro (Real Valladolid CF, 100)",
-    "justificacion": "I. Amores (Extremo, 20 años, 166' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 40, desarrollo 100, demanda 80). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 2, venta 38. Casos similares: Bryan Zaragoza, Gabri Martínez, Raúl Moro. Revalorización esperada (modelo): €706k."
+    "justificacion": "I. Amores (Extremo, 20 años, 166' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 40, desarrollo 100, demanda 80). Lectura táctica: Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 2, venta 38. Casos similares: Bryan Zaragoza, Gabri Martínez, Raúl Moro. Revalorización esperada (modelo): €706k."
   },
   {
     "jugador": "Ian Forns",
@@ -345,10 +357,11 @@
     "club_modelo": "Albacete Balompié",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€235k",
-    "clubes_ideales": "Albacete Balompié (68) | Cádiz CF (62) | CD Mirandés (51) | Real Zaragoza (51) | SD Eibar (50)",
-    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
+    "clubes_ideales": "Albacete Balompié (70) | Cádiz CF (64) | Real Zaragoza (52) | CD Mirandés (52) | Sporting Gijón (51)",
+    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | David Gallego",
+    "explicaciones_tacticas": "Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje exterior para lateral. Juego por fuera 78/100 y 5952 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Real Zaragoza: encaje exterior para lateral. Juego por fuera 68/100 y 4384 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Abel Bretones (Real Oviedo, 100) | Ignasi Vilarrasa (SD Huesca, 100) | Cristian Gutiérrez (SD Eibar, 100)",
-    "justificacion": "Ian Forns (Lateral, 22 años, 2379' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Mejor destino: Albacete Balompié (score v2 cesión 40, desarrollo 100, demanda 92). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 40, venta 42. Casos similares: Abel Bretones, Ignasi Vilarrasa, Cristian Gutiérrez. Revalorización esperada (modelo): €235k."
+    "justificacion": "Ian Forns (Lateral, 22 años, 2379' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 50/100. Mejor destino: Albacete Balompié (score v2 cesión 40, desarrollo 100, demanda 92). Lectura táctica: Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 50, mantener 40, venta 42. Casos similares: Abel Bretones, Ignasi Vilarrasa, Cristian Gutiérrez. Revalorización esperada (modelo): €235k."
   },
   {
     "jugador": "Jorge Oreiro",
@@ -372,10 +385,11 @@
     "club_modelo": "CD Leganés",
     "entrenador_modelo": "Borja Jiménez",
     "revalorizacion_esperada": "€250k",
-    "clubes_ideales": "CD Leganés (62) | Cádiz CF (60) | Sporting Gijón (57) | Real Valladolid CF (56) | CD Mirandés (54)",
+    "clubes_ideales": "CD Leganés (64) | Cádiz CF (62) | Sporting Gijón (59) | Real Valladolid CF (58) | CD Mirandés (57)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Rubén Albés | Diego Cocca | Míchel Alonso",
+    "explicaciones_tacticas": "CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 76/100 y 5706 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje por oportunidad competitiva. Demanda 93/100 y 4918 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "David López (Elche CF, 79) | Y. Saidu (Real Zaragoza, 56) | David Torres (Real Valladolid CF, 50)",
-    "justificacion": "Jorge Oreiro (Central, 20 años, 2346' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Mejor destino: CD Leganés (score v2 cesión 39, desarrollo 100, demanda 78). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 43, venta 36. Casos similares: David López, Y. Saidu, David Torres. Revalorización esperada (modelo): €250k."
+    "justificacion": "Jorge Oreiro (Central, 20 años, 2346' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Mejor destino: CD Leganés (score v2 cesión 39, desarrollo 100, demanda 78). Lectura táctica: CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 43, venta 36. Casos similares: David López, Y. Saidu, David Torres. Revalorización esperada (modelo): €250k."
   },
   {
     "jugador": "Antonio González",
@@ -399,10 +413,11 @@
     "club_modelo": "Cádiz CF",
     "entrenador_modelo": "Pako Ayestarán",
     "revalorizacion_esperada": "€1.1M",
-    "clubes_ideales": "Cádiz CF (69) | Sporting Gijón (60) | Deportivo de La Coruña (60) | FC Andorra (54) | CD Mirandés (51)",
+    "clubes_ideales": "Cádiz CF (70) | Sporting Gijón (62) | Deportivo de La Coruña (59) | FC Andorra (55) | CD Mirandés (52)",
     "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Míchel Alonso",
+    "explicaciones_tacticas": "Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 85/100, 44% de sus minutos Sub23 en perfiles de banda/lateral y demanda 82/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Deportivo de La Coruña: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 38/100, 24% de sus minutos Sub23 en perfiles de banda/lateral y demanda 64/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Dani Fernández (CD Tenerife, 21) | I. Álvarez (Cádiz CF, 9) | Paco Cortés (Cultural Leonesa, 4)",
-    "justificacion": "Antonio González (Extremo, 18 años, 99' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 39, desarrollo 100, demanda 80). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 0, venta 37. Casos similares: Dani Fernández, I. Álvarez, Paco Cortés. Revalorización esperada (modelo): €1.1M."
+    "justificacion": "Antonio González (Extremo, 18 años, 99' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 39, desarrollo 100, demanda 80). Lectura táctica: Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 0, venta 37. Casos similares: Dani Fernández, I. Álvarez, Paco Cortés. Revalorización esperada (modelo): €1.1M."
   },
   {
     "jugador": "R. Oya Mesa",
@@ -426,10 +441,11 @@
     "club_modelo": "Cádiz CF",
     "entrenador_modelo": "Pako Ayestarán",
     "revalorizacion_esperada": "€1.1M",
-    "clubes_ideales": "Cádiz CF (69) | Sporting Gijón (60) | Deportivo de La Coruña (60) | FC Andorra (54) | CD Mirandés (51)",
+    "clubes_ideales": "Cádiz CF (70) | Sporting Gijón (62) | Deportivo de La Coruña (59) | FC Andorra (55) | CD Mirandés (52)",
     "entrenadores_ideales": "Pako Ayestarán | David Gallego | Óscar Gilsanz | Ferran Costa | Míchel Alonso",
+    "explicaciones_tacticas": "Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 85/100, 44% de sus minutos Sub23 en perfiles de banda/lateral y demanda 82/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Deportivo de La Coruña: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 38/100, 24% de sus minutos Sub23 en perfiles de banda/lateral y demanda 64/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Dani Fernández (CD Tenerife, 21) | I. Álvarez (Cádiz CF, 9) | Paco Cortés (Cultural Leonesa, 4)",
-    "justificacion": "R. Oya Mesa (Extremo, 18 años, 105' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 39, desarrollo 100, demanda 80). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 1, venta 37. Casos similares: Dani Fernández, I. Álvarez, Paco Cortés. Revalorización esperada (modelo): €1.1M."
+    "justificacion": "R. Oya Mesa (Extremo, 18 años, 105' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 39, desarrollo 100, demanda 80). Lectura táctica: Cádiz CF: encaje para extremo abierto. El perfil necesita juego por banda, duelos exteriores; el club tiene juego exterior proxy 78/100, 39% de sus minutos Sub23 en perfiles de banda/lateral y demanda 80/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 1, venta 37. Casos similares: Dani Fernández, I. Álvarez, Paco Cortés. Revalorización esperada (modelo): €1.1M."
   },
   {
     "jugador": "D. Bladi",
@@ -453,10 +469,11 @@
     "club_modelo": "Albacete Balompié",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€262k",
-    "clubes_ideales": "Albacete Balompié (68) | Cádiz CF (62) | CD Mirandés (51) | Real Zaragoza (51) | SD Eibar (50)",
-    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
+    "clubes_ideales": "Albacete Balompié (70) | Cádiz CF (63) | Real Zaragoza (52) | CD Mirandés (52) | Sporting Gijón (51)",
+    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | David Gallego",
+    "explicaciones_tacticas": "Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje exterior para lateral. Juego por fuera 78/100 y 5952 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Real Zaragoza: encaje exterior para lateral. Juego por fuera 68/100 y 4384 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Anderson Arroyo (CD Mirandés, 100) | Imanol García De Albéniz (CD Mirandés, 100) | Juan María Alcedo (Albacete Balompié, 100)",
-    "justificacion": "D. Bladi (Lateral, 21 años, 2313' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Mejor destino: Albacete Balompié (score v2 cesión 39, desarrollo 100, demanda 92). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 44, venta 36. Casos similares: Anderson Arroyo, Imanol García De Albéniz, Juan María Alcedo. Revalorización esperada (modelo): €262k."
+    "justificacion": "D. Bladi (Lateral, 21 años, 2313' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Mejor destino: Albacete Balompié (score v2 cesión 39, desarrollo 100, demanda 92). Lectura táctica: Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 44, venta 36. Casos similares: Anderson Arroyo, Imanol García De Albéniz, Juan María Alcedo. Revalorización esperada (modelo): €262k."
   },
   {
     "jugador": "Dani Pérez",
@@ -480,10 +497,11 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€233k",
-    "clubes_ideales": "Sporting Gijón (66) | CD Mirandés (64) | Racing Santander (61) | UD Almería (58) | SD Eibar (55)",
+    "clubes_ideales": "Sporting Gijón (69) | CD Mirandés (67) | Racing Santander (64) | UD Almería (60) | SD Eibar (57)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 100/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Racing Santander: encaje interior. El club acumula 13932 min Sub23 en la zona y demanda 92/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Rafel Bauzà (CD Mirandés, 74) | Izan Merino (Málaga CF, 67) | T. Helguera (CD Mirandés, 63)",
-    "justificacion": "Dani Pérez (Centrocampista, 20 años, 2090' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Mejor destino: Sporting Gijón (score v2 cesión 39, desarrollo 96, demanda 93). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 37, venta 36. Casos similares: Rafel Bauzà, Izan Merino, T. Helguera. Revalorización esperada (modelo): €233k."
+    "justificacion": "Dani Pérez (Centrocampista, 20 años, 2090' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 49/100. Mejor destino: Sporting Gijón (score v2 cesión 39, desarrollo 96, demanda 93). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 49, mantener 37, venta 36. Casos similares: Rafel Bauzà, Izan Merino, T. Helguera. Revalorización esperada (modelo): €233k."
   },
   {
     "jugador": "Iván Corralejo",
@@ -507,10 +525,11 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€250k",
-    "clubes_ideales": "Sporting Gijón (66) | CD Mirandés (64) | Racing Santander (61) | UD Almería (58) | SD Eibar (55)",
+    "clubes_ideales": "Sporting Gijón (69) | CD Mirandés (67) | Racing Santander (64) | UD Almería (60) | SD Eibar (57)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 100/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Racing Santander: encaje interior. El club acumula 13932 min Sub23 en la zona y demanda 92/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "A. Martin Luis (CD Mirandés, 50) | Beñat Turrientes (Real Sociedad B, 46) | Manu Rodríguez (Sporting Gijón, 41)",
-    "justificacion": "Iván Corralejo (Centrocampista, 19 años, 1345' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 48/100. Mejor destino: Sporting Gijón (score v2 cesión 38, desarrollo 96, demanda 93). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 48, mantener 31, venta 36. Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €250k."
+    "justificacion": "Iván Corralejo (Centrocampista, 19 años, 1345' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 48/100. Mejor destino: Sporting Gijón (score v2 cesión 38, desarrollo 96, demanda 93). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 48, mantener 31, venta 36. Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €250k."
   },
   {
     "jugador": "G. Bouare Samake",
@@ -534,10 +553,11 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€192k",
-    "clubes_ideales": "Sporting Gijón (48) | UD Almería (44) | SD Eibar (42) | CD Mirandés (42) | Deportivo de La Coruña (41)",
-    "entrenadores_ideales": "Rubén Albés | Gaizka Garitano | Míchel Alonso | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (50) | UD Almería (45) | CD Mirandés (44) | Deportivo de La Coruña (43) | SD Eibar (43)",
+    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Óscar Gilsanz | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | UD Almería: encaje interior. El club acumula 8681 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Antonio Moyano (AD Alcorcón, 100) | Anderson Arroyo (CD Mirandés, 100) | Imanol García De Albéniz (CD Mirandés, 100)",
-    "justificacion": "G. Bouare Samake (Mediocentro, 21 años, 2783' esta temporada). Recomendación MANTENER: rinde en el filial, score 48/100. Mejor destino: Sporting Gijón (score v2 cesión 37, desarrollo 100, demanda 0). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 37, mantener 48, venta 34. Casos similares: Antonio Moyano, Anderson Arroyo, Imanol García De Albéniz. Revalorización esperada (modelo): €192k."
+    "justificacion": "G. Bouare Samake (Mediocentro, 21 años, 2783' esta temporada). Recomendación MANTENER: rinde en el filial, score 48/100. Mejor destino: Sporting Gijón (score v2 cesión 37, desarrollo 100, demanda 0). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 37, mantener 48, venta 34. Casos similares: Antonio Moyano, Anderson Arroyo, Imanol García De Albéniz. Revalorización esperada (modelo): €192k."
   },
   {
     "jugador": "E. Zidane",
@@ -561,10 +581,11 @@
     "club_modelo": "CD Leganés",
     "entrenador_modelo": "Borja Jiménez",
     "revalorizacion_esperada": "€238k",
-    "clubes_ideales": "CD Leganés (62) | Cádiz CF (60) | Sporting Gijón (56) | Real Valladolid CF (55) | CD Mirandés (54)",
+    "clubes_ideales": "CD Leganés (64) | Cádiz CF (62) | Sporting Gijón (59) | Real Valladolid CF (58) | CD Mirandés (57)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Rubén Albés | Diego Cocca | Míchel Alonso",
+    "explicaciones_tacticas": "CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 76/100 y 5706 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje por oportunidad competitiva. Demanda 93/100 y 4918 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "David López (Elche CF, 79) | Y. Saidu (Real Zaragoza, 56) | David Torres (Real Valladolid CF, 50)",
-    "justificacion": "E. Zidane (Central, 20 años, 1666' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 48/100. Mejor destino: CD Leganés (score v2 cesión 38, desarrollo 100, demanda 78). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 48, mantener 31, venta 35. Casos similares: David López, Y. Saidu, David Torres. Revalorización esperada (modelo): €238k."
+    "justificacion": "E. Zidane (Central, 20 años, 1666' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 48/100. Mejor destino: CD Leganés (score v2 cesión 38, desarrollo 100, demanda 78). Lectura táctica: CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 48, mantener 31, venta 35. Casos similares: David López, Y. Saidu, David Torres. Revalorización esperada (modelo): €238k."
   },
   {
     "jugador": "German García",
@@ -588,10 +609,11 @@
     "club_modelo": "FC Andorra",
     "entrenador_modelo": NaN,
     "revalorizacion_esperada": "€10k",
-    "clubes_ideales": "FC Andorra (55) | Cádiz CF (54) | Real Valladolid CF (48) | Córdoba CF (44) | Granada CF (35)",
+    "clubes_ideales": "FC Andorra (54) | Cádiz CF (53) | Real Valladolid CF (46) | Córdoba CF (42) | Granada CF (34)",
     "entrenadores_ideales": "Pako Ayestarán | Paulo Pezzolano",
+    "explicaciones_tacticas": "FC Andorra: encaje por oportunidad competitiva. Demanda 63/100 y 4106 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 26/100 y 3571 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Real Valladolid CF: encaje por oportunidad competitiva. Demanda 49/100 y 2576 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Leo Román (Real Oviedo, 100) | Victor Aznar (Cádiz CF, 67) | Ramón Vila (Córdoba CF, 52)",
-    "justificacion": "German García (Portero, 22 años, 525' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 48/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: FC Andorra (score v2 cesión 38, desarrollo 100, demanda 62). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 48, mantener 1, venta 39. Casos similares: Leo Román, Victor Aznar, Ramón Vila. Revalorización esperada (modelo): €10k."
+    "justificacion": "German García (Portero, 22 años, 525' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 48/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: FC Andorra (score v2 cesión 38, desarrollo 100, demanda 62). Lectura táctica: FC Andorra: encaje por oportunidad competitiva. Demanda 63/100 y 4106 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 48, mantener 1, venta 39. Casos similares: Leo Román, Victor Aznar, Ramón Vila. Revalorización esperada (modelo): €10k."
   },
   {
     "jugador": "V. Răfăilă",
@@ -615,10 +637,39 @@
     "club_modelo": "FC Andorra",
     "entrenador_modelo": NaN,
     "revalorizacion_esperada": "€16k",
-    "clubes_ideales": "FC Andorra (54) | Cádiz CF (54) | Real Valladolid CF (48) | Córdoba CF (44) | Granada CF (35)",
+    "clubes_ideales": "FC Andorra (54) | Cádiz CF (53) | Real Valladolid CF (46) | Córdoba CF (42) | Granada CF (34)",
     "entrenadores_ideales": "Pako Ayestarán | Paulo Pezzolano",
+    "explicaciones_tacticas": "FC Andorra: encaje por oportunidad competitiva. Demanda 63/100 y 4106 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 26/100 y 3571 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Real Valladolid CF: encaje por oportunidad competitiva. Demanda 49/100 y 2576 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Pablo Campos (Levante UD, 100) | Ramón Juan (CD Mirandés, 79) | Antal Yaakobishvili (FC Andorra, 51)",
-    "justificacion": "V. Răfăilă (Portero, 21 años, 106' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 48/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: FC Andorra (score v2 cesión 38, desarrollo 100, demanda 62). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 48, mantener 0, venta 33. Casos similares: Pablo Campos, Ramón Juan, Antal Yaakobishvili. Revalorización esperada (modelo): €16k."
+    "justificacion": "V. Răfăilă (Portero, 21 años, 106' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 48/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: FC Andorra (score v2 cesión 38, desarrollo 100, demanda 62). Lectura táctica: FC Andorra: encaje por oportunidad competitiva. Demanda 63/100 y 4106 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 48, mantener 0, venta 33. Casos similares: Pablo Campos, Ramón Juan, Antal Yaakobishvili. Revalorización esperada (modelo): €16k."
+  },
+  {
+    "jugador": "D. Traoré",
+    "posicion": "Mediapunta",
+    "edad": 19,
+    "es_sub23": true,
+    "minutos_actuales": 108,
+    "goles_actuales": 0,
+    "operacion_recomendada": "CEDER",
+    "probabilidad_exito": 46.8,
+    "modelo_decision": "operation_success_v2",
+    "score_v2_cesion": 36.8,
+    "score_cesion_ajustado": 46.8,
+    "score_mantener": 0.0,
+    "score_mantener_raw": 18.0,
+    "score_traspaso": 40.0,
+    "score_traspaso_ajustado": 34.0,
+    "contexto_descenso_filial": true,
+    "penalizacion_mantener_descenso": 18.0,
+    "bonus_cesion_categoria_superior": 10.0,
+    "club_modelo": "Cádiz CF",
+    "entrenador_modelo": "Pako Ayestarán",
+    "revalorizacion_esperada": "€117k",
+    "clubes_ideales": "Cádiz CF (59) | Racing Santander (58) | Sporting Gijón (57) | CD Mirandés (57) | SD Eibar (56)",
+    "entrenadores_ideales": "Pako Ayestarán | Íñigo Vélez | Rubén Albés | Míchel Alonso | Gaizka Garitano",
+    "explicaciones_tacticas": "Cádiz CF: encaje por oportunidad competitiva. Demanda 80/100 y 6199 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Racing Santander: encaje por oportunidad competitiva. Demanda 74/100 y 13932 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje por oportunidad competitiva. Demanda 50/100 y 10680 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
+    "casos_similares": "Mateusz Bogusz (UD Ibiza, 58) | Gorka Gorosabel (Real Sociedad B, 54) | Aingeru Olabarrieta (FC Andorra, 39)",
+    "justificacion": "D. Traoré (Mediapunta, 19 años, 108' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 47/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Cádiz CF (score v2 cesión 37, desarrollo 52, demanda 80). Lectura táctica: Cádiz CF: encaje por oportunidad competitiva. Demanda 80/100 y 6199 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 47, mantener 0, venta 34. Casos similares: Mateusz Bogusz, Gorka Gorosabel, Aingeru Olabarrieta. Revalorización esperada (modelo): €117k."
   },
   {
     "jugador": "Òscar Masqué",
@@ -642,37 +693,11 @@
     "club_modelo": "Albacete Balompié",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€321k",
-    "clubes_ideales": "Albacete Balompié (66) | Cádiz CF (61) | CD Mirandés (50) | Real Zaragoza (49) | SD Eibar (48)",
-    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
+    "clubes_ideales": "Albacete Balompié (68) | Cádiz CF (63) | CD Mirandés (51) | Real Zaragoza (51) | Sporting Gijón (49)",
+    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | David Gallego",
+    "explicaciones_tacticas": "Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje exterior para lateral. Juego por fuera 78/100 y 5952 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje exterior para lateral. Juego por fuera 52/100 y 5648 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Álex Valle (Levante UD, 100) | Jonathan Gómez (CD Mirandés, 96) | J. Salinas (Racing Santander, 69)",
-    "justificacion": "Òscar Masqué (Lateral, 19 años, 1361' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Mejor destino: Albacete Balompié (score v2 cesión 36, desarrollo 100, demanda 92). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 26, venta 34. Casos similares: Álex Valle, Jonathan Gómez, J. Salinas. Revalorización esperada (modelo): €321k."
-  },
-  {
-    "jugador": "M. Hamdoune",
-    "posicion": "Central",
-    "edad": 21,
-    "es_sub23": true,
-    "minutos_actuales": 1079,
-    "goles_actuales": 0,
-    "operacion_recomendada": "CEDER",
-    "probabilidad_exito": 46.0,
-    "modelo_decision": "operation_success_v2",
-    "score_v2_cesion": 36.0,
-    "score_cesion_ajustado": 46.0,
-    "score_mantener": 11.0,
-    "score_mantener_raw": 29.0,
-    "score_traspaso": 39.0,
-    "score_traspaso_ajustado": 33.0,
-    "contexto_descenso_filial": true,
-    "penalizacion_mantener_descenso": 18.0,
-    "bonus_cesion_categoria_superior": 10.0,
-    "club_modelo": "CD Leganés",
-    "entrenador_modelo": "Borja Jiménez",
-    "revalorizacion_esperada": "€226k",
-    "clubes_ideales": "CD Leganés (61) | Cádiz CF (59) | Sporting Gijón (56) | Real Valladolid CF (54) | CD Mirandés (53)",
-    "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Rubén Albés | Diego Cocca | Míchel Alonso",
-    "casos_similares": "José Copete (SD Ponferradina, 100) | Loïc Williams (CD Tenerife, 100) | David López (Burgos CF, 100)",
-    "justificacion": "M. Hamdoune (Central, 21 años, 1079' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Mejor destino: CD Leganés (score v2 cesión 36, desarrollo 100, demanda 78). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 11, venta 33. Casos similares: José Copete, Loïc Williams, David López. Revalorización esperada (modelo): €226k."
+    "justificacion": "Òscar Masqué (Lateral, 19 años, 1361' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Mejor destino: Albacete Balompié (score v2 cesión 36, desarrollo 100, demanda 92). Lectura táctica: Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 26, venta 34. Casos similares: Álex Valle, Jonathan Gómez, J. Salinas. Revalorización esperada (modelo): €321k."
   },
   {
     "jugador": "Emmanuel",
@@ -696,10 +721,39 @@
     "club_modelo": "CD Leganés",
     "entrenador_modelo": "Borja Jiménez",
     "revalorizacion_esperada": "€322k",
-    "clubes_ideales": "CD Leganés (61) | Cádiz CF (59) | Sporting Gijón (55) | Real Valladolid CF (54) | CD Mirandés (53)",
+    "clubes_ideales": "CD Leganés (63) | Cádiz CF (61) | Sporting Gijón (58) | Real Valladolid CF (57) | CD Mirandés (56)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Rubén Albés | Diego Cocca | Míchel Alonso",
+    "explicaciones_tacticas": "CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 76/100 y 5706 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje por oportunidad competitiva. Demanda 93/100 y 4918 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Marc Pubill (Levante UD, 50) | Mamadou Mbacke (Villarreal CF B, 46) | Iker Córdoba (CD Mirandés, 38)",
-    "justificacion": "Emmanuel (Central, 19 años, 951' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Mejor destino: CD Leganés (score v2 cesión 36, desarrollo 100, demanda 78). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 20, venta 33. Casos similares: Marc Pubill, Mamadou Mbacke, Iker Córdoba. Revalorización esperada (modelo): €322k."
+    "justificacion": "Emmanuel (Central, 19 años, 951' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Mejor destino: CD Leganés (score v2 cesión 36, desarrollo 100, demanda 78). Lectura táctica: CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 20, venta 33. Casos similares: Marc Pubill, Mamadou Mbacke, Iker Córdoba. Revalorización esperada (modelo): €322k."
+  },
+  {
+    "jugador": "M. Hamdoune",
+    "posicion": "Central",
+    "edad": 21,
+    "es_sub23": true,
+    "minutos_actuales": 1079,
+    "goles_actuales": 0,
+    "operacion_recomendada": "CEDER",
+    "probabilidad_exito": 46.0,
+    "modelo_decision": "operation_success_v2",
+    "score_v2_cesion": 36.0,
+    "score_cesion_ajustado": 46.0,
+    "score_mantener": 11.0,
+    "score_mantener_raw": 29.0,
+    "score_traspaso": 39.0,
+    "score_traspaso_ajustado": 33.0,
+    "contexto_descenso_filial": true,
+    "penalizacion_mantener_descenso": 18.0,
+    "bonus_cesion_categoria_superior": 10.0,
+    "club_modelo": "CD Leganés",
+    "entrenador_modelo": "Borja Jiménez",
+    "revalorizacion_esperada": "€226k",
+    "clubes_ideales": "CD Leganés (63) | Cádiz CF (61) | Sporting Gijón (58) | Real Valladolid CF (57) | CD Mirandés (57)",
+    "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Rubén Albés | Diego Cocca | Míchel Alonso",
+    "explicaciones_tacticas": "CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 76/100 y 5706 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje por oportunidad competitiva. Demanda 93/100 y 4918 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
+    "casos_similares": "José Copete (SD Ponferradina, 100) | Loïc Williams (CD Tenerife, 100) | David López (Burgos CF, 100)",
+    "justificacion": "M. Hamdoune (Central, 21 años, 1079' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Mejor destino: CD Leganés (score v2 cesión 36, desarrollo 100, demanda 78). Lectura táctica: CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 11, venta 33. Casos similares: José Copete, Loïc Williams, David López. Revalorización esperada (modelo): €226k."
   },
   {
     "jugador": "F. Embalo Muñoz",
@@ -723,10 +777,11 @@
     "club_modelo": "CD Leganés",
     "entrenador_modelo": "Borja Jiménez",
     "revalorizacion_esperada": "€236k",
-    "clubes_ideales": "CD Leganés (61) | Cádiz CF (59) | Sporting Gijón (55) | Real Valladolid CF (54) | CD Mirandés (53)",
+    "clubes_ideales": "CD Leganés (63) | Cádiz CF (61) | Sporting Gijón (58) | Real Valladolid CF (57) | CD Mirandés (56)",
     "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Rubén Albés | Diego Cocca | Míchel Alonso",
+    "explicaciones_tacticas": "CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 76/100 y 5706 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje por oportunidad competitiva. Demanda 93/100 y 4918 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "David López (Elche CF, 79) | Y. Saidu (Real Zaragoza, 56) | David Torres (Real Valladolid CF, 50)",
-    "justificacion": "F. Embalo Muñoz (Central, 20 años, 824' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: CD Leganés (score v2 cesión 36, desarrollo 100, demanda 78). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 15, venta 33. Casos similares: David López, Y. Saidu, David Torres. Revalorización esperada (modelo): €236k."
+    "justificacion": "F. Embalo Muñoz (Central, 20 años, 824' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: CD Leganés (score v2 cesión 36, desarrollo 100, demanda 78). Lectura táctica: CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 15, venta 33. Casos similares: David López, Y. Saidu, David Torres. Revalorización esperada (modelo): €236k."
   },
   {
     "jugador": "Pablo Busto",
@@ -750,10 +805,11 @@
     "club_modelo": "Albacete Balompié",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€244k",
-    "clubes_ideales": "Albacete Balompié (66) | Cádiz CF (60) | CD Mirandés (49) | Real Zaragoza (48) | SD Eibar (48)",
-    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
+    "clubes_ideales": "Albacete Balompié (68) | Cádiz CF (62) | CD Mirandés (50) | Real Zaragoza (50) | Sporting Gijón (49)",
+    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | David Gallego",
+    "explicaciones_tacticas": "Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje exterior para lateral. Juego por fuera 78/100 y 5952 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje exterior para lateral. Juego por fuera 52/100 y 5648 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Marcos Luna (Real Zaragoza, 100) | Oscar Naasei (Granada CF, 69) | Roger Hinojo (Cultural Leonesa, 68)",
-    "justificacion": "Pablo Busto (Lateral, 20 años, 896' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 36, desarrollo 100, demanda 92). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 12, venta 33. Casos similares: Marcos Luna, Oscar Naasei, Roger Hinojo. Revalorización esperada (modelo): €244k."
+    "justificacion": "Pablo Busto (Lateral, 20 años, 896' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 36, desarrollo 100, demanda 92). Lectura táctica: Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 12, venta 33. Casos similares: Marcos Luna, Oscar Naasei, Roger Hinojo. Revalorización esperada (modelo): €244k."
   },
   {
     "jugador": "Adrian Martin",
@@ -777,10 +833,11 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€240k",
-    "clubes_ideales": "Sporting Gijón (65) | CD Mirandés (62) | Racing Santander (60) | UD Almería (57) | SD Eibar (54)",
+    "clubes_ideales": "Sporting Gijón (68) | CD Mirandés (66) | Racing Santander (63) | UD Almería (59) | SD Eibar (55)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 100/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Racing Santander: encaje interior. El club acumula 13932 min Sub23 en la zona y demanda 92/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "A. Martin Luis (CD Mirandés, 50) | Beñat Turrientes (Real Sociedad B, 46) | Manu Rodríguez (Sporting Gijón, 41)",
-    "justificacion": "Adrian Martin (Centrocampista, 19 años, 52' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (score v2 cesión 36, desarrollo 96, demanda 93). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 2, venta 33. Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €240k."
+    "justificacion": "Adrian Martin (Centrocampista, 19 años, 52' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (score v2 cesión 36, desarrollo 96, demanda 93). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 2, venta 33. Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €240k."
   },
   {
     "jugador": "R. Gomez",
@@ -804,10 +861,11 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€185k",
-    "clubes_ideales": "Sporting Gijón (65) | CD Mirandés (62) | Racing Santander (60) | UD Almería (57) | SD Eibar (54)",
+    "clubes_ideales": "Sporting Gijón (68) | CD Mirandés (66) | Racing Santander (63) | UD Almería (59) | SD Eibar (55)",
     "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Íñigo Vélez | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 100/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Racing Santander: encaje interior. El club acumula 13932 min Sub23 en la zona y demanda 92/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "A. Martin Luis (CD Mirandés, 50) | Beñat Turrientes (Real Sociedad B, 46) | Manu Rodríguez (Sporting Gijón, 41)",
-    "justificacion": "R. Gomez (Centrocampista, 19 años, 159' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (score v2 cesión 36, desarrollo 96, demanda 93). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 0, venta 33. Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €185k."
+    "justificacion": "R. Gomez (Centrocampista, 19 años, 159' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 46/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (score v2 cesión 36, desarrollo 96, demanda 93). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 93/100. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 46, mantener 0, venta 33. Casos similares: A. Martin Luis, Beñat Turrientes, Manu Rodríguez. Revalorización esperada (modelo): €185k."
   },
   {
     "jugador": "Marcos Solís",
@@ -831,10 +889,11 @@
     "club_modelo": "Albacete Balompié",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€237k",
-    "clubes_ideales": "Albacete Balompié (66) | Cádiz CF (60) | CD Mirandés (49) | Real Zaragoza (48) | SD Eibar (47)",
-    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
+    "clubes_ideales": "Albacete Balompié (68) | Cádiz CF (62) | CD Mirandés (50) | Real Zaragoza (50) | Sporting Gijón (48)",
+    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | David Gallego",
+    "explicaciones_tacticas": "Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje exterior para lateral. Juego por fuera 78/100 y 5952 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje exterior para lateral. Juego por fuera 52/100 y 5648 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Marcos Luna (Real Zaragoza, 100) | Oscar Naasei (Granada CF, 69) | Roger Hinojo (Cultural Leonesa, 68)",
-    "justificacion": "Marcos Solís (Lateral, 20 años, 129' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 45/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 35, desarrollo 100, demanda 92). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 45, mantener 0, venta 33. Casos similares: Marcos Luna, Oscar Naasei, Roger Hinojo. Revalorización esperada (modelo): €237k."
+    "justificacion": "Marcos Solís (Lateral, 20 años, 129' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 45/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 35, desarrollo 100, demanda 92). Lectura táctica: Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 45, mantener 0, venta 33. Casos similares: Marcos Luna, Oscar Naasei, Roger Hinojo. Revalorización esperada (modelo): €237k."
   },
   {
     "jugador": "Ruben De Sa Abreu",
@@ -858,37 +917,11 @@
     "club_modelo": "Albacete Balompié",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€742k",
-    "clubes_ideales": "Albacete Balompié (66) | Cádiz CF (60) | CD Mirandés (49) | Real Zaragoza (48) | SD Eibar (47)",
-    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
+    "clubes_ideales": "Albacete Balompié (68) | Cádiz CF (62) | CD Mirandés (50) | Real Zaragoza (50) | Sporting Gijón (48)",
+    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | David Gallego",
+    "explicaciones_tacticas": "Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje exterior para lateral. Juego por fuera 78/100 y 5952 min Sub23 en laterales. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje exterior para lateral. Juego por fuera 52/100 y 5648 min Sub23 en laterales. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Juanlu Sánchez (CD Mirandés, 62) | Diego Sánchez (Sporting Gijón, 39) | Álex Valle (FC Andorra, 16)",
-    "justificacion": "Ruben De Sa Abreu (Lateral, 18 años, 355' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 45/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 35, desarrollo 100, demanda 92). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 45, mantener 4, venta 32. Casos similares: Juanlu Sánchez, Diego Sánchez, Álex Valle. Revalorización esperada (modelo): €742k."
-  },
-  {
-    "jugador": "Mario Navarro",
-    "posicion": "Lateral",
-    "edad": 17,
-    "es_sub23": true,
-    "minutos_actuales": 27,
-    "goles_actuales": 0,
-    "operacion_recomendada": "CEDER",
-    "probabilidad_exito": 44.7,
-    "modelo_decision": "operation_success_v2",
-    "score_v2_cesion": 34.7,
-    "score_cesion_ajustado": 44.7,
-    "score_mantener": 0.0,
-    "score_mantener_raw": 16.2,
-    "score_traspaso": 38.3,
-    "score_traspaso_ajustado": 32.3,
-    "contexto_descenso_filial": true,
-    "penalizacion_mantener_descenso": 18.0,
-    "bonus_cesion_categoria_superior": 10.0,
-    "club_modelo": "Albacete Balompié",
-    "entrenador_modelo": "Rubén Albés",
-    "revalorizacion_esperada": "€739k",
-    "clubes_ideales": "Albacete Balompié (66) | Cádiz CF (60) | CD Mirandés (49) | Real Zaragoza (48) | SD Eibar (47)",
-    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
-    "casos_similares": "Carlos Jimenez (Levante UD, 1) | Juanlu Sánchez (CD Mirandés, 62) | Diego Sánchez (Sporting Gijón, 39)",
-    "justificacion": "Mario Navarro (Lateral, 17 años, 27' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 45/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 35, desarrollo 100, demanda 92). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 45, mantener 0, venta 32. Casos similares: Carlos Jimenez, Juanlu Sánchez, Diego Sánchez. Revalorización esperada (modelo): €739k."
+    "justificacion": "Ruben De Sa Abreu (Lateral, 18 años, 355' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 45/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 35, desarrollo 100, demanda 92). Lectura táctica: Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Rasgos del jugador considerados: amenaza exterior. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 45, mantener 4, venta 32. Casos similares: Juanlu Sánchez, Diego Sánchez, Álex Valle. Revalorización esperada (modelo): €742k."
   },
   {
     "jugador": "C. De Roa García",
@@ -912,10 +945,39 @@
     "club_modelo": "Albacete Balompié",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€739k",
-    "clubes_ideales": "Albacete Balompié (66) | Cádiz CF (60) | CD Mirandés (49) | Real Zaragoza (48) | SD Eibar (47)",
-    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | Gaizka Garitano",
+    "clubes_ideales": "Albacete Balompié (68) | Cádiz CF (62) | CD Mirandés (50) | Real Zaragoza (50) | Sporting Gijón (48)",
+    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | David Gallego",
+    "explicaciones_tacticas": "Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje exterior para lateral. Juego por fuera 78/100 y 5952 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje exterior para lateral. Juego por fuera 52/100 y 5648 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Juanlu Sánchez (CD Mirandés, 62) | Diego Sánchez (Sporting Gijón, 39) | Álex Valle (FC Andorra, 16)",
-    "justificacion": "C. De Roa García (Lateral, 18 años, 117' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 45/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 35, desarrollo 100, demanda 92). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 45, mantener 0, venta 32. Casos similares: Juanlu Sánchez, Diego Sánchez, Álex Valle. Revalorización esperada (modelo): €739k."
+    "justificacion": "C. De Roa García (Lateral, 18 años, 117' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 45/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 35, desarrollo 100, demanda 92). Lectura táctica: Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 45, mantener 0, venta 32. Casos similares: Juanlu Sánchez, Diego Sánchez, Álex Valle. Revalorización esperada (modelo): €739k."
+  },
+  {
+    "jugador": "Mario Navarro",
+    "posicion": "Lateral",
+    "edad": 17,
+    "es_sub23": true,
+    "minutos_actuales": 27,
+    "goles_actuales": 0,
+    "operacion_recomendada": "CEDER",
+    "probabilidad_exito": 44.7,
+    "modelo_decision": "operation_success_v2",
+    "score_v2_cesion": 34.7,
+    "score_cesion_ajustado": 44.7,
+    "score_mantener": 0.0,
+    "score_mantener_raw": 16.2,
+    "score_traspaso": 38.3,
+    "score_traspaso_ajustado": 32.3,
+    "contexto_descenso_filial": true,
+    "penalizacion_mantener_descenso": 18.0,
+    "bonus_cesion_categoria_superior": 10.0,
+    "club_modelo": "Albacete Balompié",
+    "entrenador_modelo": "Rubén Albés",
+    "revalorizacion_esperada": "€739k",
+    "clubes_ideales": "Albacete Balompié (68) | Cádiz CF (62) | CD Mirandés (50) | Real Zaragoza (50) | Sporting Gijón (48)",
+    "entrenadores_ideales": "Rubén Albés | Pako Ayestarán | Víctor Fernández | David Gallego",
+    "explicaciones_tacticas": "Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje exterior para lateral. Juego por fuera 78/100 y 5952 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje exterior para lateral. Juego por fuera 52/100 y 5648 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
+    "casos_similares": "Carlos Jimenez (Levante UD, 1) | Juanlu Sánchez (CD Mirandés, 62) | Diego Sánchez (Sporting Gijón, 39)",
+    "justificacion": "Mario Navarro (Lateral, 17 años, 27' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 45/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Albacete Balompié (score v2 cesión 35, desarrollo 100, demanda 92). Lectura táctica: Albacete Balompié: encaje exterior para lateral. Juego por fuera 75/100 y 8898 min Sub23 en laterales. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 45, mantener 0, venta 32. Casos similares: Carlos Jimenez, Juanlu Sánchez, Diego Sánchez. Revalorización esperada (modelo): €739k."
   },
   {
     "jugador": "K. Sosu",
@@ -941,35 +1003,9 @@
     "revalorizacion_esperada": "-",
     "clubes_ideales": "",
     "entrenadores_ideales": "",
+    "explicaciones_tacticas": "",
     "casos_similares": "Bryan Zaragoza (Granada CF, 100) | Álvaro Aceves (CD Eldense, 100) | Gabri Martínez (CD Mirandés, 100)",
     "justificacion": "K. Sosu (RAMF, 20 años, 903' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 44/100. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 44, mantener 30, venta 39. Casos similares: Bryan Zaragoza, Álvaro Aceves, Gabri Martínez."
-  },
-  {
-    "jugador": "D. Traoré",
-    "posicion": "Mediapunta",
-    "edad": 19,
-    "es_sub23": true,
-    "minutos_actuales": 108,
-    "goles_actuales": 0,
-    "operacion_recomendada": "CEDER",
-    "probabilidad_exito": 43.6,
-    "modelo_decision": "operation_success_v2",
-    "score_v2_cesion": 33.6,
-    "score_cesion_ajustado": 43.6,
-    "score_mantener": 0.0,
-    "score_mantener_raw": 18.0,
-    "score_traspaso": 36.7,
-    "score_traspaso_ajustado": 30.7,
-    "contexto_descenso_filial": true,
-    "penalizacion_mantener_descenso": 18.0,
-    "bonus_cesion_categoria_superior": 10.0,
-    "club_modelo": "Racing Santander",
-    "entrenador_modelo": "Íñigo Vélez",
-    "revalorizacion_esperada": "€117k",
-    "clubes_ideales": "Racing Santander (56) | Sporting Gijón (56) | Cádiz CF (56) | SD Eibar (54) | CD Mirandés (54)",
-    "entrenadores_ideales": "Íñigo Vélez | Rubén Albés | Pako Ayestarán | Gaizka Garitano | Míchel Alonso",
-    "casos_similares": "Mateusz Bogusz (UD Ibiza, 58) | Gorka Gorosabel (Real Sociedad B, 54) | Aingeru Olabarrieta (FC Andorra, 39)",
-    "justificacion": "D. Traoré (Mediapunta, 19 años, 108' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 44/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Racing Santander (score v2 cesión 34, desarrollo 100, demanda 74). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 44, mantener 0, venta 31. Casos similares: Mateusz Bogusz, Gorka Gorosabel, Aingeru Olabarrieta. Revalorización esperada (modelo): €117k."
   },
   {
     "jugador": "Y. Koré",
@@ -993,10 +1029,11 @@
     "club_modelo": "CD Leganés",
     "entrenador_modelo": "Borja Jiménez",
     "revalorizacion_esperada": "€100k",
-    "clubes_ideales": "CD Leganés (60) | Cádiz CF (56) | Sporting Gijón (53) | Real Valladolid CF (53) | Deportivo de La Coruña (50)",
-    "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Rubén Albés | Diego Cocca | Óscar Gilsanz",
+    "clubes_ideales": "CD Leganés (62) | Cádiz CF (59) | Sporting Gijón (56) | Real Valladolid CF (55) | CD Mirandés (54)",
+    "entrenadores_ideales": "Borja Jiménez | Pako Ayestarán | Rubén Albés | Diego Cocca | Míchel Alonso",
+    "explicaciones_tacticas": "CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Cádiz CF: encaje por oportunidad competitiva. Demanda 76/100 y 5706 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | Sporting Gijón: encaje por oportunidad competitiva. Demanda 93/100 y 4918 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "José Copete (SD Ponferradina, 100) | Loïc Williams (CD Tenerife, 100) | David López (Burgos CF, 100)",
-    "justificacion": "Y. Koré (Central, 21 años, 779' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 43/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: CD Leganés (score v2 cesión 33, desarrollo 100, demanda 78). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 43, mantener 19, venta 29. Casos similares: José Copete, Loïc Williams, David López. Revalorización esperada (modelo): €100k."
+    "justificacion": "Y. Koré (Central, 21 años, 779' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 43/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: CD Leganés (score v2 cesión 33, desarrollo 100, demanda 78). Lectura táctica: CD Leganés: encaje por oportunidad competitiva. Demanda 78/100 y 11583 min Sub23 en la posición. Rasgos del jugador considerados: altura para atacar centros. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+10). Comparativa interna ajustada: cesión 43, mantener 19, venta 29. Casos similares: José Copete, Loïc Williams, David López. Revalorización esperada (modelo): €100k."
   },
   {
     "jugador": "Aitor Gismera",
@@ -1020,10 +1057,11 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€122k",
-    "clubes_ideales": "Sporting Gijón (48) | UD Almería (43) | CD Mirandés (41) | SD Eibar (41) | Deportivo de La Coruña (41)",
-    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Gaizka Garitano | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (49) | UD Almería (44) | CD Mirandés (43) | Deportivo de La Coruña (43) | SD Eibar (42)",
+    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Óscar Gilsanz | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | UD Almería: encaje interior. El club acumula 8681 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Marc Aguado (FC Andorra, 100) | Abel Bretones (Real Oviedo, 100)",
-    "justificacion": "Aitor Gismera (Mediocentro, 22 años, 1558' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 36/100. Mejor destino: Sporting Gijón (score v2 cesión 36, desarrollo 100, demanda 0). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 36, mantener 21, venta 38. Casos similares: Jonathan Dubasin, Marc Aguado, Abel Bretones. Revalorización esperada (modelo): €122k."
+    "justificacion": "Aitor Gismera (Mediocentro, 22 años, 1558' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 36/100. Mejor destino: Sporting Gijón (score v2 cesión 36, desarrollo 100, demanda 0). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 36, mantener 21, venta 38. Casos similares: Jonathan Dubasin, Marc Aguado, Abel Bretones. Revalorización esperada (modelo): €122k."
   },
   {
     "jugador": "M. Mensah",
@@ -1047,10 +1085,11 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€119k",
-    "clubes_ideales": "Sporting Gijón (47) | UD Almería (43) | CD Mirandés (40) | SD Eibar (40) | Deportivo de La Coruña (40)",
-    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Gaizka Garitano | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (49) | UD Almería (44) | CD Mirandés (43) | Deportivo de La Coruña (42) | SD Eibar (41)",
+    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Óscar Gilsanz | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | UD Almería: encaje interior. El club acumula 8681 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Jonathan Dubasin (Albacete Balompié, 100) | Marc Aguado (FC Andorra, 100) | Abel Bretones (Real Oviedo, 100)",
-    "justificacion": "M. Mensah (Mediocentro, 22 años, 1209' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 34/100. Mejor destino: Sporting Gijón (score v2 cesión 34, desarrollo 100, demanda 0). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 34, mantener 16, venta 37. Casos similares: Jonathan Dubasin, Marc Aguado, Abel Bretones. Revalorización esperada (modelo): €119k."
+    "justificacion": "M. Mensah (Mediocentro, 22 años, 1209' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 34/100. Mejor destino: Sporting Gijón (score v2 cesión 34, desarrollo 100, demanda 0). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 34, mantener 16, venta 37. Casos similares: Jonathan Dubasin, Marc Aguado, Abel Bretones. Revalorización esperada (modelo): €119k."
   },
   {
     "jugador": "M. Romero",
@@ -1074,10 +1113,11 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€756k",
-    "clubes_ideales": "Sporting Gijón (47) | UD Almería (42) | CD Mirandés (40) | SD Eibar (40) | Deportivo de La Coruña (39)",
-    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Gaizka Garitano | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (48) | UD Almería (43) | CD Mirandés (42) | Deportivo de La Coruña (42) | SD Eibar (41)",
+    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Óscar Gilsanz | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | UD Almería: encaje interior. El club acumula 8681 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Jeremy Arévalo (Racing Santander, 100) | Gonzalo Petit (CD Mirandés, 100) | Jon Karrikaburu (Real Sociedad B, 86)",
-    "justificacion": "M. Romero (Mediocentro, 18 años, 40' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 34/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (score v2 cesión 34, desarrollo 100, demanda 0). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 34, mantener 2, venta 30. Casos similares: Jeremy Arévalo, Gonzalo Petit, Jon Karrikaburu. Revalorización esperada (modelo): €756k."
+    "justificacion": "M. Romero (Mediocentro, 18 años, 40' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 34/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (score v2 cesión 34, desarrollo 100, demanda 0). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 34, mantener 2, venta 30. Casos similares: Jeremy Arévalo, Gonzalo Petit, Jon Karrikaburu. Revalorización esperada (modelo): €756k."
   },
   {
     "jugador": "Ismael Barea",
@@ -1101,9 +1141,10 @@
     "club_modelo": "Sporting Gijón",
     "entrenador_modelo": "Rubén Albés",
     "revalorizacion_esperada": "€146k",
-    "clubes_ideales": "Sporting Gijón (47) | UD Almería (42) | CD Mirandés (40) | SD Eibar (40) | Deportivo de La Coruña (39)",
-    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Gaizka Garitano | Óscar Gilsanz",
+    "clubes_ideales": "Sporting Gijón (48) | UD Almería (43) | CD Mirandés (42) | Deportivo de La Coruña (42) | SD Eibar (41)",
+    "entrenadores_ideales": "Rubén Albés | Míchel Alonso | Óscar Gilsanz | Gaizka Garitano",
+    "explicaciones_tacticas": "Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | UD Almería: encaje interior. El club acumula 8681 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. | CD Mirandés: encaje interior. El club acumula 13632 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar.",
     "casos_similares": "Bryan Zaragoza (Granada CF, 100) | Álvaro Aceves (CD Eldense, 100) | Gabri Martínez (CD Mirandés, 100)",
-    "justificacion": "Ismael Barea (Mediocentro, 20 años, 395' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 33/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (score v2 cesión 33, desarrollo 100, demanda 0). Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 33, mantener 4, venta 30. Casos similares: Bryan Zaragoza, Álvaro Aceves, Gabri Martínez. Revalorización esperada (modelo): €146k."
+    "justificacion": "Ismael Barea (Mediocentro, 20 años, 395' esta temporada). Recomendación CEDER: probabilidad de éxito estimada 33/100. Pocos minutos en el filial: necesita competir para desarrollarse. Mejor destino: Sporting Gijón (score v2 cesión 33, desarrollo 100, demanda 0). Lectura táctica: Sporting Gijón: encaje interior. El club acumula 10680 min Sub23 en la zona y demanda 0/100. Fuente táctica actual: proxy construido con minutos/posición Wyscout; faltan eventos de centros, regates, duelos y mapas de calor para afinar. Contexto clave: el Betis Deportivo ha descendido, por lo que mantener en el filial se penaliza (-18) y una cesión a categoría superior con destino competitivo recibe bonus (+0). Comparativa interna ajustada: cesión 33, mantener 4, venta 30. Casos similares: Bryan Zaragoza, Álvaro Aceves, Gabri Martínez. Revalorización esperada (modelo): €146k."
   }
 ]
