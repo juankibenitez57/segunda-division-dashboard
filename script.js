@@ -7,7 +7,7 @@
 
 /* ===================== CONSTANTS ===================== */
 const CHART_COLORS = ['#009a44','#1d6fa4','#e07b39','#8b5cf6','#d4a017','#0891b2','#be185d','#059669','#7c3aed','#b45309'];
-const DATA_VERSION = '2026-06-08-ml-benchmark';
+const DATA_VERSION = '2026-06-08-model-evidence';
 
 /* ============================================================
    REGISTRO DE LIGAS (multi-liga)
@@ -4432,6 +4432,15 @@ function sgptDecisionForBetisPlayer(playerName) {
   const clubesText = dec?.clubes_ideales || summary.clubes_ideales || '';
   const entrenadoresText = dec?.entrenadores_ideales || summary.entrenadores_ideales || '';
   const modeloDecision = dec?.modelo_decision || (v2Rows.length ? 'operation_success_v2' : 'RF histórico');
+  const benchmarkBest = OPERATION_BENCHMARK_REPORT?.best_models || {};
+  const loanBest = benchmarkBest.loan_success_label || {};
+  const scoreBest = benchmarkBest.operation_success_score_v2 || {};
+  const benchmarkLine = loanBest.model
+    ? `Benchmark ML: para cesiones gana <strong>${loanBest.model}</strong> (F1 CV ${num(loanBest.cv_f1_mean).toFixed(3)}, AUC ${num(loanBest.cv_roc_auc_mean).toFixed(3)}); para score 0-100 gana <strong>${scoreBest.model || '—'}</strong>.`
+    : `Benchmark ML: compara Random Forest, Extra Trees, Gradient Boosting, regresión logística/Ridge y baseline.`;
+  const descensoLine = isTrue(dec?.contexto_descenso_filial)
+    ? `Ajuste deportivo aplicado: Betis Deportivo descendido, mantener se penaliza -${num(dec.penalizacion_mantener_descenso).toFixed(0)} y cesión competitiva recibe +${num(dec.bonus_cesion_categoria_superior).toFixed(0)}.`
+    : '';
   const stats = getPlayerSeasonStats(playerName);
   const totals = summarizePlayerStats(stats);
   const lectura = justificacion
@@ -4463,6 +4472,13 @@ function sgptDecisionForBetisPlayer(playerName) {
       <td>${pct(summary.prob_revalorizacion_positiva_media_top5)}</td>
       <td>${pct(summary.prob_cesion_historica)}</td><td>${pct(summary.prob_traspaso_historico)}</td>
     </tr></tbody></table>
+    <div style="margin:10px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
+      <strong>Modelo y evidencias utilizadas:</strong><br>
+      <span class="muted">Motor de decisión: <strong>${modeloDecision}</strong>. ${benchmarkLine}</span><br>
+      <span class="muted">Variables usadas: edad, posición, valor, minutos previos, goles/xG previos, demanda club-posición, minutos Sub23 del club, uso Sub23 del entrenador y casos históricos similares.</span>
+      ${dec ? `<br><span class="muted">Comparativa ajustada: cesión ${num(dec.score_cesion_ajustado || dec.score_v2_cesion).toFixed(1)}, mantener ${num(dec.score_mantener).toFixed(1)}, venta ${num(dec.score_traspaso_ajustado || dec.score_traspaso).toFixed(1)}.</span>` : ''}
+      ${descensoLine ? `<br><span class="muted">${descensoLine}</span>` : ''}
+    </div>
     <div style="margin:10px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
       <strong>Justificación deportiva:</strong><br>
       <span class="muted">${lectura}</span>
