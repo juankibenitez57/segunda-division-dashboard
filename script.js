@@ -163,6 +163,7 @@ function layout(overrides = {}, data = []) {
     const yCategories = axisCategoriesFromTraces(data, 'y');
     if (yCategories.length) {
       next.yaxis = Object.assign({}, next.yaxis, {
+        type: 'category',
         categoryorder: 'array',
         categoryarray: yCategories,
       });
@@ -173,6 +174,7 @@ function layout(overrides = {}, data = []) {
   const hasNumericX = data.some(trace => Array.isArray(trace.x) && trace.x.some(v => typeof v === 'number' || (!isNaN(+v) && v !== '')));
   if (xCategories.length && !hasNumericX && !(next.xaxis && next.xaxis.categoryorder)) {
     next.xaxis = Object.assign({}, next.xaxis, {
+      type: 'category',
       categoryorder: 'array',
       categoryarray: xCategories,
     });
@@ -622,8 +624,8 @@ function renderEvolucion(data) {
       text: bajas.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 } }
   ], {
     barmode: 'group',
-    yaxis: { title: 'Millones €', gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
-    xaxis: { gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
+    yaxis: { title: 'Millones €', type: 'linear', rangemode: 'tozero', gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
+    xaxis: { type: 'category', categoryorder: 'array', categoryarray: seasons, gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
     margin: { t: 45, r: 20, b: 50, l: 70 }
   });
 }
@@ -655,8 +657,8 @@ function renderEvolucionOps(data) {
       fill: 'tozeroy', fillcolor: 'rgba(224,123,57,0.15)', line: { color: CHART_COLORS[2], width: 2 },
       marker: { color: CHART_COLORS[2], size: 7 } }
   ], {
-    yaxis: { title: 'Operaciones', gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
-    xaxis: { gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' }
+    yaxis: { title: 'Operaciones', type: 'linear', rangemode: 'tozero', gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
+    xaxis: { type: 'category', categoryorder: 'array', categoryarray: seasons, gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' }
   });
 }
 
@@ -1368,8 +1370,8 @@ function renderRevTemporada(revData) {
       text: vals.map(v => `€${v.toFixed(1)}M`), textposition: 'outside', textfont: { size: 10 },
       hovertemplate: '%{x}: €%{y:.2f}M<extra></extra>' }
   ], {
-    xaxis: { title: 'Temporada salida', gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
-    yaxis: { title: 'Revalorización (M€)', gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
+    xaxis: { title: 'Temporada salida', type: 'category', categoryorder: 'array', categoryarray: seasons, gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
+    yaxis: { title: 'Revalorización (M€)', type: 'linear', gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
     margin: { t: 40, r: 20, b: 60, l: 70 }
   });
 }
@@ -1732,7 +1734,8 @@ function renderSub23Tab() {
       line: { color: '#c8a951', width: 2 },
       marker: { size: 6 }
     }], {
-      yaxis: { title: 'Operaciones', gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
+      xaxis: { type: 'category', categoryorder: 'array', categoryarray: seasons, gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
+      yaxis: { title: 'Operaciones', type: 'linear', gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
       yaxis2: { title: 'M€', overlaying: 'y', side: 'right', showgrid: false, gridcolor: '#e5e7eb', linecolor: '#e5e7eb', zerolinecolor: '#e5e7eb' },
       legend: { orientation: 'h', y: 1.1, bgcolor: 'rgba(0,0,0,0)', font: { size: 10 } },
       height: 340, margin: { t: 50, r: 80, b: 50, l: 60 }
@@ -3522,38 +3525,47 @@ function sgptPlayerInfo(name) {
     ? `${fmt(totals.partidos)} partidos, ${fmt(totals.minutos)} minutos, ${fmt(totals.goles)} goles y ${totals.xg.toFixed(2)} xG en ${totals.temporadas} temporada${totals.temporadas !== 1 ? 's' : ''}.`
     : 'No hay registros Wyscout/master de rendimiento para este jugador.';
 
-  return `<strong>${name}</strong><br>
-    <span class="muted">${mainPos} · ${latest?.nacionalidad || latestStats?.nacionalidad || '—'} · último club registrado: ${mainClub}</span>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
-      ${stats.length ? `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Partidos</span><br><strong>${fmt(totals.partidos)}</strong></div>
-      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Minutos</span><br><strong>${fmt(totals.minutos)}</strong></div>
-      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Goles</span><br><strong>${fmt(totals.goles)}</strong></div>
-      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">xG</span><br><strong>${totals.xg.toFixed(2)}</strong></div>` : ''}
-      ${ops.length ? `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Operaciones</span><br><strong>${ops.length}</strong></div>
-      <div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Importe total</span><br><strong>${formatM(totalImporte)}</strong></div>` : ''}
-      ${rev ? `<div style="padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)"><span class="muted">Revalorización</span><br><strong class="${(+rev.revalorizacion_abs||0) >= 0 ? 'green' : 'red'}">${formatDeltaM(+rev.revalorizacion_abs || 0)} · ${(+rev.revalorizacion_pct || 0).toFixed(0)}%</strong></div>` : ''}
-    </div>
-    <div style="margin:8px 0 12px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">
-      <strong>Lectura deportiva:</strong> <span class="muted">${statText}</span>
-    </div>
-    ${stats.length ? `<strong>Rendimiento por temporada</strong><br>
-    <table><thead><tr><th>Temp.</th><th>Club</th><th>Entrenador</th><th>Pos.</th><th>Edad</th><th>Part.</th><th>Min</th><th>Goles</th><th>xG</th></tr></thead>
+  // KPIs esenciales (solo los que aportan), como chips compactos
+  const chips = [];
+  if (stats.length) {
+    chips.push(['Partidos', fmt(totals.partidos)]);
+    chips.push(['Minutos', fmt(totals.minutos)]);
+    chips.push(['Goles', fmt(totals.goles)]);
+    chips.push(['xG', totals.xg.toFixed(1)]);
+  }
+  if (rev) {
+    const v = +rev.revalorizacion_abs || 0;
+    chips.push(['Revalorización', `<span class="${v >= 0 ? 'green' : 'red'}">${formatDeltaM(v)} (${(+rev.revalorizacion_pct||0).toFixed(0)}%)</span>`]);
+  } else if (ops.length) {
+    chips.push(['Importe total', formatM(totalImporte)]);
+  }
+
+  const chipRow = chips.map(([k, v]) =>
+    `<span style="display:inline-flex;flex-direction:column;padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);line-height:1.3">
+      <span class="muted" style="font-size:0.72rem">${k}</span><strong>${v}</strong></span>`).join('');
+
+  // Tabla principal: rendimiento por temporada (o, si no hay, operaciones)
+  let tabla = '';
+  if (stats.length) {
+    tabla = `<table><thead><tr><th>Temp.</th><th>Club</th><th>Pos.</th><th>Edad</th><th>Part.</th><th>Min</th><th>Goles</th><th>xG</th></tr></thead>
     <tbody>${stats.map(s => `<tr>
-      <td>${s.temporada}</td><td class="bold">${s.club}</td><td>${s.entrenador || '—'}</td>
+      <td>${s.temporada}</td><td class="bold">${s.club}</td>
       <td class="muted">${s.posicion || '—'}</td><td>${s.edad || '—'}</td><td>${fmt(s.partidos)}</td>
-      <td>${fmt(s.minutos)}</td><td>${fmt(s.goles)}</td><td>${s.xg ? s.xg.toFixed(2) : '—'}</td>
-    </tr>`).join('')}</tbody></table>` : ''}
-    ${ops.length ? `<br><strong>Historial de operaciones</strong><br>
-    <table><thead><tr><th>Temp.</th><th>Club</th><th>Movimiento</th><th>Tipo</th><th>Importe</th></tr></thead>
-    <tbody>${sortedOps.slice(0, 8).map(op => `<tr>
-      <td>${op.temporada || '—'}</td>
-      <td class="bold">${op.club || '—'}</td>
-      <td>${op.movimiento || '—'}</td>
-      <td class="muted">${prettyTipo(op.tipo_operacion || op.movimiento)}</td>
+      <td>${fmt(s.minutos)}</td><td>${fmt(s.goles)}</td><td>${s.xg ? s.xg.toFixed(1) : '—'}</td>
+    </tr>`).join('')}</tbody></table>`;
+  } else if (ops.length) {
+    tabla = `<table><thead><tr><th>Temp.</th><th>Club</th><th>Mov.</th><th>Tipo</th><th>Importe</th></tr></thead>
+    <tbody>${sortedOps.slice(0, 6).map(op => `<tr>
+      <td>${op.temporada || '—'}</td><td class="bold">${op.club || '—'}</td>
+      <td>${op.movimiento || '—'}</td><td class="muted">${prettyTipo(op.tipo_operacion || op.movimiento)}</td>
       <td>${op.importe_numerico ? formatM(op.importe_numerico) : (op.importe_original || '—')}</td>
-    </tr>`).join('')}</tbody></table>` : ''}
-    ${sortedOps.length > 8 ? `<span class="muted">Mostrando las 8 operaciones más recientes.</span><br>` : ''}
-    <span class="muted">Justificación: rendimiento tomado de master/Wyscout cuando existe; operaciones y valores tomados de Transfermarkt consolidado.</span>`;
+    </tr>`).join('')}</tbody></table>`;
+  }
+
+  return `<strong style="font-size:1.05rem">${name}</strong>
+    <span class="muted"> · ${mainPos} · ${latest?.nacionalidad || latestStats?.nacionalidad || '—'} · ${mainClub}</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">${chipRow}</div>
+    ${tabla}`;
 }
 
 function sgptDefault(raw) {
