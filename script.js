@@ -3097,8 +3097,9 @@ function isScoutSourceClarificationQuery(q) {
   if (isRbbContractQuery(q)) return false;
   const hasPosition = /(laterales?|extremos?|centrales?|mediocentros?|centrocampistas?|mediapuntas?|delanteros?|porteros?)/.test(q);
   const hasRatingIntent = /(mejor|mejores|top|ranking|mayor|mayores|ordenad|valoracion|valoraci[oó]n|media|nota|total)/.test(q);
+  const hasBirthOrAgeIntent = /(nacid|nacimiento|edad|a[nñ]os|anos|generacion|quinta|despues de|despues del|a partir de)/.test(q);
   const hasGenericPlayersRanking = /(mejores?|top|ranking).{0,30}jugadores?|jugadores?.{0,30}(mejores?|top|ranking)/.test(q);
-  return (hasPosition && hasRatingIntent) || hasGenericPlayersRanking;
+  return (hasPosition && (hasRatingIntent || hasBirthOrAgeIntent)) || hasGenericPlayersRanking;
 }
 
 function isRbbDatabaseQuery(q) {
@@ -3151,6 +3152,10 @@ function detectRbbSide(raw) {
 
 function detectRbbContractLimit(raw) {
   const q = norm(raw);
+  const hasContractIntent = /contrato|termina|terminan|acaba|acaban|finaliza|finalizan|vence|vencen/.test(q);
+  const hasBirthIntent = /nacid|nacimiento|ano de nacimiento|generacion|quinta/.test(q);
+  if (hasBirthIntent && !hasContractIntent) return null;
+
   let m = q.match(/antes de(?:l)?\s+(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})/);
   if (m) {
     const year = Number(m[3].length === 2 ? `20${m[3]}` : m[3]);
@@ -3168,6 +3173,86 @@ function detectRbbContractLimit(raw) {
   if (m) return new Date(Number(m[3]), monthMap[m[2]], Number(m[1]));
   m = q.match(/antes de(?:l)?\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+de\s+(\d{4})/);
   if (m) return new Date(Number(m[2]), monthMap[m[1]] + 1, 0);
+  return null;
+}
+
+function detectRbbBirthYearRange(raw) {
+  const q = norm(raw);
+  const hasBirthIntent = /nacid|nacimiento|\bano\b|ano de nacimiento|generacion|quinta|despues de(?:l)?\s+20\d{2}|a partir de\s+20\d{2}|desde\s+20\d{2}/.test(q);
+  if (!hasBirthIntent) return null;
+
+  let m = q.match(/entre\s+(20\d{2})\s+y\s+(20\d{2})/);
+  if (m) {
+    const a = Number(m[1]), b = Number(m[2]);
+    return { min: Math.min(a, b), max: Math.max(a, b), label: `nacidos entre ${Math.min(a, b)} y ${Math.max(a, b)}` };
+  }
+
+  m = q.match(/(?:despues de(?:l)?|a partir de|desde|posterior(?:es)? a)\s+(20\d{2})/);
+  if (m) {
+    const y = Number(m[1]);
+    return { min: y, max: null, label: `nacidos desde ${y}` };
+  }
+
+  m = q.match(/(?:antes de(?:l)?|anteriores? a)\s+(20\d{2})/);
+  if (m) {
+    const y = Number(m[1]) - 1;
+    return { min: null, max: y, label: `nacidos antes de ${Number(m[1])}` };
+  }
+
+  m = q.match(/(?:hasta|como maximo|maximo)\s+(20\d{2})/);
+  if (m) {
+    const y = Number(m[1]);
+    return { min: null, max: y, label: `nacidos hasta ${y}` };
+  }
+
+  m = q.match(/(?:nacid[oa]s?\s+en|nacimiento|ano)\s+(20\d{2})/);
+  if (m) {
+    const y = Number(m[1]);
+    return { min: y, max: y, label: `nacidos en ${y}` };
+  }
+
+  return null;
+}
+
+function currentRbbYear() {
+  return new Date().getFullYear();
+}
+
+function rbbAgeFromYear(year) {
+  return year ? currentRbbYear() - year : null;
+}
+
+function detectRbbAgeRange(raw) {
+  const q = norm(raw);
+  if (!/(edad|a[nñ]os|anos|sub\s*-?\s*\d{1,2}|u\s*-?\s*\d{1,2})/.test(q)) return null;
+
+  let m = q.match(/entre\s+(\d{1,2})\s+y\s+(\d{1,2})\s+(?:anos|a[nñ]os)/);
+  if (m) {
+    const a = Number(m[1]), b = Number(m[2]);
+    return { min: Math.min(a, b), max: Math.max(a, b), label: `edad aprox. entre ${Math.min(a, b)} y ${Math.max(a, b)}` };
+  }
+
+  m = q.match(/(?:menores? de|menos de)\s+(\d{1,2})\s*(?:anos|a[nñ]os)?/);
+  if (m) return { min: null, max: Number(m[1]) - 1, label: `edad aprox. menor de ${Number(m[1])}` };
+
+  m = q.match(/(?:sub|u)\s*-?\s*(\d{1,2})/);
+  if (m) return { min: null, max: Number(m[1]) - 1, label: `edad aprox. Sub-${Number(m[1])}` };
+
+  m = q.match(/(?:hasta|como maximo|maximo)\s+(\d{1,2})\s*(?:anos|a[nñ]os)/);
+  if (m) return { min: null, max: Number(m[1]), label: `edad aprox. hasta ${Number(m[1])}` };
+
+  m = q.match(/(?:mayores? de|mas de)\s+(\d{1,2})\s*(?:anos|a[nñ]os)?/);
+  if (m) return { min: Number(m[1]) + 1, max: null, label: `edad aprox. mayor de ${Number(m[1])}` };
+
+  m = q.match(/(?:desde|a partir de)\s+(\d{1,2})\s*(?:anos|a[nñ]os)/);
+  if (m) return { min: Number(m[1]), max: null, label: `edad aprox. desde ${Number(m[1])}` };
+
+  m = q.match(/edad\s+(\d{1,2})(?:\s*(?:anos|a[nñ]os))?/);
+  if (m) return { min: Number(m[1]), max: Number(m[1]), label: `edad aprox. ${Number(m[1])}` };
+
+  m = q.match(/(?:de\s+)?(\d{1,2})\s*(?:anos|a[nñ]os)\b/);
+  if (m) return { min: Number(m[1]), max: Number(m[1]), label: `edad aprox. ${Number(m[1])}` };
+
   return null;
 }
 
@@ -3196,6 +3281,8 @@ function sgptRbbDatabaseRanking(raw, topLimit = 20) {
   const pos = detectRbbPosition(raw);
   const side = detectRbbSide(raw);
   const limitDate = detectRbbContractLimit(raw);
+  const birthRange = detectRbbBirthYearRange(raw);
+  const ageRange = detectRbbAgeRange(raw);
   const q = norm(raw);
   const onlyContract = /contrato|termina|acaba|finaliza|vence|vencen|antes de/.test(q);
 
@@ -3208,6 +3295,7 @@ function sgptRbbDatabaseRanking(raw, topLimit = 20) {
     liga: sgptRbbCol(d, 'Liga'),
     procedencia: sgptRbbCol(d, 'Procedencia'),
     anio: sgptRbbCol(d, 'Año', 'Ano'),
+    anioNum: parseInt(sgptRbbCol(d, 'Año', 'Ano'), 10) || 0,
     media: parseRbbNumber(sgptRbbCol(d, 'Media')),
     total: parseRbbNumber(sgptRbbCol(d, 'Total')),
     rendimiento: sgptRbbCol(d, 'Rendimiento'),
@@ -3215,12 +3303,26 @@ function sgptRbbDatabaseRanking(raw, topLimit = 20) {
     contexto: sgptRbbCol(d, 'Contexto'),
     ojeador: sgptRbbCol(d, 'Ojeador'),
     contrato: parseRbbDate(sgptRbbCol(d, 'CONTRATOS')),
-  }));
+  })).map(r => ({ ...r, edad: r.anioNum ? rbbAgeFromYear(r.anioNum) : null }));
 
   if (pos) rows = rows.filter(r => norm(r.posicion) === norm(pos));
   if (side && ['Lateral', 'Extremo', 'Defensa central'].includes(pos)) rows = rows.filter(r => rbbSideMatches(r.raw, side));
   if (limitDate) rows = rows.filter(r => r.contrato && r.contrato <= limitDate);
   if (onlyContract && !limitDate) rows = rows.filter(r => r.contrato);
+  if (birthRange) {
+    rows = rows.filter(r =>
+      r.anioNum
+      && (birthRange.min == null || r.anioNum >= birthRange.min)
+      && (birthRange.max == null || r.anioNum <= birthRange.max)
+    );
+  }
+  if (ageRange) {
+    rows = rows.filter(r =>
+      r.edad != null
+      && (ageRange.min == null || r.edad >= ageRange.min)
+      && (ageRange.max == null || r.edad <= ageRange.max)
+    );
+  }
 
   rows = rows
     .filter(r => r.media > 0)
@@ -3228,24 +3330,33 @@ function sgptRbbDatabaseRanking(raw, topLimit = 20) {
     .slice(0, topLimit);
 
   if (!rows.length) {
-    const bits = [pos || 'jugadores', side ? `perfil ${side}` : '', limitDate ? `contrato antes de ${fmtRbbDate(limitDate)}` : ''].filter(Boolean).join(' · ');
+    const bits = [
+      pos || 'jugadores',
+      side ? `perfil ${side}` : '',
+      birthRange ? birthRange.label : '',
+      ageRange ? ageRange.label : '',
+      limitDate ? `contrato antes de ${fmtRbbDate(limitDate)}` : '',
+    ].filter(Boolean).join(' · ');
     return `No encuentro resultados en la Base de Datos RBB para <strong>${bits}</strong>.`;
   }
 
   const titleBits = [
     pos ? (side ? `${pos} perfil ${side}` : pos) : 'Jugadores',
+    birthRange ? birthRange.label : '',
+    ageRange ? ageRange.label : '',
     limitDate ? `contrato hasta ${fmtRbbDate(limitDate)}` : '',
   ].filter(Boolean).join(' · ');
 
   return `<strong>${titleBits} — mejor valoración RBB</strong>
     <span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;margin-left:6px">Base RBB</span><br>
-    <span class="muted">Ordenado por Media RBB y desempate por Total. ${limitDate ? `Filtro de contrato aplicado: hasta ${fmtRbbDate(limitDate)}.` : ''} ${side ? 'El perfil derecho/izquierdo se infiere desde comentarios y pierna dominante porque la posición del CSV es genérica.' : ''}</span><br>
-    <table><thead><tr><th>#</th><th>Jugador</th><th>Pos.</th><th>Año</th><th>Equipo</th><th>Liga</th><th>Media</th><th>Total</th><th>R/P</th><th>Contrato</th></tr></thead>
+    <span class="muted">Ordenado por Media RBB y desempate por Total. ${birthRange ? `Filtro de nacimiento aplicado: ${birthRange.label}.` : ''} ${ageRange ? `La edad es aproximada porque el CSV solo trae año de nacimiento. ` : ''}${limitDate ? `Filtro de contrato aplicado: hasta ${fmtRbbDate(limitDate)}.` : ''} ${side ? 'El perfil derecho/izquierdo se infiere desde comentarios y pierna dominante porque la posición del CSV es genérica.' : ''}</span><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Pos.</th><th>Año</th><th>Edad</th><th>Equipo</th><th>Liga</th><th>Media</th><th>Total</th><th>R/P</th><th>Contrato</th></tr></thead>
     <tbody>${rows.map((r, i) => `<tr>
       <td>${i + 1}</td>
       <td class="bold">${r.apodo}</td>
       <td>${r.posicion}</td>
       <td>${r.anio || '—'}</td>
+      <td>${r.edad != null ? r.edad : '—'}</td>
       <td>${r.equipo || '—'}</td>
       <td class="muted">${r.liga || '—'}</td>
       <td class="green">${r.media.toFixed(2)}</td>

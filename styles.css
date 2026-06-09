@@ -1596,17 +1596,17 @@ table.dataTable thead .sorting_desc {
 }
 
 .cg-pitch {
-  width: 1080px;
-  height: 720px;
-  min-width: 1080px;
+  width: 1120px;
+  height: 780px;
+  min-width: 1120px;
   background: #367e0e;
   background-image:
     repeating-linear-gradient(
       90deg,
       rgba(255,255,255,0.06) 0,
-      rgba(255,255,255,0.06) 135px,
-      rgba(0,0,0,0.10) 135px,
-      rgba(0,0,0,0.10) 270px
+        rgba(255,255,255,0.06) 140px,
+        rgba(0,0,0,0.10) 140px,
+        rgba(0,0,0,0.10) 280px
     );
   border: 7px solid #fff;
   border-radius: 0;
@@ -1642,9 +1642,9 @@ table.dataTable thead .sorting_desc {
 }
 
 .cg-field-box {
-  top: 162px;
+  top: 176px;
   width: 112px;
-  height: 388px;
+  height: 420px;
   border: 5px solid rgba(255,255,255,0.92);
 }
 
@@ -1659,9 +1659,9 @@ table.dataTable thead .sorting_desc {
 }
 
 .cg-field-goal {
-  top: 252px;
+  top: 276px;
   width: 42px;
-  height: 208px;
+  height: 214px;
   border: 5px solid rgba(255,255,255,0.92);
 }
 
@@ -1708,17 +1708,17 @@ table.dataTable thead .sorting_desc {
   z-index: 2;
 }
 
-#cg-zone-LI { left: 162px; top: 24px; }
-#cg-zone-MC { left: 426px; top: 24px; }
-#cg-zone-EI { left: 696px; top: 24px; }
-#cg-zone-CTI { left: 6px; top: 248px; }
-#cg-zone-CTD { left: 270px; top: 248px; }
-#cg-zone-MP { left: 536px; top: 248px; }
-#cg-zone-DC { left: 806px; top: 248px; }
-#cg-zone-LD { left: 162px; top: 474px; }
-#cg-zone-CC { left: 426px; top: 474px; }
-#cg-zone-ED { left: 696px; top: 474px; }
-#cg-zone-GK { left: 416px; top: 632px; width: 252px; }
+#cg-zone-LI { left: 168px; top: 26px; }
+#cg-zone-MC { left: 438px; top: 26px; }
+#cg-zone-EI { left: 708px; top: 26px; }
+#cg-zone-CTI { left: 18px; top: 250px; }
+#cg-zone-CTD { left: 288px; top: 250px; }
+#cg-zone-MP { left: 558px; top: 250px; }
+#cg-zone-DC { left: 828px; top: 250px; }
+#cg-zone-LD { left: 168px; top: 474px; }
+#cg-zone-CC { left: 438px; top: 474px; }
+#cg-zone-ED { left: 708px; top: 474px; }
+#cg-zone-GK { left: 442px; top: 684px; width: 236px; }
 
 /* ── Tabla por zona ─────────────────────────────────────────── */
 .cg-table {
@@ -1754,7 +1754,7 @@ table.dataTable thead .sorting_desc {
 }
 
 .cg-table-body {
-  max-height: 146px;
+  max-height: 118px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -1778,7 +1778,7 @@ table.dataTable thead .sorting_desc {
   align-items: center;
   color: #1a2332;
   line-height: 1.25;
-  min-height: 18px;
+  min-height: 16px;
 }
 
 .cg-row:last-child { border-bottom: none; }
@@ -1806,7 +1806,25 @@ table.dataTable thead .sorting_desc {
 }
 
 .cg-zone-gk {
-  width: 252px;
+  width: 236px;
+  opacity: 0.88;
+}
+
+#cg-zone-GK .cg-table {
+  border-width: 3px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.18);
+}
+
+#cg-zone-GK .cg-table-hdr {
+  padding: 4px 8px;
+}
+
+#cg-zone-GK .cg-thead {
+  display: none;
+}
+
+#cg-zone-GK .cg-table-body {
+  max-height: 44px;
 }
 
 .cg-gk-label {

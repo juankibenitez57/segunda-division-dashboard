@@ -8,7 +8,8 @@
   // ── Config ────────────────────────────────────────────────────────────────────
   const CSV_FILE = 'Base de Datos 25-26 RBB.csv';
   const REFRESH_MS = 30 * 60 * 1000;
-  const TOP_N = 8;
+  const TOP_N = 7;
+  const GK_TOP_N = 3;
 
   // ── State ─────────────────────────────────────────────────────────────────────
   let _all = [];
@@ -55,8 +56,8 @@
     ['LI',  ['lateral izquierdo', 'lateral izq', ' li ', 'carrilero izquierdo']],
     ['LD',  ['lateral derecho', 'lateral der', 'lateral dcho', ' ld ', 'carrilero derecho']],
     ['LAT', [' lateral ']],
-    ['DC',  ['delantero centro', 'delantero', ' dc ', 'punta', 'ariete', 'centro delantero', '9 ']],
     ['MP',  ['mediapunta', 'media punta', ' mp ', ' mco', 'segunda punta', 'enganche', 'ofensivo', 'trequartista']],
+    ['DC',  ['delantero centro', 'delantero', ' dc ', ' punta ', 'ariete', 'centro delantero', ' 9 ']],
     ['CC',  ['centrocampista', 'interior', 'volante', ' cc ']],
     ['MC',  ['mediocentro', ' mc ', 'pivote', ' mcd']],
     ['CTI', ['central izquierdo', 'central izq']],
@@ -263,7 +264,7 @@
     // Sort by Media desc, take top N
     for (const z of Object.keys(zones)) {
       zones[z].sort((a, b) => parseMedia(b) - parseMedia(a));
-      zones[z] = zones[z].slice(0, TOP_N);
+      zones[z] = zones[z].slice(0, z === 'GK' ? GK_TOP_N : TOP_N);
     }
 
     // Update total count
