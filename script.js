@@ -2750,7 +2750,7 @@ function renderScoutGPTTab() {
 
     let html;
     const qn = norm(q);
-    if (isDecisionModelQuery(qn) || isLocalStatsQuery(qn) || isOperationModelQualityQuery(qn) || isModelBenchmarkQuery(qn) || isRbbDatabaseQuery(qn)) {
+    if (isCampogramaQuery(qn) || isDecisionModelQuery(qn) || isLocalStatsQuery(qn) || isOperationModelQualityQuery(qn) || isModelBenchmarkQuery(qn) || isRbbDatabaseQuery(qn)) {
       await new Promise(resolve => loadLoanModelData(resolve));
       await new Promise(resolve => loadDecisionModelData(resolve));
       await new Promise(resolve => loadOperationModelReport(resolve));
@@ -3079,9 +3079,16 @@ function fmtRbbDate(d) {
   return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+function isCampogramaQuery(q) {
+  return /\bcampograma\b|base rbb|base de datos rbb|base del campograma/.test(q);
+}
+
 function isRbbDatabaseQuery(q) {
-  return /(base de datos|campograma|valoraci[oó]n|valoracion|contrato|termina|acaba|finaliza|vence|vencen|laterales?|extremos?|centrales?|mediocentros?|centrocampistas?|mediapuntas?|delanteros?|porteros?)/.test(q)
-    && /(mejor|top|ranking|valoraci[oó]n|valoracion|contrato|termina|acaba|finaliza|vence|vencen|antes de|laterales?|extremos?|centrales?|mediocentros?|centrocampistas?|mediapuntas?|delanteros?|porteros?)/.test(q);
+  if (isCampogramaQuery(q)) return true;
+  const hasRbbMetric = /(valoracion|valoraci[oó]n|media|nota|total|contrato|termina|terminan|acaba|acaban|finaliza|finalizan|vence|vencen|antes de)/.test(q);
+  const hasRbbPosition = /(laterales?|extremos?|centrales?|mediocentros?|centrocampistas?|mediapuntas?|delanteros?|porteros?)/.test(q);
+  const hasRankingIntent = /(mejor|mejores|top|ranking|mayor|mayores|ordenad|valoracion|valoraci[oó]n|media|nota)/.test(q);
+  return (hasRbbPosition && (hasRbbMetric || hasRankingIntent)) || (hasRbbMetric && hasRankingIntent);
 }
 
 function detectRbbPosition(raw) {
