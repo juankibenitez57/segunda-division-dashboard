@@ -2723,6 +2723,7 @@ function noResults(query) {
 
 let _sgptReady = false;
 let _aiEnabled = false;   // true cuando el proxy confirma que Groq está activo
+let RBB_DATABASE_DATA = [];
 
 function renderScoutGPTTab() {
   if (_sgptReady) return;
@@ -2735,6 +2736,7 @@ function renderScoutGPTTab() {
   loadOperationContext(() => {});
   loadOperationModelReport(() => {});
   loadOperationBenchmarkReport(() => {});
+  loadRbbDatabaseData(() => {});
 
   const input = document.getElementById('scoutgpt-input');
   const btn   = document.getElementById('scoutgpt-send');
@@ -2748,12 +2750,13 @@ function renderScoutGPTTab() {
 
     let html;
     const qn = norm(q);
-    if (isDecisionModelQuery(qn) || isLocalStatsQuery(qn) || isOperationModelQualityQuery(qn) || isModelBenchmarkQuery(qn)) {
+    if (isDecisionModelQuery(qn) || isLocalStatsQuery(qn) || isOperationModelQualityQuery(qn) || isModelBenchmarkQuery(qn) || isRbbDatabaseQuery(qn)) {
       await new Promise(resolve => loadLoanModelData(resolve));
       await new Promise(resolve => loadDecisionModelData(resolve));
       await new Promise(resolve => loadOperationModelReport(resolve));
       await new Promise(resolve => loadOperationBenchmarkReport(resolve));
       await new Promise(resolve => loadMasterData(resolve));
+      await new Promise(resolve => loadRbbDatabaseData(resolve));
       html = processScoutQuery(q);
     } else {
       await new Promise(resolve => loadLoanModelData(resolve));
@@ -3008,6 +3011,205 @@ function addSgptMessage(role, html) {
   container.scrollTop = container.scrollHeight;
 }
 
+function sgptRbbCol(row, ...names) {
+  for (const n of names) {
+    const v = row[n];
+    if (v !== undefined && v !== null && String(v).trim() !== '') return String(v).trim();
+  }
+  return '';
+}
+
+function normalizeRbbRow(row) {
+  const clean = {};
+  Object.entries(row || {}).forEach(([k, v]) => {
+    const key = String(k || '').replace(/\s+/g, ' ').trim();
+    if (!key || key.startsWith('Unnamed')) return;
+    clean[key] = v == null ? '' : v;
+  });
+  if (row['Pierna\nDominante'] && !clean['Pierna Dominante']) clean['Pierna Dominante'] = row['Pierna\nDominante'];
+  return clean;
+}
+
+function loadRbbDatabaseData(callback) {
+  if (RBB_DATABASE_DATA.length) { callback(RBB_DATABASE_DATA); return; }
+  fetch(dataPath('Base de Datos 25-26 RBB.csv'))
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.arrayBuffer();
+    })
+    .then(buf => {
+      let text;
+      try {
+        text = new TextDecoder('utf-8', { fatal: true }).decode(buf);
+      } catch (_) {
+        text = new TextDecoder('windows-1252').decode(buf);
+      }
+      Papa.parse(text, {
+        header: true,
+        delimiter: ';',
+        skipEmptyLines: 'greedy',
+        transformHeader: h => String(h || '').trim(),
+        complete: r => {
+          RBB_DATABASE_DATA = r.data
+            .map(normalizeRbbRow)
+            .filter(d => sgptRbbCol(d, 'Nombre') && sgptRbbCol(d, 'Posición', 'Posicion'));
+          callback(RBB_DATABASE_DATA);
+        },
+        error: () => { RBB_DATABASE_DATA = []; callback([]); },
+      });
+    })
+    .catch(() => { RBB_DATABASE_DATA = []; callback([]); });
+}
+
+function parseRbbNumber(value) {
+  return parseFloat(String(value || '').replace(',', '.')) || 0;
+}
+
+function parseRbbDate(value) {
+  if (!value) return null;
+  const s = String(value).trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function fmtRbbDate(d) {
+  if (!d) return '—';
+  return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function isRbbDatabaseQuery(q) {
+  return /(base de datos|campograma|valoraci[oó]n|valoracion|contrato|termina|acaba|finaliza|vence|vencen|laterales?|extremos?|centrales?|mediocentros?|centrocampistas?|mediapuntas?|delanteros?|porteros?)/.test(q)
+    && /(mejor|top|ranking|valoraci[oó]n|valoracion|contrato|termina|acaba|finaliza|vence|vencen|antes de|laterales?|extremos?|centrales?|mediocentros?|centrocampistas?|mediapuntas?|delanteros?|porteros?)/.test(q);
+}
+
+function detectRbbPosition(raw) {
+  const q = norm(raw);
+  if (/lateral/.test(q)) return 'Lateral';
+  if (/extremo/.test(q)) return 'Extremo';
+  if (/central|defensa central/.test(q)) return 'Defensa central';
+  if (/mediocentro|pivote/.test(q)) return 'Mediocentro';
+  if (/centrocampista|interior/.test(q)) return 'Centrocampista';
+  if (/mediapunta|media punta|mco/.test(q)) return 'Mediapunta';
+  if (/delanter|punta|ariete/.test(q)) return 'Delantero';
+  if (/portero|gk/.test(q)) return 'Portero';
+  return '';
+}
+
+function detectRbbSide(raw) {
+  const q = norm(raw);
+  if (/derech|drch|diestro|banda derecha|perfil derecho| ld | ed /.test(` ${q} `)) return 'derecha';
+  if (/izquierd|izq|zurdo|banda izquierda|perfil izquierdo| li | ei /.test(` ${q} `)) return 'izquierda';
+  return '';
+}
+
+function detectRbbContractLimit(raw) {
+  const q = norm(raw);
+  let m = q.match(/antes de(?:l)?\s+(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})/);
+  if (m) {
+    const year = Number(m[3].length === 2 ? `20${m[3]}` : m[3]);
+    return new Date(year, Number(m[2]) - 1, Number(m[1]));
+  }
+  m = q.match(/antes de(?:l)?\s+(\d{4})/);
+  if (m) return new Date(Number(m[1]), 11, 31);
+
+  const monthMap = {
+    enero: 0, febrero: 1, marzo: 2, abril: 3, mayo: 4, junio: 5,
+    julio: 6, agosto: 7, septiembre: 8, setiembre: 8, octubre: 9,
+    noviembre: 10, diciembre: 11,
+  };
+  m = q.match(/antes de(?:l)?\s+(\d{1,2})\s+de\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+de\s+(\d{4})/);
+  if (m) return new Date(Number(m[3]), monthMap[m[2]], Number(m[1]));
+  m = q.match(/antes de(?:l)?\s+(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\s+de\s+(\d{4})/);
+  if (m) return new Date(Number(m[2]), monthMap[m[1]] + 1, 0);
+  return null;
+}
+
+function rbbSideMatches(row, side) {
+  if (!side) return true;
+  const text = norm([
+    sgptRbbCol(row, 'Posición', 'Posicion'),
+    sgptRbbCol(row, 'Pierna Dominante', 'Pierna\nDominante'),
+    sgptRbbCol(row, 'Comentarios'),
+  ].join(' '));
+  if (side === 'derecha') {
+    return /derech|drch|diestro|pierna natural|perfil derecho|banda derecha/.test(text)
+      || !/izquierd|izq|zurdo|perfil izquierdo|banda izquierda/.test(text);
+  }
+  if (side === 'izquierda') {
+    return /izquierd|izq|zurdo|perfil izquierdo|banda izquierda/.test(text)
+      || !/derech|drch|diestro|perfil derecho|banda derecha/.test(text);
+  }
+  return true;
+}
+
+function sgptRbbDatabaseRanking(raw, topLimit = 20) {
+  if (!RBB_DATABASE_DATA.length) {
+    return 'La Base de Datos RBB todavía se está cargando. Vuelve a preguntar en unos segundos.';
+  }
+  const pos = detectRbbPosition(raw);
+  const side = detectRbbSide(raw);
+  const limitDate = detectRbbContractLimit(raw);
+  const q = norm(raw);
+  const onlyContract = /contrato|termina|acaba|finaliza|vence|vencen|antes de/.test(q);
+
+  let rows = RBB_DATABASE_DATA.map(d => ({
+    raw: d,
+    nombre: sgptRbbCol(d, 'Nombre'),
+    apodo: sgptRbbCol(d, 'Apodo') || sgptRbbCol(d, 'Nombre'),
+    posicion: sgptRbbCol(d, 'Posición', 'Posicion'),
+    equipo: sgptRbbCol(d, 'Equipo'),
+    liga: sgptRbbCol(d, 'Liga'),
+    procedencia: sgptRbbCol(d, 'Procedencia'),
+    anio: sgptRbbCol(d, 'Año', 'Ano'),
+    media: parseRbbNumber(sgptRbbCol(d, 'Media')),
+    total: parseRbbNumber(sgptRbbCol(d, 'Total')),
+    rendimiento: sgptRbbCol(d, 'Rendimiento'),
+    proyeccion: sgptRbbCol(d, 'Proyección', 'Proyeccion'),
+    contexto: sgptRbbCol(d, 'Contexto'),
+    ojeador: sgptRbbCol(d, 'Ojeador'),
+    contrato: parseRbbDate(sgptRbbCol(d, 'CONTRATOS')),
+  }));
+
+  if (pos) rows = rows.filter(r => norm(r.posicion) === norm(pos));
+  if (side && ['Lateral', 'Extremo', 'Defensa central'].includes(pos)) rows = rows.filter(r => rbbSideMatches(r.raw, side));
+  if (limitDate) rows = rows.filter(r => r.contrato && r.contrato <= limitDate);
+  if (onlyContract && !limitDate) rows = rows.filter(r => r.contrato);
+
+  rows = rows
+    .filter(r => r.media > 0)
+    .sort((a, b) => b.media - a.media || b.total - a.total)
+    .slice(0, topLimit);
+
+  if (!rows.length) {
+    const bits = [pos || 'jugadores', side ? `perfil ${side}` : '', limitDate ? `contrato antes de ${fmtRbbDate(limitDate)}` : ''].filter(Boolean).join(' · ');
+    return `No encuentro resultados en la Base de Datos RBB para <strong>${bits}</strong>.`;
+  }
+
+  const titleBits = [
+    pos ? (side ? `${pos} perfil ${side}` : pos) : 'Jugadores',
+    limitDate ? `contrato hasta ${fmtRbbDate(limitDate)}` : '',
+  ].filter(Boolean).join(' · ');
+
+  return `<strong>${titleBits} — mejor valoración RBB</strong>
+    <span style="background:rgba(0,154,68,0.12);color:var(--primary-dark);padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;margin-left:6px">Base RBB</span><br>
+    <span class="muted">Ordenado por Media RBB y desempate por Total. ${limitDate ? `Filtro de contrato aplicado: hasta ${fmtRbbDate(limitDate)}.` : ''} ${side ? 'El perfil derecho/izquierdo se infiere desde comentarios y pierna dominante porque la posición del CSV es genérica.' : ''}</span><br>
+    <table><thead><tr><th>#</th><th>Jugador</th><th>Pos.</th><th>Año</th><th>Equipo</th><th>Liga</th><th>Media</th><th>Total</th><th>R/P</th><th>Contrato</th></tr></thead>
+    <tbody>${rows.map((r, i) => `<tr>
+      <td>${i + 1}</td>
+      <td class="bold">${r.apodo}</td>
+      <td>${r.posicion}</td>
+      <td>${r.anio || '—'}</td>
+      <td>${r.equipo || '—'}</td>
+      <td class="muted">${r.liga || '—'}</td>
+      <td class="green">${r.media.toFixed(2)}</td>
+      <td>${r.total ? r.total.toFixed(0) : '—'}</td>
+      <td>${r.rendimiento || '—'}/${r.proyeccion || '—'}</td>
+      <td>${fmtRbbDate(r.contrato)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
 /* --- Query Parser --- */
 function processScoutQuery(raw) {
   const q = norm(raw);
@@ -3057,6 +3259,7 @@ function processScoutQuery(raw) {
 
   if (isModelBenchmarkQuery(q)) return sgptOperationBenchmarkReport();
   if (isOperationModelQualityQuery(q)) return sgptOperationModelReport();
+  if (isRbbDatabaseQuery(q)) return sgptRbbDatabaseRanking(raw, topLimit);
 
   // Evaluación DIRIGIDA: jugador Betis + club destino concreto + operación
   // Ej: "¿sería buena la cesión de Rodrigo Marina al Ceuta?" / "¿vender a Morante al Andorra?"
