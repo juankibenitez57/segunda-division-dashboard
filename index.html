@@ -846,11 +846,22 @@
 
       <!-- ── Filtros ──────────────────────────────────────────── -->
       <div id="cg-filters" class="cg-filters-panel">
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Buscar</label>
+          <input type="search" id="cg-filter-search" class="select-styled" placeholder="Jugador, equipo..." style="width:100%">
+        </div>
 
         <div class="cg-filter-group">
           <label class="cg-filter-label">Procedencia</label>
           <select id="cg-filter-procedencia" class="select-styled" style="width:100%">
             <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Equipo</label>
+          <select id="cg-filter-equipo" class="select-styled" style="width:100%">
+            <option value="">Todos</option>
           </select>
         </div>
 
@@ -862,14 +873,58 @@
         </div>
 
         <div class="cg-filter-group">
+          <label class="cg-filter-label">Categoría</label>
+          <select id="cg-filter-categoria" class="select-styled" style="width:100%">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Posición</label>
+          <select id="cg-filter-posicion" class="select-styled" style="width:100%">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Pierna dominante</label>
+          <select id="cg-filter-pierna" class="select-styled" style="width:100%">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Etapa</label>
+          <select id="cg-filter-etapa" class="select-styled" style="width:100%">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="cg-filter-group">
           <label class="cg-filter-label">Año nacimiento</label>
-          <div class="cg-slider-row">
-            <span id="cg-year-min-val">—</span>
-            <input type="range" id="cg-year-min" class="cg-slider" min="1990" max="2010" value="1990">
+          <div class="cg-two-cols">
+            <input type="number" id="cg-year-min" class="select-styled" min="1990" max="2012" value="1990" aria-label="Año mínimo">
+            <input type="number" id="cg-year-max" class="select-styled" min="1990" max="2012" value="2012" aria-label="Año máximo">
           </div>
-          <div class="cg-slider-row">
-            <span id="cg-year-max-val">—</span>
-            <input type="range" id="cg-year-max" class="cg-slider" min="1990" max="2010" value="2010">
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Mínimos</label>
+          <div class="cg-two-cols">
+            <input type="number" id="cg-filter-media-min" class="select-styled" min="0" max="10" step="0.1" placeholder="Media">
+            <input type="number" id="cg-filter-total-min" class="select-styled" min="0" max="60" step="1" placeholder="Total">
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Físico</label>
+          <div class="cg-two-cols">
+            <select id="cg-filter-altura" class="select-styled" aria-label="Altura">
+              <option value="">Altura</option>
+            </select>
+            <select id="cg-filter-complexion" class="select-styled" aria-label="Complexión">
+              <option value="">Complexión</option>
+            </select>
           </div>
         </div>
 
@@ -889,6 +944,7 @@
             <label><input type="checkbox" class="cg-chk-proy" value="A"> A</label>
             <label><input type="checkbox" class="cg-chk-proy" value="B"> B</label>
             <label><input type="checkbox" class="cg-chk-proy" value="C"> C</label>
+            <label><input type="checkbox" class="cg-chk-proy" value="D"> D</label>
           </div>
         </div>
 
@@ -917,13 +973,19 @@
         </div>
 
         <button id="cg-reset-btn" class="btn-primary" style="width:100%;margin-top:8px">
-          🗑️ Limpiar filtros
+          Limpiar filtros
         </button>
       </div>
 
       <!-- ── Campo ──────────────────────────────────────────────── -->
       <div class="cg-campo-scroll">
         <div class="cg-pitch">
+          <div class="cg-field-line cg-field-half"></div>
+          <div class="cg-field-circle"></div>
+          <div class="cg-field-box cg-field-box-left"></div>
+          <div class="cg-field-box cg-field-box-right"></div>
+          <div class="cg-field-goal cg-field-goal-left"></div>
+          <div class="cg-field-goal cg-field-goal-right"></div>
 
           <!-- Línea de fondo de ataque -->
           <div class="cg-pitch-row">
@@ -945,6 +1007,7 @@
             <div id="cg-zone-MC"  class="cg-zone"></div>
             <div id="cg-zone-CTD" class="cg-zone"></div>
           </div>
+          <div id="cg-zone-CC" class="cg-zone"></div>
 
           <!-- Portería -->
           <div class="cg-gk-row">

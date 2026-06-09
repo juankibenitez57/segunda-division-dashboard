@@ -17,10 +17,20 @@
 
   function emptyFilters() {
     return {
+      search: '',
       procedencia: '',
+      equipo: '',
       liga: '',
+      categoria: '',
+      posicion: '',
+      pierna: '',
+      etapa: '',
       yearMin: 0,
       yearMax: 9999,
+      mediaMin: 0,
+      totalMin: 0,
+      altura: '',
+      complexion: '',
       rendimiento: new Set(),
       proyeccion:  new Set(),
       ojeador:     new Set(),
@@ -47,7 +57,8 @@
     ['LAT', [' lateral ']],
     ['DC',  ['delantero centro', 'delantero', ' dc ', 'punta', 'ariete', 'centro delantero', '9 ']],
     ['MP',  ['mediapunta', 'media punta', ' mp ', ' mco', 'segunda punta', 'enganche', 'ofensivo', 'trequartista']],
-    ['MC',  ['mediocentro', 'centrocampista', ' mc ', 'pivote', ' mcd', 'interior', 'volante', ' cc ']],
+    ['CC',  ['centrocampista', 'interior', 'volante', ' cc ']],
+    ['MC',  ['mediocentro', ' mc ', 'pivote', ' mcd']],
     ['CTI', ['central izquierdo', 'central izq']],
     ['CTD', ['central derecho', 'central der', 'central dcho']],
     ['CT',  [' central', 'defensa central']],
@@ -73,10 +84,18 @@
     ['CTI', 'Centrales IZQ',  'left'],
     ['MC',  'Mediocentros',   'center'],
     ['CTD', 'Centrales DRCH', 'right'],
+    ['CC',  'Centrocampistas', 'center'],
     ['GK',  'Porteros',       'center'],
   ];
 
-  const HDR_COLOR = { left: '#e67e22', center: '#c0392b', right: '#2980b9' };
+  const HDR_COLOR = { left: '#e67e22', center: '#5f8f18', right: '#2386d9' };
+  const ZONE_COLOR = {
+    LI: '#ef8200', LD: '#ef8200',
+    EI: '#2386d9', ED: '#2386d9', DC: '#2386d9',
+    CTI: '#c9202f', CTD: '#c9202f',
+    MC: '#5f8f18', MP: '#5f8f18', CC: '#5f8f18',
+    GK: '#333333',
+  };
 
   // ── DOM shortcuts ─────────────────────────────────────────────────────────────
   const $  = id => document.getElementById(id);
@@ -168,14 +187,34 @@
     return isNaN(d.getTime()) ? null : d;
   }
 
+  function parseNumValue(value) {
+    return parseFloat(String(value || '').replace(',', '.')) || 0;
+  }
+
   function applyFilters() {
     const f = _filters;
     return _all.filter(p => {
+      if (f.search) {
+        const haystack = [
+          col(p, 'Nombre'), col(p, 'Apodo'), col(p, 'NOM PROPIO SIN TILDES'),
+          col(p, 'Equipo'), col(p, 'Liga'), col(p, 'Procedencia'), col(p, 'Comentarios')
+        ].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+        if (!haystack.includes(f.search)) return false;
+      }
       if (f.procedencia && col(p, 'Procedencia') !== f.procedencia) return false;
+      if (f.equipo      && col(p, 'Equipo') !== f.equipo)           return false;
       if (f.liga        && col(p, 'Liga') !== f.liga)               return false;
+      if (f.categoria   && col(p, 'Categoría', 'Categoria') !== f.categoria) return false;
+      if (f.posicion    && col(p, 'Posición', 'Posicion', 'Pos') !== f.posicion) return false;
+      if (f.pierna      && col(p, 'Pierna Dominante', 'Pierna\nDominante') !== f.pierna) return false;
+      if (f.etapa       && col(p, 'Etapa') !== f.etapa) return false;
+      if (f.altura      && col(p, 'Altura') !== f.altura) return false;
+      if (f.complexion  && col(p, 'Complexión', 'Complexion') !== f.complexion) return false;
 
       const yr = parseInt(col(p, 'Año', 'Ano')) || 0;
       if (yr && (yr < f.yearMin || yr > f.yearMax)) return false;
+      if (f.mediaMin && parseMedia(p) < f.mediaMin) return false;
+      if (f.totalMin && parseNumValue(col(p, 'Total')) < f.totalMin) return false;
 
       if (f.rendimiento.size && !f.rendimiento.has(col(p, 'Rendimiento'))) return false;
       if (f.proyeccion.size  && !f.proyeccion.has(col(p, 'Proyección', 'Proyeccion'))) return false;
@@ -195,7 +234,7 @@
 
   // ── Render ────────────────────────────────────────────────────────────────────
   function parseMedia(p) {
-    return parseFloat(String(col(p, 'Media')).replace(',', '.')) || 0;
+    return parseNumValue(col(p, 'Media'));
   }
 
   function renderCampograma() {
@@ -238,8 +277,9 @@
       const players = zones[zoneId] || [];
       container.innerHTML = '';
 
-      const color = HDR_COLOR[side];
+      const color = ZONE_COLOR[zoneId] || HDR_COLOR[side];
       const wrap  = mk('div', 'cg-table');
+      wrap.style.borderColor = color;
 
       // Header
       const hdr = mk('div', 'cg-table-hdr');
@@ -251,20 +291,23 @@
         wrap.appendChild(mk('div', 'cg-empty', '—'));
       } else {
         const thead = mk('div', 'cg-thead');
+        thead.style.background = color;
         thead.innerHTML = `
           <span class="cgc-nota">Nota</span>
           <span class="cgc-nombre">Nombre</span>
-          <span class="cgc-anio">Año</span>
-          <span class="cgc-equipo">Equipo</span>`;
+          <span class="cgc-anio">Y</span>
+          <span class="cgc-equipo">Eq.</span>`;
         wrap.appendChild(thead);
 
+        const body = mk('div', 'cg-table-body');
         for (const p of players) {
           const media  = parseMedia(p);
           const mStr   = media ? media.toFixed(1) : '—';
           const apodo  = col(p, 'Apodo') || col(p, 'Nombre');
           const nombre = col(p, 'Nombre');
           const equipo = col(p, 'Equipo');
-          const yr     = col(p, 'Año', 'Ano') || '—';
+          const yrRaw  = col(p, 'Año', 'Ano') || '—';
+          const yr     = /^\d{4}$/.test(yrRaw) ? yrRaw.slice(2) : yrRaw;
           const rend   = col(p, 'Rendimiento') || '—';
           const proy   = col(p, 'Proyección', 'Proyeccion') || '—';
 
@@ -275,10 +318,11 @@
           row.innerHTML = `
             <span class="cgc-nota" style="color:${color}">${mStr}</span>
             <span class="cgc-nombre" title="${nombre.replace(/"/g,'&quot;')} · Rend. ${rend} · Proy. ${proy}"><b>${disp}</b></span>
-            <span class="cgc-anio">${yr}</span>
+            <span class="cgc-anio" style="color:${color}">${yr}</span>
             <span class="cgc-equipo" title="${equipo.replace(/"/g,'&quot;')}">${eDisp}</span>`;
-          wrap.appendChild(row);
+          body.appendChild(row);
         }
+        wrap.appendChild(body);
       }
       container.appendChild(wrap);
     }
@@ -310,7 +354,14 @@
 
   function populateFilters() {
     fillSelect('cg-filter-procedencia', uniqueVals('Procedencia'), 'Todas las procedencias');
+    fillSelect('cg-filter-equipo',      uniqueVals('Equipo'),      'Todos los equipos');
     fillSelect('cg-filter-liga',        uniqueVals('Liga'),        'Todas las ligas');
+    fillSelect('cg-filter-categoria',   uniqueVals('Categoría', ['Categoria']), 'Todas las categorías');
+    fillSelect('cg-filter-posicion',    uniqueVals('Posición', ['Posicion', 'Pos']), 'Todas las posiciones');
+    fillSelect('cg-filter-pierna',      uniqueVals('Pierna Dominante', ['Pierna\nDominante']), 'Todas las piernas');
+    fillSelect('cg-filter-etapa',       uniqueVals('Etapa'),       'Todas las etapas');
+    fillSelect('cg-filter-altura',      uniqueVals('Altura'),      'Altura');
+    fillSelect('cg-filter-complexion',  uniqueVals('Complexión', ['Complexion']), 'Complexión');
 
     // Year range
     const years = _all
@@ -324,8 +375,6 @@
         sl.min = yMin; sl.max = yMax;
         sl.value = i === 0 ? yMin : yMax;
       });
-      $('cg-year-min-val') && ($('cg-year-min-val').textContent = yMin);
-      $('cg-year-max-val') && ($('cg-year-max-val').textContent = yMax);
       _filters.yearMin = yMin;
       _filters.yearMax = yMax;
     }
@@ -358,25 +407,54 @@
     if ($('cg-filter-procedencia')?.dataset.bound === '1') return;
     $('cg-filter-procedencia').dataset.bound = '1';
     // Selects
+    $('cg-filter-search').addEventListener('input', e => {
+      _filters.search = _norm(e.target.value || '');
+      renderCampograma();
+    });
     $('cg-filter-procedencia').addEventListener('change', e => {
       _filters.procedencia = e.target.value; renderCampograma();
+    });
+    $('cg-filter-equipo').addEventListener('change', e => {
+      _filters.equipo = e.target.value; renderCampograma();
     });
     $('cg-filter-liga').addEventListener('change', e => {
       _filters.liga = e.target.value; renderCampograma();
     });
+    $('cg-filter-categoria').addEventListener('change', e => {
+      _filters.categoria = e.target.value; renderCampograma();
+    });
+    $('cg-filter-posicion').addEventListener('change', e => {
+      _filters.posicion = e.target.value; renderCampograma();
+    });
+    $('cg-filter-pierna').addEventListener('change', e => {
+      _filters.pierna = e.target.value; renderCampograma();
+    });
+    $('cg-filter-etapa').addEventListener('change', e => {
+      _filters.etapa = e.target.value; renderCampograma();
+    });
+    $('cg-filter-altura').addEventListener('change', e => {
+      _filters.altura = e.target.value; renderCampograma();
+    });
+    $('cg-filter-complexion').addEventListener('change', e => {
+      _filters.complexion = e.target.value; renderCampograma();
+    });
+    $('cg-filter-media-min').addEventListener('input', e => {
+      _filters.mediaMin = parseNumValue(e.target.value); renderCampograma();
+    });
+    $('cg-filter-total-min').addEventListener('input', e => {
+      _filters.totalMin = parseNumValue(e.target.value); renderCampograma();
+    });
 
-    // Year sliders
+    // Year range
     const onYear = () => {
       let a = parseInt($('cg-year-min').value);
       let b = parseInt($('cg-year-max').value);
       if (a > b) [a, b] = [b, a];
       _filters.yearMin = a; _filters.yearMax = b;
-      $('cg-year-min-val').textContent = a;
-      $('cg-year-max-val').textContent = b;
       renderCampograma();
     };
-    $('cg-year-min').addEventListener('input', onYear);
-    $('cg-year-max').addEventListener('input', onYear);
+    $('cg-year-min').addEventListener('change', onYear);
+    $('cg-year-max').addEventListener('change', onYear);
 
     // Checkboxes (Rendimiento, Proyección)
     const bindChecks = (cls, filterKey) => {
@@ -419,8 +497,18 @@
     // Reset
     $('cg-reset-btn').addEventListener('click', () => {
       _filters = emptyFilters();
+      $('cg-filter-search').value = '';
       $('cg-filter-procedencia').value = '';
+      $('cg-filter-equipo').value      = '';
       $('cg-filter-liga').value        = '';
+      $('cg-filter-categoria').value   = '';
+      $('cg-filter-posicion').value    = '';
+      $('cg-filter-pierna').value      = '';
+      $('cg-filter-etapa').value       = '';
+      $('cg-filter-altura').value      = '';
+      $('cg-filter-complexion').value  = '';
+      $('cg-filter-media-min').value   = '';
+      $('cg-filter-total-min').value   = '';
       $('cg-filter-contrato').value    = '';
       document.querySelectorAll('.cg-chk-rend, .cg-chk-proy')
         .forEach(c => c.checked = false);
@@ -429,8 +517,6 @@
       const sl1 = $('cg-year-min'), sl2 = $('cg-year-max');
       if (sl1 && sl2) {
         sl1.value = sl1.min; sl2.value = sl2.max;
-        $('cg-year-min-val').textContent = sl1.min;
-        $('cg-year-max-val').textContent = sl2.max;
         _filters.yearMin = parseInt(sl1.min) || 0;
         _filters.yearMax = parseInt(sl2.max) || 9999;
       }
