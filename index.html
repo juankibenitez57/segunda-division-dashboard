@@ -53,6 +53,7 @@
     <li><a href="#" class="nav-link" data-tab="tab-entrenadores"><span class="nav-icon">👔</span><span class="nav-text">Entrenadores</span></a></li>
     <li><a href="#" class="nav-link" data-tab="tab-pos-dev"><span class="nav-icon">📐</span><span class="nav-text">Desarrollo Posición</span></a></li>
     <li><a href="#" class="nav-link" data-tab="tab-bbdd"><span class="nav-icon">🗄️</span><span class="nav-text">Base de Datos</span></a></li>
+    <li><a href="#" class="nav-link" data-tab="tab-campograma"><span class="nav-icon">⚽</span><span class="nav-text">Campograma RBB</span></a></li>
   </ul>
 </nav>
 
@@ -815,6 +816,147 @@
     </div>
   </div>
 
+  <!-- ===================== TAB: CAMPOGRAMA RBB ===================== -->
+  <div id="tab-campograma" class="tab-content">
+    <div class="section-header">
+      <h2 class="section-title">⚽ Campograma RBB</h2>
+      <p class="section-subtitle">
+        Vista táctica del radar de seguimiento — datos en tiempo real desde Base de Datos
+        &nbsp;|&nbsp;
+        <span id="cg-last-update" style="color:var(--primary);font-weight:600">Pendiente de carga</span>
+        &nbsp;
+        <span id="cg-loading" style="display:none;color:var(--accent);font-weight:700;animation:spin .8s linear infinite">⟳</span>
+        &nbsp;|&nbsp;
+        <span id="cg-total-count" style="color:var(--text-muted)"></span>
+      </p>
+    </div>
+
+    <!-- Error state -->
+    <div id="cg-error" style="display:none;flex-direction:column;align-items:center;gap:16px;padding:40px;text-align:center">
+      <div style="font-size:2.5rem">⚠️</div>
+      <p id="cg-error-msg" style="color:var(--danger);font-weight:600;max-width:500px"></p>
+      <p style="color:var(--text-muted);font-size:0.82rem;max-width:500px">
+        Si el archivo de SharePoint pide autenticación, asegúrate de estar logueado en tu cuenta de Microsoft en este navegador, o ajusta los permisos del archivo para que sea accesible desde el enlace.
+      </p>
+      <button id="cg-retry-btn" class="btn-primary">🔄 Reintentar</button>
+    </div>
+
+    <!-- Main layout: filters + campo -->
+    <div id="campo-container" class="cg-layout">
+
+      <!-- ── Filtros ──────────────────────────────────────────── -->
+      <div id="cg-filters" class="cg-filters-panel">
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Procedencia</label>
+          <select id="cg-filter-procedencia" class="select-styled" style="width:100%">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Liga</label>
+          <select id="cg-filter-liga" class="select-styled" style="width:100%">
+            <option value="">Todas</option>
+          </select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Año nacimiento</label>
+          <div class="cg-slider-row">
+            <span id="cg-year-min-val">—</span>
+            <input type="range" id="cg-year-min" class="cg-slider" min="1990" max="2010" value="1990">
+          </div>
+          <div class="cg-slider-row">
+            <span id="cg-year-max-val">—</span>
+            <input type="range" id="cg-year-max" class="cg-slider" min="1990" max="2010" value="2010">
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Rendimiento</label>
+          <div class="cg-checks">
+            <label><input type="checkbox" class="cg-chk-rend" value="A"> A</label>
+            <label><input type="checkbox" class="cg-chk-rend" value="B"> B</label>
+            <label><input type="checkbox" class="cg-chk-rend" value="C"> C</label>
+            <label><input type="checkbox" class="cg-chk-rend" value="D"> D</label>
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Proyección</label>
+          <div class="cg-checks">
+            <label><input type="checkbox" class="cg-chk-proy" value="A"> A</label>
+            <label><input type="checkbox" class="cg-chk-proy" value="B"> B</label>
+            <label><input type="checkbox" class="cg-chk-proy" value="C"> C</label>
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Ojeador</label>
+          <div class="cg-toggle-group">
+            <button class="cg-btn-ojeador" data-val="Á. Oñate">Á. Oñate</button>
+            <button class="cg-btn-ojeador" data-val="J.L. Tijerín">J.L. Tijerín</button>
+            <button class="cg-btn-ojeador" data-val="J. Román">J. Román</button>
+            <button class="cg-btn-ojeador" data-val="Javi G">Javi G</button>
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Contexto</label>
+          <div class="cg-toggle-group">
+            <button class="cg-btn-contexto" data-val="Betis Deportivo">Betis Dep.</button>
+            <button class="cg-btn-contexto" data-val="Real Betis C">RB Betis C</button>
+            <button class="cg-btn-contexto" data-val="Betis Juvenil DH">Juvenil DH</button>
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Fin contrato antes de</label>
+          <input type="date" id="cg-filter-contrato" class="select-styled" style="width:100%">
+        </div>
+
+        <button id="cg-reset-btn" class="btn-primary" style="width:100%;margin-top:8px">
+          🗑️ Limpiar filtros
+        </button>
+      </div>
+
+      <!-- ── Campo ──────────────────────────────────────────────── -->
+      <div class="cg-campo-scroll">
+        <div class="cg-pitch">
+
+          <!-- Línea de fondo de ataque -->
+          <div class="cg-pitch-row">
+            <div id="cg-zone-EI"  class="cg-zone"></div>
+            <div id="cg-zone-DC"  class="cg-zone"></div>
+            <div id="cg-zone-ED"  class="cg-zone"></div>
+          </div>
+
+          <!-- Línea media-alta -->
+          <div class="cg-pitch-row">
+            <div id="cg-zone-LI"  class="cg-zone"></div>
+            <div id="cg-zone-MP"  class="cg-zone"></div>
+            <div id="cg-zone-LD"  class="cg-zone"></div>
+          </div>
+
+          <!-- Línea defensiva -->
+          <div class="cg-pitch-row">
+            <div id="cg-zone-CTI" class="cg-zone"></div>
+            <div id="cg-zone-MC"  class="cg-zone"></div>
+            <div id="cg-zone-CTD" class="cg-zone"></div>
+          </div>
+
+          <!-- Portería -->
+          <div class="cg-gk-row">
+            <div class="cg-gk-label">⬛ PORTERÍA</div>
+          </div>
+
+        </div><!-- .cg-pitch -->
+      </div><!-- .cg-campo-scroll -->
+
+    </div><!-- .cg-layout / #campo-container -->
+  </div><!-- #tab-campograma -->
+
 </div><!-- end main-content -->
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -825,5 +967,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
 <script src="script.js?v=36"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="campograma.js?v=1"></script>
 </body>
 </html>

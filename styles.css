@@ -1480,3 +1480,248 @@ table.dataTable thead .sorting_desc {
   color: var(--text-muted);
 }
 .dev-notice:empty { display: none; }
+
+/* ════════════════════════════════════════════════════════════
+   CAMPOGRAMA RBB
+   ════════════════════════════════════════════════════════════ */
+
+/* Layout: filtros | campo */
+.cg-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  min-height: 0;
+}
+
+/* ── Panel de filtros ───────────────────────────────────────── */
+.cg-filters-panel {
+  flex-shrink: 0;
+  width: 190px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+}
+
+.cg-filter-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.cg-filter-group { display: flex; flex-direction: column; }
+
+.cg-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.cg-slider {
+  flex: 1;
+  accent-color: var(--primary);
+  height: 4px;
+}
+
+.cg-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.cg-checks label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cg-checks input[type=checkbox] {
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.cg-toggle-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.cg-btn-ojeador,
+.cg-btn-contexto {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border-strong);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  white-space: nowrap;
+}
+
+.cg-btn-ojeador:hover,
+.cg-btn-contexto:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.cg-btn-ojeador.cg-btn-active,
+.cg-btn-contexto.cg-btn-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* ── Campo de fútbol ────────────────────────────────────────── */
+.cg-campo-scroll {
+  flex: 1;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cg-pitch {
+  min-width: 720px;
+  background: #2d7a3a;
+  background-image:
+    /* Franjas verticales de hierba */
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.04) 0px,
+      rgba(0,0,0,0.04) 60px,
+      transparent 60px,
+      transparent 120px
+    );
+  border: 3px solid rgba(255,255,255,0.55);
+  border-radius: 8px;
+  padding: 12px 10px 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Línea central */
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08);
+}
+
+/* Línea central horizontal */
+.cg-pitch::after {
+  content: '';
+  position: absolute;
+  left: 8%; right: 8%;
+  top: 50%;
+  border-top: 2px dashed rgba(255,255,255,0.25);
+  pointer-events: none;
+}
+
+.cg-pitch-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+/* ── Zona individual ────────────────────────────────────────── */
+.cg-zone {
+  min-width: 0;
+}
+
+/* ── Tabla por zona ─────────────────────────────────────────── */
+.cg-table {
+  background: rgba(255,255,255,0.96);
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 0.72rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.cg-table-hdr {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 5px 8px;
+  white-space: nowrap;
+}
+
+.cg-thead {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px 1fr;
+  gap: 0;
+  background: #f0f0f0;
+  padding: 3px 6px;
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #666;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.cg-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px 1fr;
+  gap: 0;
+  padding: 3px 6px;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+  color: #1a2332;
+  line-height: 1.3;
+}
+
+.cg-row:last-child { border-bottom: none; }
+
+.cg-row:hover { background: #f8fff4; }
+
+/* Column widths */
+.cgc-nota   { font-weight: 700; font-size: 0.75rem; text-align: center; }
+.cgc-nombre { font-size: 0.71rem; overflow: hidden; white-space: nowrap; padding: 0 4px; }
+.cgc-anio   { font-size: 0.68rem; color: #666; text-align: center; }
+.cgc-equipo { font-size: 0.67rem; color: #555; overflow: hidden; white-space: nowrap; padding-left: 4px; }
+
+.cg-empty {
+  text-align: center;
+  padding: 12px;
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+/* ── Portería ────────────────────────────────────────────────── */
+.cg-gk-row {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 12px;
+}
+
+.cg-gk-label {
+  background: rgba(0,0,0,0.35);
+  border: 2px solid rgba(255,255,255,0.5);
+  border-radius: 6px;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 6px 32px;
+}
+
+/* ── Responsive: en móvil el campo hace scroll ───────────────── */
+@media (max-width: 900px) {
+  .cg-layout { flex-direction: column; }
+  .cg-filters-panel { width: 100%; max-height: none; flex-direction: row; flex-wrap: wrap; }
+  .cg-filter-group  { min-width: 140px; flex: 1; }
+}
