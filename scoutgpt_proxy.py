@@ -626,6 +626,56 @@ def player_profile(pid: str):
     return jsonify(profile)
 
 
+# ── Excel proxy — Base de Datos RBB ───────────────────────────────────────────
+
+_EXCEL_URL = (
+    "https://rbetis-my.sharepoint.com/:x:/g/personal/fjgalan_realbetisbalompie_es/"
+    "IQCCefupX_z4SqroSjwOYLsRAT7gpWpcY15eSwSIo7g28to?e=pBDVTy&download=1"
+)
+_excel_cache: dict = {"data": None, "ts": 0.0}
+_EXCEL_TTL = 30 * 60  # 30 min
+
+
+@app.route("/excel-bbdd")
+def excel_bbdd():
+    """
+    Descarga el Excel de la Base de Datos RBB desde SharePoint y lo sirve
+    al dashboard con cabeceras CORS para evitar bloqueos del navegador.
+    El archivo se cachea 30 minutos en memoria para no sobrecargar SharePoint.
+    """
+    import time as _time
+    now = _time.time()
+
+    if _excel_cache["data"] and now - _excel_cache["ts"] < _EXCEL_TTL:
+        logger.info("Excel — sirviendo desde caché")
+        data = _excel_cache["data"]
+    else:
+        logger.info("Excel — descargando desde SharePoint…")
+        try:
+            resp = requests.get(_EXCEL_URL, timeout=30, headers={
+                "User-Agent": "Mozilla/5.0 (compatible; BetisScout/1.0)",
+            })
+            resp.raise_for_status()
+            data = resp.content
+            _excel_cache["data"] = data
+            _excel_cache["ts"]   = now
+            logger.info("Excel — descargado OK (%d bytes)", len(data))
+        except Exception as e:
+            logger.error("Excel — error descargando: %s", e)
+            return jsonify({"error": str(e)}), 503
+
+    from flask import Response
+    return Response(
+        data,
+        status=200,
+        headers={
+            "Content-Type":        "application/vnd.ms-excel.sheet.macroEnabled.12",
+            "Content-Disposition": "inline; filename=bbdd_rbb.xlsm",
+            "Cache-Control":       "public, max-age=1800",
+        },
+    )
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":

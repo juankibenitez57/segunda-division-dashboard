@@ -6,9 +6,9 @@
   'use strict';
 
   // ── Config ────────────────────────────────────────────────────────────────────
-  const EXCEL_URL =
-    'https://rbetis-my.sharepoint.com/:x:/g/personal/fjgalan_realbetisbalompie_es/' +
-    'IQCCefupX_z4SqroSjwOYLsRAT7gpWpcY15eSwSIo7g28to?e=pBDVTy&download=1';
+  // El Excel se descarga a través del proxy de Render para evitar bloqueos CORS.
+  // El proxy cachea el archivo 30 min y lo sirve con los headers correctos.
+  const EXCEL_URL  = 'https://segunda-division-dashboard.onrender.com/excel-bbdd';
   const REFRESH_MS = 30 * 60 * 1000;
   const TOP_N = 8;
 
@@ -94,7 +94,7 @@
       if (typeof XLSX === 'undefined')
         throw new Error('SheetJS no está cargado. Recarga la página.');
 
-      const resp = await fetch(EXCEL_URL, { credentials: 'include' });
+      const resp = await fetch(EXCEL_URL);
       if (!resp.ok)
         throw new Error(`Error HTTP ${resp.status} al descargar el Excel de SharePoint`);
 
