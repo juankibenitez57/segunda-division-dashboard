@@ -2750,11 +2750,12 @@ function renderScoutGPTTab() {
 
     let html;
     const qn = norm(q);
-    if (isCampogramaQuery(qn) || isDecisionModelQuery(qn) || isLocalStatsQuery(qn) || isOperationModelQualityQuery(qn) || isModelBenchmarkQuery(qn) || isRbbDatabaseQuery(qn)) {
+    if (isCampogramaQuery(qn) || isSegundaSourceQuery(qn) || isScoutSourceClarificationQuery(qn) || isDecisionModelQuery(qn) || isLocalStatsQuery(qn) || isOperationModelQualityQuery(qn) || isModelBenchmarkQuery(qn) || isRbbDatabaseQuery(qn)) {
       await new Promise(resolve => loadLoanModelData(resolve));
       await new Promise(resolve => loadDecisionModelData(resolve));
       await new Promise(resolve => loadOperationModelReport(resolve));
       await new Promise(resolve => loadOperationBenchmarkReport(resolve));
+      await new Promise(resolve => loadOperationContext(resolve));
       await new Promise(resolve => loadMasterData(resolve));
       await new Promise(resolve => loadRbbDatabaseData(resolve));
       html = processScoutQuery(q);
@@ -3083,12 +3084,49 @@ function isCampogramaQuery(q) {
   return /\bcampograma\b|base rbb|base de datos rbb|base del campograma/.test(q);
 }
 
+function isSegundaSourceQuery(q) {
+  return /\bsegunda\b|segunda division|segunda divisi[oó]n|laliga hypermotion|mercado|fichajes?|traspasos?|operaciones?|wyscout|sub.?23|revalorizaci[oó]n|cesiones?|entrenadores?|desarrollo/.test(q);
+}
+
+function isRbbContractQuery(q) {
+  return /contrato|termina|terminan|acaba|acaban|finaliza|finalizan|vence|vencen|antes de/.test(q);
+}
+
+function isScoutSourceClarificationQuery(q) {
+  if (isCampogramaQuery(q) || isSegundaSourceQuery(q)) return false;
+  if (isRbbContractQuery(q)) return false;
+  const hasPosition = /(laterales?|extremos?|centrales?|mediocentros?|centrocampistas?|mediapuntas?|delanteros?|porteros?)/.test(q);
+  const hasRatingIntent = /(mejor|mejores|top|ranking|mayor|mayores|ordenad|valoracion|valoraci[oó]n|media|nota|total)/.test(q);
+  const hasGenericPlayersRanking = /(mejores?|top|ranking).{0,30}jugadores?|jugadores?.{0,30}(mejores?|top|ranking)/.test(q);
+  return (hasPosition && hasRatingIntent) || hasGenericPlayersRanking;
+}
+
 function isRbbDatabaseQuery(q) {
   if (isCampogramaQuery(q)) return true;
+  if (isSegundaSourceQuery(q) || isScoutSourceClarificationQuery(q)) return false;
   const hasRbbMetric = /(valoracion|valoraci[oó]n|media|nota|total|contrato|termina|terminan|acaba|acaban|finaliza|finalizan|vence|vencen|antes de)/.test(q);
   const hasRbbPosition = /(laterales?|extremos?|centrales?|mediocentros?|centrocampistas?|mediapuntas?|delanteros?|porteros?)/.test(q);
   const hasRankingIntent = /(mejor|mejores|top|ranking|mayor|mayores|ordenad|valoracion|valoraci[oó]n|media|nota)/.test(q);
-  return (hasRbbPosition && (hasRbbMetric || hasRankingIntent)) || (hasRbbMetric && hasRankingIntent);
+  return isRbbContractQuery(q) && (hasRbbPosition || hasRankingIntent || /jugadores?/.test(q) || hasRbbMetric);
+}
+
+function sgptSourceClarification(raw) {
+  const clean = String(raw || '').replace(/[¿?]/g, '').trim();
+  return `<strong>¿Quieres que busque en Segunda o en el campograma?</strong><br>
+    <span class="muted">La pregunta puede encajar en más de una base y prefiero no mezclar fuentes.</span><br><br>
+    <table><thead><tr><th>Fuente</th><th>Úsala para</th><th>Ejemplo</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="bold">Segunda</td>
+        <td>Operaciones, mercado, Wyscout, minutos, goles, xG, Sub23, clubes y entrenadores.</td>
+        <td>Segunda: ${clean || 'mejores laterales derechos por minutos'}</td>
+      </tr>
+      <tr>
+        <td class="bold">Campograma</td>
+        <td>Base RBB, valoración, media, nota, rendimiento, proyección y contratos.</td>
+        <td>Campograma: ${clean || 'laterales derechos con mejor valoración'}</td>
+      </tr>
+    </tbody></table>`;
 }
 
 function detectRbbPosition(raw) {
@@ -3264,6 +3302,7 @@ function processScoutQuery(raw) {
 
   // --- Routing ---
 
+  if (isScoutSourceClarificationQuery(q)) return sgptSourceClarification(raw);
   if (isModelBenchmarkQuery(q)) return sgptOperationBenchmarkReport();
   if (isOperationModelQualityQuery(q)) return sgptOperationModelReport();
   if (isRbbDatabaseQuery(q)) return sgptRbbDatabaseRanking(raw, topLimit);
