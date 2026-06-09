@@ -821,7 +821,7 @@
     <div class="section-header">
       <h2 class="section-title">⚽ Campograma RBB</h2>
       <p class="section-subtitle">
-        Vista táctica del radar de seguimiento — datos en tiempo real desde Base de Datos
+        Vista táctica del radar de seguimiento — datos desde Base de Datos 25-26 RBB
         &nbsp;|&nbsp;
         <span id="cg-last-update" style="color:var(--primary);font-weight:600">Pendiente de carga</span>
         &nbsp;
@@ -836,7 +836,7 @@
       <div style="font-size:2.5rem">⚠️</div>
       <p id="cg-error-msg" style="color:var(--danger);font-weight:600;max-width:500px"></p>
       <p style="color:var(--text-muted);font-size:0.82rem;max-width:500px">
-        Si el archivo de SharePoint pide autenticación, asegúrate de estar logueado en tu cuenta de Microsoft en este navegador, o ajusta los permisos del archivo para que sea accesible desde el enlace.
+        Revisa que exista data/final/Base de Datos 25-26 RBB.csv y que mantenga separador por punto y coma.
       </p>
       <button id="cg-retry-btn" class="btn-primary">🔄 Reintentar</button>
     </div>
@@ -895,10 +895,10 @@
         <div class="cg-filter-group">
           <label class="cg-filter-label">Ojeador</label>
           <div class="cg-toggle-group">
-            <button class="cg-btn-ojeador" data-val="Á. Oñate">Á. Oñate</button>
+            <button class="cg-btn-ojeador" data-val="A. Oñate">A. Oñate</button>
             <button class="cg-btn-ojeador" data-val="J.L. Tijerín">J.L. Tijerín</button>
             <button class="cg-btn-ojeador" data-val="J. Román">J. Román</button>
-            <button class="cg-btn-ojeador" data-val="Javi G">Javi G</button>
+            <button class="cg-btn-ojeador" data-val="Javi Galán">Javi Galán</button>
           </div>
         </div>
 
@@ -948,7 +948,7 @@
 
           <!-- Portería -->
           <div class="cg-gk-row">
-            <div class="cg-gk-label">⬛ PORTERÍA</div>
+            <div id="cg-zone-GK" class="cg-zone cg-zone-gk"></div>
           </div>
 
         </div><!-- .cg-pitch -->
@@ -966,8 +966,7 @@
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="script.js?v=36"></script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="campograma.js?v=1"></script>
+<script src="script.js?v=37"></script>
+<script src="campograma.js?v=2"></script>
 </body>
 </html>

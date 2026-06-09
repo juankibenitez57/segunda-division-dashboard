@@ -1708,6 +1708,10 @@ table.dataTable thead .sorting_desc {
   padding: 10px 0 12px;
 }
 
+.cg-zone-gk {
+  width: min(360px, 100%);
+}
+
 .cg-gk-label {
   background: rgba(0,0,0,0.35);
   border: 2px solid rgba(255,255,255,0.5);

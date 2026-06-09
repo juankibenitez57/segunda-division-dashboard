@@ -1,14 +1,12 @@
 /* campograma.js — Campograma RBB
-   Lee jugadores desde Excel OneDrive/SharePoint, los muestra en un campo táctico.
+   Lee jugadores desde Base de Datos 25-26 RBB.csv y los muestra en un campo táctico.
    Se inicializa la primera vez que se hace clic en la pestaña. */
 
 (function () {
   'use strict';
 
   // ── Config ────────────────────────────────────────────────────────────────────
-  // El Excel se descarga a través del proxy de Render para evitar bloqueos CORS.
-  // El proxy cachea el archivo 30 min y lo sirve con los headers correctos.
-  const EXCEL_URL  = 'https://segunda-division-dashboard.onrender.com/excel-bbdd';
+  const CSV_FILE = 'Base de Datos 25-26 RBB.csv';
   const REFRESH_MS = 30 * 60 * 1000;
   const TOP_N = 8;
 
@@ -43,8 +41,10 @@
   const ZONE_RULES = [
     ['EI',  ['extremo izquierdo', 'extremo izq', 'ei ', ' xi ', 'ala izquierda', 'ala izq', 'carrilero izq']],
     ['ED',  ['extremo derecho', 'extremo der', 'extremo dcho', ' ed ', ' xd ', 'ala derecha', 'ala der', 'carrilero der']],
+    ['EXT', [' extremo ']],
     ['LI',  ['lateral izquierdo', 'lateral izq', ' li ', 'carrilero izquierdo']],
     ['LD',  ['lateral derecho', 'lateral der', 'lateral dcho', ' ld ', 'carrilero derecho']],
+    ['LAT', [' lateral ']],
     ['DC',  ['delantero centro', 'delantero', ' dc ', 'punta', 'ariete', 'centro delantero', '9 ']],
     ['MP',  ['mediapunta', 'media punta', ' mp ', ' mco', 'segunda punta', 'enganche', 'ofensivo', 'trequartista']],
     ['MC',  ['mediocentro', 'centrocampista', ' mc ', 'pivote', ' mcd', 'interior', 'volante', ' cc ']],
@@ -73,6 +73,7 @@
     ['CTI', 'Centrales IZQ',  'left'],
     ['MC',  'Mediocentros',   'center'],
     ['CTD', 'Centrales DRCH', 'right'],
+    ['GK',  'Porteros',       'center'],
   ];
 
   const HDR_COLOR = { left: '#e67e22', center: '#c0392b', right: '#2980b9' };
@@ -91,19 +92,38 @@
     setLoading(true);
     hideError();
     try {
-      if (typeof XLSX === 'undefined')
-        throw new Error('SheetJS no está cargado. Recarga la página.');
+      if (typeof Papa === 'undefined')
+        throw new Error('PapaParse no está cargado. Recarga la página.');
 
-      const resp = await fetch(EXCEL_URL);
+      const csvPath = typeof dataPath === 'function'
+        ? dataPath(CSV_FILE)
+        : `data/final/${CSV_FILE}`;
+      const resp = await fetch(csvPath);
       if (!resp.ok)
-        throw new Error(`Error HTTP ${resp.status} al descargar el Excel de SharePoint`);
+        throw new Error(`Error HTTP ${resp.status} al cargar ${CSV_FILE}`);
 
       const buf = await resp.arrayBuffer();
-      const wb  = XLSX.read(buf, { type: 'array', cellDates: true });
-      const ws  = wb.Sheets['JUGADORES'];
-      if (!ws) throw new Error('No se encontró la hoja "JUGADORES" en el archivo');
+      let csv;
+      try {
+        csv = new TextDecoder('utf-8', { fatal: true }).decode(buf);
+      } catch (_) {
+        csv = new TextDecoder('windows-1252').decode(buf);
+      }
+      const parsed = Papa.parse(csv, {
+        header: true,
+        delimiter: ';',
+        skipEmptyLines: 'greedy',
+        transformHeader: h => String(h || '').trim(),
+      });
+      if (parsed.errors.length && !parsed.data.length) {
+        const first = parsed.errors[0];
+        throw new Error(`No se pudo leer bien el CSV: ${first.message || 'formato no válido'}`);
+      }
+      if (parsed.errors.length) console.warn('Campograma CSV warnings', parsed.errors.slice(0, 5));
 
-      _all = XLSX.utils.sheet_to_json(ws, { defval: '' });
+      _all = parsed.data
+        .map(normalizePlayerRow)
+        .filter(p => col(p, 'Nombre') && col(p, 'Posición', 'Posicion', 'Pos'));
       populateFilters();
       renderCampograma();
       $('cg-last-update').textContent =
@@ -125,6 +145,29 @@
     return '';
   }
 
+  function normalizePlayerRow(row) {
+    const clean = {};
+    for (const [k, v] of Object.entries(row || {})) {
+      const key = String(k || '').replace(/\s+/g, ' ').trim();
+      if (!key || key.startsWith('Unnamed')) continue;
+      clean[key] = v == null ? '' : v;
+    }
+    if (row['Pierna\nDominante'] && !clean['Pierna Dominante']) {
+      clean['Pierna Dominante'] = row['Pierna\nDominante'];
+    }
+    return clean;
+  }
+
+  function parseDate(value) {
+    if (!value) return null;
+    if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+    const s = String(value).trim();
+    const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
   function applyFilters() {
     const f = _filters;
     return _all.filter(p => {
@@ -140,10 +183,10 @@
       if (f.contexto.size    && !f.contexto.has(col(p, 'Contexto')))   return false;
 
       if (f.finContrato) {
-        const fc = col(p, 'fin_contrato', 'Fin Contrato', 'Fin contrato', 'FinContrato');
+        const fc = col(p, 'CONTRATOS', 'fin_contrato', 'Fin Contrato', 'Fin contrato', 'FinContrato');
         if (fc) {
-          const d = fc instanceof Date ? fc : new Date(fc);
-          if (!isNaN(d.getTime()) && d > f.finContrato) return false;
+          const d = parseDate(fc);
+          if (d && d > f.finContrato) return false;
         }
       }
       return true;
@@ -162,11 +205,17 @@
     const zones = {};
     for (const p of filtered) {
       let zone = classifyPos(col(p, 'Posición', 'Posicion', 'Pos'));
-      if (!zone || zone === 'GK') continue;
+      if (!zone) continue;
       if (zone === 'CT') {
         // Generic central → appears in both left and right central columns
         (zones.CTI = zones.CTI || []).push(p);
         (zones.CTD = zones.CTD || []).push(p);
+      } else if (zone === 'EXT') {
+        (zones.EI = zones.EI || []).push(p);
+        (zones.ED = zones.ED || []).push(p);
+      } else if (zone === 'LAT') {
+        (zones.LI = zones.LI || []).push(p);
+        (zones.LD = zones.LD || []).push(p);
       } else {
         (zones[zone] = zones[zone] || []).push(p);
       }
@@ -216,6 +265,8 @@
           const nombre = col(p, 'Nombre');
           const equipo = col(p, 'Equipo');
           const yr     = col(p, 'Año', 'Ano') || '—';
+          const rend   = col(p, 'Rendimiento') || '—';
+          const proy   = col(p, 'Proyección', 'Proyeccion') || '—';
 
           const disp  = apodo.length  > 16 ? apodo.slice(0,15)  + '…' : apodo;
           const eDisp = equipo.length > 14 ? equipo.slice(0,13) + '…' : equipo;
@@ -223,7 +274,7 @@
           const row = mk('div', 'cg-row');
           row.innerHTML = `
             <span class="cgc-nota" style="color:${color}">${mStr}</span>
-            <span class="cgc-nombre" title="${nombre.replace(/"/g,'&quot;')}"><b>${disp}</b></span>
+            <span class="cgc-nombre" title="${nombre.replace(/"/g,'&quot;')} · Rend. ${rend} · Proy. ${proy}"><b>${disp}</b></span>
             <span class="cgc-anio">${yr}</span>
             <span class="cgc-equipo" title="${equipo.replace(/"/g,'&quot;')}">${eDisp}</span>`;
           wrap.appendChild(row);
@@ -299,11 +350,13 @@
     const err = $('cg-error');
     if (err) err.style.display = 'none';
     const c = $('campo-container');
-    if (c) c.style.display = 'block';
+    if (c) c.style.display = 'flex';
   }
 
   // ── Events ────────────────────────────────────────────────────────────────────
   function bindEvents() {
+    if ($('cg-filter-procedencia')?.dataset.bound === '1') return;
+    $('cg-filter-procedencia').dataset.bound = '1';
     // Selects
     $('cg-filter-procedencia').addEventListener('change', e => {
       _filters.procedencia = e.target.value; renderCampograma();
@@ -401,6 +454,8 @@
     loadData();
     startAutoRefresh();
   }
+
+  window.initCampograma = init;
 
   // Hook into the dashboard tab click
   document.addEventListener('DOMContentLoaded', () => {

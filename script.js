@@ -540,7 +540,7 @@ function switchTab(tabId) {
 }
 
 function renderCurrentTab() {
-  if (ALL_DATA.length === 0 && currentTab !== 'tab-inicio') return;
+  if (ALL_DATA.length === 0 && currentTab !== 'tab-inicio' && currentTab !== 'tab-campograma') return;
 
   switch (currentTab) {
     case 'tab-inicio':       renderInicioTab(); break;
@@ -558,6 +558,7 @@ function renderCurrentTab() {
     case 'tab-entrenadores': renderEntrenadoresTab(); break;
     case 'tab-pos-dev':      renderPosDevTab(); break;
     case 'tab-bbdd':         if (!chartsRendered['tab-bbdd']) { renderBBDDTab(); chartsRendered['tab-bbdd'] = true; } break;
+    case 'tab-campograma':   if (window.initCampograma) window.initCampograma(); break;
   }
 }
 
