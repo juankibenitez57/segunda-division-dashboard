@@ -1588,6 +1588,7 @@ table.dataTable thead .sorting_desc {
 /* ── Campo de fútbol ────────────────────────────────────────── */
 .cg-campo-scroll {
   flex: 1;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
