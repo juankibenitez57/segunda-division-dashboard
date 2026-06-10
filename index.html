@@ -1069,27 +1069,16 @@
     <!-- KPIs -->
     <div class="oi-kpis" id="oi-kpis"></div>
 
-    <!-- Pitch container -->
-    <div class="oi-wrapper">
-      <!-- Pitch -->
-      <div class="oi-pitch-container">
-        <div class="oi-pitch" id="oi-pitch">
-          <!-- Pitch markings -->
-          <div class="oi-pitch-circle"></div>
-          <div class="oi-pitch-center-line"></div>
-          <div class="oi-pitch-box oi-pitch-box-top"></div>
-          <div class="oi-pitch-box oi-pitch-box-bottom"></div>
-          <div class="oi-pitch-goal oi-pitch-goal-top"></div>
-          <div class="oi-pitch-goal oi-pitch-goal-bottom"></div>
-          <!-- Players injected by JS -->
-          <div id="oi-players-layer" class="oi-players-layer"></div>
-        </div>
-      </div>
-
-      <!-- Sidebar: top players list -->
-      <div class="oi-sidebar">
-        <h3 class="oi-sidebar-title">📋 Ranking por posición</h3>
-        <div id="oi-position-ranking"></div>
+    <!-- Pitch -->
+    <div class="oi-pitch-outer">
+      <div class="oi-pitch" id="oi-pitch">
+        <div class="oi-pitch-circle"></div>
+        <div class="oi-pitch-center-line"></div>
+        <div class="oi-pitch-box oi-pitch-box-top"></div>
+        <div class="oi-pitch-box oi-pitch-box-bottom"></div>
+        <div class="oi-pitch-goal oi-pitch-goal-top"></div>
+        <div class="oi-pitch-goal oi-pitch-goal-bottom"></div>
+        <div id="oi-players-layer" class="oi-players-layer"></div>
       </div>
     </div>
 
@@ -1099,9 +1088,15 @@
       <div id="oi-bench" class="oi-bench-row"></div>
     </div>
 
+    <!-- Ranking por zona -->
+    <div class="chart-card full-width" style="margin-top:16px">
+      <div class="chart-title">📋 Ranking por posición</div>
+      <div id="oi-position-ranking" class="oi-ranking-grid"></div>
+    </div>
+
     <!-- Full roster table -->
-    <div class="chart-card full-width" style="margin-top:24px">
-      <div class="chart-title">📊 Tabla completa — Jugadores seleccionados</div>
+    <div class="chart-card full-width" style="margin-top:16px">
+      <div class="chart-title">📊 Tabla completa</div>
       <div id="oi-table-container" style="overflow-x:auto"></div>
     </div>
   </div><!-- #tab-once-ideal -->
@@ -1115,7 +1110,7 @@
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="script.js?v=43"></script>
+<script src="script.js?v=44"></script>
 <script src="campograma.js?v=3"></script>
 </body>
 </html>

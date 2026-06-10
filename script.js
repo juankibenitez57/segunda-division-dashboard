@@ -5466,115 +5466,137 @@ function _oiZone(pos) {
   return null;
 }
 
-/* --- Formation slot definitions (x/y as % of pitch container) --- */
+/* --- Formation slot definitions (x/y as % of 860×620 landscape pitch) --- */
 const OI_FORMATIONS = {
   '433': [
-    { id:'gk',  label:'PO', zones:['GK'],              x:50, y:87 },
-    { id:'li',  label:'LI', zones:['LI','LAT'],        x:12, y:70 },
-    { id:'cti', label:'CT', zones:['CTI','CT'],        x:33, y:73 },
-    { id:'ctd', label:'CT', zones:['CTD','CT'],        x:67, y:73 },
-    { id:'ld',  label:'LD', zones:['LD','LAT'],        x:88, y:70 },
-    { id:'mc1', label:'MC', zones:['MC','CC'],          x:28, y:50 },
-    { id:'mc2', label:'MC', zones:['MC','CC'],          x:50, y:47 },
-    { id:'mc3', label:'MC', zones:['MC','CC'],          x:72, y:50 },
-    { id:'ei',  label:'EI', zones:['EI','EXT','MP'],    x:14, y:20 },
+    { id:'gk',  label:'PO', zones:['GK'],              x:50, y:85 },
+    { id:'li',  label:'LI', zones:['LI','LAT'],        x:9,  y:65 },
+    { id:'cti', label:'CT', zones:['CTI','CT'],        x:31, y:68 },
+    { id:'ctd', label:'CT', zones:['CTD','CT'],        x:69, y:68 },
+    { id:'ld',  label:'LD', zones:['LD','LAT'],        x:91, y:65 },
+    { id:'mc1', label:'MC', zones:['MC','CC'],          x:27, y:43 },
+    { id:'mc2', label:'MC', zones:['MC','CC'],          x:50, y:39 },
+    { id:'mc3', label:'MC', zones:['MC','CC'],          x:73, y:43 },
+    { id:'ei',  label:'EI', zones:['EI','EXT','MP'],    x:13, y:19 },
     { id:'dc',  label:'DC', zones:['DC'],               x:50, y:14 },
-    { id:'ed',  label:'ED', zones:['ED','EXT','MP'],    x:86, y:20 },
+    { id:'ed',  label:'ED', zones:['ED','EXT','MP'],    x:87, y:19 },
   ],
   '4231': [
-    { id:'gk',  label:'PO',    zones:['GK'],            x:50, y:87 },
-    { id:'li',  label:'LI',    zones:['LI','LAT'],      x:12, y:70 },
-    { id:'cti', label:'CT',    zones:['CTI','CT'],      x:33, y:73 },
-    { id:'ctd', label:'CT',    zones:['CTD','CT'],      x:67, y:73 },
-    { id:'ld',  label:'LD',    zones:['LD','LAT'],      x:88, y:70 },
-    { id:'mc1', label:'MC',    zones:['MC'],             x:33, y:57 },
-    { id:'mc2', label:'MC',    zones:['MC'],             x:67, y:57 },
-    { id:'ei',  label:'EI/MP', zones:['EI','EXT','MP'], x:15, y:34 },
-    { id:'mp',  label:'MP',    zones:['MP','CC'],        x:50, y:31 },
-    { id:'ed',  label:'ED/MP', zones:['ED','EXT','MP'], x:85, y:34 },
-    { id:'dc',  label:'DC',    zones:['DC'],             x:50, y:14 },
+    { id:'gk',  label:'PO',  zones:['GK'],              x:50, y:85 },
+    { id:'li',  label:'LI',  zones:['LI','LAT'],        x:9,  y:65 },
+    { id:'cti', label:'CT',  zones:['CTI','CT'],        x:31, y:68 },
+    { id:'ctd', label:'CT',  zones:['CTD','CT'],        x:69, y:68 },
+    { id:'ld',  label:'LD',  zones:['LD','LAT'],        x:91, y:65 },
+    { id:'mc1', label:'MC',  zones:['MC'],               x:33, y:52 },
+    { id:'mc2', label:'MC',  zones:['MC'],               x:67, y:52 },
+    { id:'ei',  label:'EI',  zones:['EI','EXT','MP'],   x:13, y:31 },
+    { id:'mp',  label:'MP',  zones:['MP','CC'],          x:50, y:27 },
+    { id:'ed',  label:'ED',  zones:['ED','EXT','MP'],   x:87, y:31 },
+    { id:'dc',  label:'DC',  zones:['DC'],               x:50, y:13 },
   ],
   '442': [
-    { id:'gk',  label:'PO', zones:['GK'],               x:50, y:87 },
-    { id:'li',  label:'LI', zones:['LI','LAT'],         x:12, y:70 },
-    { id:'cti', label:'CT', zones:['CTI','CT'],         x:33, y:73 },
-    { id:'ctd', label:'CT', zones:['CTD','CT'],         x:67, y:73 },
-    { id:'ld',  label:'LD', zones:['LD','LAT'],         x:88, y:70 },
-    { id:'ei',  label:'EI', zones:['EI','LAT'],         x:12, y:48 },
-    { id:'mc1', label:'MC', zones:['MC','CC'],           x:37, y:48 },
-    { id:'mc2', label:'MC', zones:['MC','CC'],           x:63, y:48 },
-    { id:'ed',  label:'ED', zones:['ED','LAT'],         x:88, y:48 },
-    { id:'dc1', label:'DC', zones:['DC','EI','MP'],      x:36, y:17 },
-    { id:'dc2', label:'DC', zones:['DC','ED','MP'],      x:64, y:17 },
+    { id:'gk',  label:'PO', zones:['GK'],               x:50, y:85 },
+    { id:'li',  label:'LI', zones:['LI','LAT'],         x:9,  y:65 },
+    { id:'cti', label:'CT', zones:['CTI','CT'],         x:31, y:68 },
+    { id:'ctd', label:'CT', zones:['CTD','CT'],         x:69, y:68 },
+    { id:'ld',  label:'LD', zones:['LD','LAT'],         x:91, y:65 },
+    { id:'ei',  label:'EI', zones:['EI','LAT'],         x:20, y:37 },
+    { id:'mc1', label:'MC', zones:['MC','CC'],           x:40, y:40 },
+    { id:'mc2', label:'MC', zones:['MC','CC'],           x:60, y:40 },
+    { id:'ed',  label:'ED', zones:['ED','LAT'],         x:80, y:37 },
+    { id:'dc1', label:'DC', zones:['DC','MP'],           x:36, y:14 },
+    { id:'dc2', label:'DC', zones:['DC','MP'],           x:64, y:14 },
   ],
   '352': [
-    { id:'gk',  label:'PO',  zones:['GK'],               x:50, y:87 },
-    { id:'cti', label:'CT',  zones:['CTI','CT'],         x:22, y:74 },
-    { id:'ct',  label:'CT',  zones:['CT','CTI','CTD'],   x:50, y:76 },
-    { id:'ctd', label:'CT',  zones:['CTD','CT'],         x:78, y:74 },
-    { id:'car1',label:'CAR', zones:['LI','EI','LAT'],    x:8,  y:52 },
-    { id:'mc1', label:'MC',  zones:['MC','CC'],           x:29, y:50 },
-    { id:'mc2', label:'MC',  zones:['MC','CC'],           x:50, y:48 },
-    { id:'mc3', label:'MC',  zones:['MC','CC'],           x:71, y:50 },
-    { id:'car2',label:'CAR', zones:['LD','ED','LAT'],    x:92, y:52 },
-    { id:'dc1', label:'DC',  zones:['DC','EI','MP'],      x:35, y:17 },
-    { id:'dc2', label:'DC',  zones:['DC','ED','MP'],      x:65, y:17 },
+    { id:'gk',  label:'PO',  zones:['GK'],               x:50, y:85 },
+    { id:'cti', label:'CT',  zones:['CTI','CT'],         x:23, y:70 },
+    { id:'ct',  label:'CT',  zones:['CT','CTI','CTD'],   x:50, y:72 },
+    { id:'ctd', label:'CT',  zones:['CTD','CT'],         x:77, y:70 },
+    { id:'car1',label:'CAR', zones:['LI','EI','LAT'],    x:9,  y:47 },
+    { id:'mc1', label:'MC',  zones:['MC','CC'],           x:30, y:44 },
+    { id:'mc2', label:'MC',  zones:['MC','CC'],           x:50, y:40 },
+    { id:'mc3', label:'MC',  zones:['MC','CC'],           x:70, y:44 },
+    { id:'car2',label:'CAR', zones:['LD','ED','LAT'],    x:91, y:47 },
+    { id:'dc1', label:'DC',  zones:['DC','MP'],           x:36, y:14 },
+    { id:'dc2', label:'DC',  zones:['DC','MP'],           x:64, y:14 },
   ],
   '4141': [
-    { id:'gk',  label:'PO', zones:['GK'],               x:50, y:87 },
-    { id:'li',  label:'LI', zones:['LI','LAT'],         x:12, y:70 },
-    { id:'cti', label:'CT', zones:['CTI','CT'],         x:33, y:73 },
-    { id:'ctd', label:'CT', zones:['CTD','CT'],         x:67, y:73 },
-    { id:'ld',  label:'LD', zones:['LD','LAT'],         x:88, y:70 },
-    { id:'mc',  label:'MC', zones:['MC'],               x:50, y:58 },
-    { id:'ei',  label:'EI', zones:['EI','EXT'],         x:14, y:40 },
-    { id:'cc1', label:'CC', zones:['CC','MC'],           x:37, y:38 },
-    { id:'cc2', label:'CC', zones:['CC','MC'],           x:63, y:38 },
-    { id:'ed',  label:'ED', zones:['ED','EXT'],         x:86, y:40 },
-    { id:'dc',  label:'DC', zones:['DC','MP'],           x:50, y:14 },
+    { id:'gk',  label:'PO', zones:['GK'],               x:50, y:85 },
+    { id:'li',  label:'LI', zones:['LI','LAT'],         x:9,  y:65 },
+    { id:'cti', label:'CT', zones:['CTI','CT'],         x:31, y:68 },
+    { id:'ctd', label:'CT', zones:['CTD','CT'],         x:69, y:68 },
+    { id:'ld',  label:'LD', zones:['LD','LAT'],         x:91, y:65 },
+    { id:'mc',  label:'MC', zones:['MC'],               x:50, y:53 },
+    { id:'ei',  label:'EI', zones:['EI','EXT'],         x:13, y:36 },
+    { id:'cc1', label:'CC', zones:['CC','MC'],           x:36, y:34 },
+    { id:'cc2', label:'CC', zones:['CC','MC'],           x:64, y:34 },
+    { id:'ed',  label:'ED', zones:['ED','EXT'],         x:87, y:36 },
+    { id:'dc',  label:'DC', zones:['DC','MP'],           x:50, y:13 },
   ],
 };
 
-/* Zona → display label */
+/* Zone → display label */
 const OI_ZONE_LABEL = {
   GK:'Portero', LI:'Lat. Izq.', LD:'Lat. Der.', CTI:'Central', CTD:'Central', CT:'Central',
   MC:'Mediocentro', CC:'Centrocampista', EI:'Extremo Izq.', ED:'Extremo Der.', EXT:'Extremo',
   MP:'Mediapunta', DC:'Delantero', LAT:'Lateral',
 };
 
-/* Safe fallback for photo errors */
+/* Zone → card header colour */
+const OI_ZONE_COLORS = {
+  GK:'#2c3e50',
+  LI:'#b03a2e', LD:'#b03a2e', LAT:'#b03a2e',
+  CTI:'#922b21', CTD:'#922b21', CT:'#922b21',
+  MC:'#1a5e35', CC:'#1a5e35', MP:'#1a5e35',
+  EI:'#154360', ED:'#154360', EXT:'#154360', DC:'#154360',
+};
+
+/* Safe fallback for photo errors — replaces <img> with initials avatar */
 window._oiPhotoError = function(el, name) {
   const tmp = document.createElement('div');
-  tmp.innerHTML = playerAvatar(name, 52);
-  el.replaceWith(tmp.firstElementChild || tmp);
+  tmp.innerHTML = playerAvatar(name, 60);
+  const av = tmp.firstElementChild;
+  if (av) {
+    av.style.cssText = 'width:60px;height:60px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0';
+    el.replaceWith(av);
+  }
 };
 
 /* Build a single player card for the pitch */
-function _oiPlayerCard(player, slotLabel, clubMapping) {
+function _oiPlayerCard(player, slotLabel, zone, clubMapping, leagueMapping) {
+  const zoneColor = OI_ZONE_COLORS[zone] || '#2d6a40';
   if (!player) {
-    return `<div class="oi-player-card oi-empty-slot">
-      <div class="oi-player-photo oi-no-player">${slotLabel}</div>
-      <div class="oi-player-name" style="color:rgba(255,255,255,0.4)">—</div>
+    return `<div class="oi-player-card oi-empty" style="--oi-zone-color:${zoneColor}">
+      <div class="oi-card-header"><span class="oi-card-zone">${slotLabel}</span><span class="oi-card-score">—</span></div>
+      <div class="oi-empty-photo">?</div>
+      <div class="oi-card-name" style="color:rgba(255,255,255,0.25)">Sin jugador</div>
+      <div class="oi-card-badges"></div>
     </div>`;
   }
-  const safe = _oiSafe(player.apodo || player.nombre);
+  const safe    = _oiSafe(player.apodo || player.nombre);
   const nameEsc = (player.apodo || player.nombre).replace(/'/g, "\\'");
-  const shortName = (player.apodo || player.nombre.split(' ').slice(0, 2).join(' ')).substring(0, 18);
-  const score = player.mediaJaviG || player.media || 0;
-  const scoreFmt = score > 0 ? score.toFixed(1) : '—';
+  const dispName= (player.apodo || player.nombre.split(' ').slice(0,2).join(' ')).substring(0,17);
+  const score   = player.mediaJaviG || player.media || 0;
+  const scoreFmt= score > 0 ? score.toFixed(1) : '—';
   const shieldSrc = clubMapping[player.equipo] || '';
-  const shieldHtml = shieldSrc
-    ? `<img class="oi-card-shield" src="${shieldSrc}" alt="" onerror="this.style.display='none'">`
-    : '';
-  return `<div class="oi-player-card" title="${player.nombre} · ${player.posicion} · ${player.equipo}">
-    <div class="oi-card-score">${scoreFmt}</div>
-    <div class="oi-player-photo">
-      <img src="assets/players/${safe}.jpg" alt="${nameEsc}" width="52" height="52"
-           style="border-radius:50%;object-fit:cover;object-position:center top;border:2px solid rgba(255,255,255,0.35);background:#1a3928"
-           onerror="_oiPhotoError(this,'${nameEsc}')">
-      ${shieldHtml}
+  const ligaSrc   = leagueMapping[player.liga]  || '';
+  const shield = shieldSrc
+    ? `<img src="${shieldSrc}" class="oi-badge-img" title="${player.equipo}" onerror="this.style.display='none'">`
+    : `<span class="oi-badge-fallback" title="${player.equipo}">C</span>`;
+  const liga = ligaSrc
+    ? `<img src="${ligaSrc}" class="oi-badge-img" title="${player.liga}" onerror="this.style.display='none'">`
+    : `<span class="oi-badge-fallback" title="${player.liga}">L</span>`;
+  return `<div class="oi-player-card" style="--oi-zone-color:${zoneColor}" title="${player.nombre} · ${player.posicion} · ${player.equipo}">
+    <div class="oi-card-header">
+      <span class="oi-card-zone">${slotLabel}</span>
+      <span class="oi-card-score">${scoreFmt}</span>
     </div>
-    <div class="oi-player-name">${shortName}</div>
+    <div class="oi-card-photo-wrap">
+      <img src="assets/players/${safe}.jpg" alt="${nameEsc}" class="oi-card-photo-img"
+           onerror="_oiPhotoError(this,'${nameEsc}')">
+    </div>
+    <div class="oi-card-name">${dispName}</div>
+    <div class="oi-card-badges">${shield}${liga}</div>
   </div>`;
 }
 
@@ -5684,11 +5706,15 @@ async function renderOnceIdeal() {
       <div class="oi-kpi"><div class="oi-kpi-value">${avgScore}</div><div class="oi-kpi-label">Media score</div></div>`;
   }
 
-  /* Load club mapping */
-  let clubMapping = {};
+  /* Load club and league mappings */
+  let clubMapping = {}, leagueMapping = {};
   try {
-    const r = await fetch('assets/config/club_mapping.json');
-    if (r.ok) clubMapping = await r.json();
+    const [rc, rl] = await Promise.all([
+      fetch('assets/config/club_mapping.json'),
+      fetch('assets/config/league_mapping.json'),
+    ]);
+    if (rc.ok) clubMapping   = await rc.json();
+    if (rl.ok) leagueMapping = await rl.json();
   } catch {}
 
   /* Select best 11 */
@@ -5697,12 +5723,9 @@ async function renderOnceIdeal() {
 
   /* --- Render player cards on pitch --- */
   const cards = formation.map(slot => {
-    const player = starters[slot.id];
-    const cardHtml = _oiPlayerCard(player, slot.label, clubMapping);
-    return `<div class="oi-slot" style="left:${slot.x}%;top:${slot.y}%">
-      <div class="oi-slot-label">${slot.label}</div>
-      ${cardHtml}
-    </div>`;
+    const player  = starters[slot.id];
+    const cardHtml = _oiPlayerCard(player, slot.label, slot.zones[0], clubMapping, leagueMapping);
+    return `<div class="oi-slot" style="left:${slot.x}%;top:${slot.y}%">${cardHtml}</div>`;
   }).join('');
   playersLayer.innerHTML = cards;
 
@@ -5712,24 +5735,28 @@ async function renderOnceIdeal() {
       benchEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">No hay suplentes disponibles con los filtros actuales.</p>';
     } else {
       benchEl.innerHTML = bench.map(p => {
-        const safe = _oiSafe(p.apodo || p.nombre);
-        const nameEsc = (p.apodo || p.nombre).replace(/'/g, "\\'");
-        const shortName = (p.apodo || p.nombre.split(' ').slice(0, 2).join(' ')).substring(0, 16);
-        const score = p.mediaJaviG || p.media || 0;
-        const shieldSrc = clubMapping[p.equipo] || '';
+        const safe      = _oiSafe(p.apodo || p.nombre);
+        const nameEsc   = (p.apodo || p.nombre).replace(/'/g, "\\'");
+        const shortName = (p.apodo || p.nombre.split(' ').slice(0,2).join(' ')).substring(0,16);
+        const score     = p.mediaJaviG || p.media || 0;
+        const shieldSrc = clubMapping[p.equipo]   || '';
+        const ligaSrc   = leagueMapping[p.liga]   || '';
         const rendBadge = p.rendimiento
-          ? `<span class="oi-badge rend-${p.rendimiento.toLowerCase()}">${p.rendimiento}</span>` : '';
+          ? `<span class="badge-rend badge-rend-${p.rendimiento.toLowerCase()}">${p.rendimiento}</span>` : '';
         return `<div class="oi-bench-card">
           <div class="oi-bench-photo">
             <img src="assets/players/${safe}.jpg" alt="${nameEsc}" width="46" height="46"
                  style="border-radius:50%;object-fit:cover;object-position:center top;border:2px solid rgba(255,255,255,0.2);background:#1a3928"
                  onerror="_oiPhotoError(this,'${nameEsc}')">
-            ${shieldSrc ? `<img class="oi-bench-shield" src="${shieldSrc}" alt="" onerror="this.style.display='none'">` : ''}
+            ${shieldSrc ? `<img class="oi-bench-shield" src="${shieldSrc}" onerror="this.style.display='none'">` : ''}
           </div>
           <div class="oi-bench-info">
             <div class="oi-bench-name">${shortName}</div>
             <div class="oi-bench-pos">${OI_ZONE_LABEL[p.zona] || p.posicion}</div>
-            <div class="oi-bench-score">${score > 0 ? score.toFixed(1) : '—'} ${rendBadge}</div>
+            <div class="oi-bench-meta">
+              ${score > 0 ? score.toFixed(1) : '—'} ${rendBadge}
+              ${ligaSrc ? `<img src="${ligaSrc}" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;background:rgba(255,255,255,0.9);border-radius:3px;padding:1px" onerror="this.style.display='none'">` : ''}
+            </div>
           </div>
         </div>`;
       }).join('');
