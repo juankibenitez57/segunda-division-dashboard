@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
 
-  <link rel="stylesheet" href="styles.css?v=18">
+  <link rel="stylesheet" href="styles.css?v=20">
 </head>
 <body>
 
@@ -1025,79 +1025,160 @@
   <div id="tab-once-ideal" class="tab-content">
     <div class="section-header">
       <h2 class="section-title">🌟 11 Ideal</h2>
-      <p class="section-subtitle">Los mejores jugadores por posición según el seguimiento del scouting de Betis</p>
+      <p class="section-subtitle">
+        Once ideal con la misma base y filtros del campograma RBB
+        &nbsp;|&nbsp;
+        <span id="oi-last-update" style="color:var(--primary);font-weight:600">Pendiente de carga</span>
+        &nbsp;|&nbsp;
+        <span id="oi-total-count" style="color:var(--text-muted)"></span>
+      </p>
     </div>
 
-    <!-- Filters bar -->
-    <div class="oi-filters-bar">
-      <div class="oi-filter-group">
-        <label class="oi-filter-label">Contexto</label>
-        <select id="oi-contexto" class="select-styled">
-          <option value="" selected>Todos</option>
-          <option value="Betis Deportivo">Betis Deportivo</option>
-          <option value="Betis Juvenil DH">Betis Juvenil DH</option>
-          <option value="Real Betis C">Real Betis C</option>
-        </select>
-      </div>
-      <div class="oi-filter-group">
-        <label class="oi-filter-label">Formación</label>
-        <select id="oi-formacion" class="select-styled">
-          <option value="433">4-3-3</option>
-          <option value="4231" selected>4-2-3-1</option>
-          <option value="442">4-4-2</option>
-          <option value="352">3-5-2</option>
-          <option value="4141">4-1-4-1</option>
-        </select>
-      </div>
-      <div class="oi-filter-group">
-        <label class="oi-filter-label">Rendimiento mín.</label>
-        <select id="oi-rendimiento" class="select-styled">
-          <option value="" selected>Todos</option>
-          <option value="A">A (Excelente)</option>
-          <option value="AB">A + B</option>
-        </select>
-      </div>
-      <div class="oi-filter-group">
-        <label class="oi-filter-label">Procedencia</label>
-        <select id="oi-procedencia" class="select-styled">
-          <option value="">Todas</option>
-        </select>
-      </div>
-      <button id="oi-refresh-btn" class="btn-primary" onclick="renderOnceIdeal()">⚽ Actualizar 11</button>
+    <div id="oi-error" style="display:none;flex-direction:column;align-items:center;gap:16px;padding:40px;text-align:center">
+      <div style="font-size:2.5rem">⚠️</div>
+      <p id="oi-error-msg" style="color:var(--danger);font-weight:600;max-width:500px"></p>
+      <button id="oi-retry-btn" class="btn-primary">🔄 Reintentar</button>
     </div>
 
-    <!-- KPIs -->
-    <div class="oi-kpis" id="oi-kpis"></div>
+    <div id="once-container" class="cg-layout oi-cg-layout">
+      <div id="oi-filters" class="cg-filters-panel">
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Buscar</label>
+          <input type="search" id="oi-filter-search" class="select-styled" placeholder="Jugador, equipo..." style="width:100%">
+        </div>
 
-    <!-- Pitch -->
-    <div class="oi-pitch-outer">
-      <div class="oi-pitch" id="oi-pitch">
-        <div class="oi-pitch-circle"></div>
-        <div class="oi-pitch-center-line"></div>
-        <div class="oi-pitch-box oi-pitch-box-left"></div>
-        <div class="oi-pitch-box oi-pitch-box-right"></div>
-        <div class="oi-pitch-goal oi-pitch-goal-left"></div>
-        <div class="oi-pitch-goal oi-pitch-goal-right"></div>
-        <div id="oi-players-layer" class="oi-players-layer"></div>
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Formación</label>
+          <select id="oi-formacion" class="select-styled" style="width:100%">
+            <option value="433">4-3-3</option>
+            <option value="4231" selected>4-2-3-1</option>
+            <option value="442">4-4-2</option>
+            <option value="352">3-5-2</option>
+            <option value="4141">4-1-4-1</option>
+          </select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Procedencia</label>
+          <select id="oi-filter-procedencia" class="select-styled" style="width:100%"><option value="">Todas</option></select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Equipo</label>
+          <select id="oi-filter-equipo" class="select-styled" style="width:100%"><option value="">Todos</option></select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Liga</label>
+          <select id="oi-filter-liga" class="select-styled" style="width:100%"><option value="">Todas</option></select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Categoría</label>
+          <select id="oi-filter-categoria" class="select-styled" style="width:100%"><option value="">Todas</option></select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Posición</label>
+          <select id="oi-filter-posicion" class="select-styled" style="width:100%"><option value="">Todas</option></select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Pierna dominante</label>
+          <select id="oi-filter-pierna" class="select-styled" style="width:100%"><option value="">Todas</option></select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Etapa</label>
+          <select id="oi-filter-etapa" class="select-styled" style="width:100%"><option value="">Todas</option></select>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Año nacimiento</label>
+          <div class="cg-two-cols">
+            <input type="number" id="oi-year-min" class="select-styled" min="1990" max="2012" value="1990" aria-label="Año mínimo">
+            <input type="number" id="oi-year-max" class="select-styled" min="1990" max="2012" value="2012" aria-label="Año máximo">
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Mínimos</label>
+          <div class="cg-two-cols">
+            <input type="number" id="oi-filter-media-min" class="select-styled" min="0" max="10" step="0.1" placeholder="Media">
+            <input type="number" id="oi-filter-total-min" class="select-styled" min="0" max="60" step="1" placeholder="Total">
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Físico</label>
+          <div class="cg-two-cols">
+            <select id="oi-filter-altura" class="select-styled" aria-label="Altura"><option value="">Altura</option></select>
+            <select id="oi-filter-complexion" class="select-styled" aria-label="Complexión"><option value="">Complexión</option></select>
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Rendimiento</label>
+          <div class="cg-checks">
+            <label><input type="checkbox" class="oi-chk-rend" value="A"> A</label>
+            <label><input type="checkbox" class="oi-chk-rend" value="B"> B</label>
+            <label><input type="checkbox" class="oi-chk-rend" value="C"> C</label>
+            <label><input type="checkbox" class="oi-chk-rend" value="D"> D</label>
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Proyección</label>
+          <div class="cg-checks">
+            <label><input type="checkbox" class="oi-chk-proy" value="A"> A</label>
+            <label><input type="checkbox" class="oi-chk-proy" value="B"> B</label>
+            <label><input type="checkbox" class="oi-chk-proy" value="C"> C</label>
+            <label><input type="checkbox" class="oi-chk-proy" value="D"> D</label>
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Ojeador</label>
+          <div class="cg-toggle-group">
+            <button class="oi-btn-ojeador cg-btn-ojeador" data-val="A. Oñate">A. Oñate</button>
+            <button class="oi-btn-ojeador cg-btn-ojeador" data-val="J.L. Tijerín">J.L. Tijerín</button>
+            <button class="oi-btn-ojeador cg-btn-ojeador" data-val="J. Román">J. Román</button>
+            <button class="oi-btn-ojeador cg-btn-ojeador" data-val="Javi Galán">Javi Galán</button>
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Contexto</label>
+          <div class="cg-toggle-group">
+            <button class="oi-btn-contexto cg-btn-contexto" data-val="Betis Deportivo">Betis Dep.</button>
+            <button class="oi-btn-contexto cg-btn-contexto" data-val="Real Betis C">RB Betis C</button>
+            <button class="oi-btn-contexto cg-btn-contexto" data-val="Betis Juvenil DH">Juvenil DH</button>
+          </div>
+        </div>
+
+        <div class="cg-filter-group">
+          <label class="cg-filter-label">Fin contrato antes de</label>
+          <input type="date" id="oi-filter-contrato" class="select-styled" style="width:100%">
+        </div>
+
+        <button id="oi-reset-btn" class="btn-primary" style="width:100%;margin-top:8px">Limpiar filtros</button>
       </div>
-    </div>
 
-    <!-- Bench -->
-    <div class="oi-bench-section">
-      <h3 class="oi-bench-title">🪑 Suplentes recomendados</h3>
-      <div id="oi-bench" class="oi-bench-row"></div>
-    </div>
-
-    <!-- Ranking por zona -->
-    <div class="chart-card full-width" style="margin-top:16px">
-      <div class="chart-title">📋 Ranking por posición</div>
-      <div id="oi-position-ranking" class="oi-ranking-grid"></div>
-    </div>
-
-    <!-- Full roster table -->
-    <div class="chart-card full-width" style="margin-top:16px">
-      <div class="chart-title">📊 Tabla completa</div>
-      <div id="oi-table-container" style="overflow-x:auto"></div>
+      <div class="cg-campo-scroll">
+        <div class="cg-pitch oi-selection-pitch">
+          <div class="cg-field-line cg-field-half"></div>
+          <div class="cg-field-circle"></div>
+          <div class="cg-field-box cg-field-box-left"></div>
+          <div class="cg-field-box cg-field-box-right"></div>
+          <div class="cg-field-goal cg-field-goal-left"></div>
+          <div class="cg-field-goal cg-field-goal-right"></div>
+          <div id="oi-players-layer" class="oi-players-layer"></div>
+        </div>
+        <div class="oi-selection-meta">
+          <div id="oi-bench" class="oi-bench-row"></div>
+          <div id="oi-position-ranking" class="oi-ranking-grid"></div>
+        </div>
+      </div>
     </div>
   </div><!-- #tab-once-ideal -->
 
@@ -1110,7 +1191,7 @@
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="script.js?v=45"></script>
+<script src="script.js?v=47"></script>
 <script src="campograma.js?v=3"></script>
 </body>
 </html>

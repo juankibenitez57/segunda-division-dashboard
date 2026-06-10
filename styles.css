@@ -2123,6 +2123,187 @@ table.dataTable thead .sorting_desc {
   margin-left: 4px;
 }
 
+/* 11 ideal sobre campo tipo campograma */
+.oi-cg-layout .cg-campo-scroll {
+  padding: 14px;
+}
+
+.oi-selection-pitch {
+  margin: 0;
+  width: 1240px;
+  height: 860px;
+  min-width: 1240px;
+}
+
+.oi-selection-pitch .oi-players-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.oi-field-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+}
+
+.oi-field-slot:hover {
+  z-index: 20;
+}
+
+.oi-field-card {
+  width: 138px;
+  min-height: 154px;
+  background: rgba(8, 30, 16, 0.88);
+  border: 3px solid var(--oi-zone-color, #009a44);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: visible;
+}
+
+.oi-field-card.oi-empty {
+  opacity: 0.55;
+  border-style: dashed;
+}
+
+.oi-field-rating {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 42px;
+  height: 24px;
+  border-radius: 12px;
+  background: #13220e;
+  color: #e7d069;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.oi-field-photo,
+.oi-field-avatar {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  margin: 18px auto 5px;
+  background: #009a44;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.35);
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.oi-field-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.oi-field-photo span {
+  color: #fff;
+}
+
+.oi-field-role {
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(255,255,255,0.72);
+  text-transform: uppercase;
+}
+
+.oi-field-name {
+  width: 100%;
+  padding: 3px 6px 0;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+
+.oi-field-badges {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 6px 4px 8px;
+}
+
+.oi-field-badge {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  background: rgba(255,255,255,0.92);
+  border-radius: 4px;
+  padding: 1px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+}
+
+.oi-selection-meta {
+  width: 1240px;
+  min-width: 1240px;
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 12px;
+}
+
+.oi-selection-meta .oi-bench-row,
+.oi-selection-meta .oi-ranking-grid {
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.oi-mini-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 132px;
+  background: #f6f7f8;
+  border: 1px solid #dfe3e8;
+  padding: 7px 9px;
+  gap: 2px;
+}
+
+.oi-mini-card strong {
+  font-size: 0.78rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.oi-mini-card span {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.oi-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.82);
+  font-weight: 700;
+}
+
 /* Rendimiento badges (shared) */
 .badge-rend { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; letter-spacing: .03em; }
 .badge-rend-a { background: rgba(34,197,94,.15);  color: #16a34a; }
