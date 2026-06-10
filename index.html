@@ -54,6 +54,7 @@
     <li><a href="#" class="nav-link" data-tab="tab-pos-dev"><span class="nav-icon">📐</span><span class="nav-text">Desarrollo Posición</span></a></li>
     <li><a href="#" class="nav-link" data-tab="tab-bbdd"><span class="nav-icon">🗄️</span><span class="nav-text">Base de Datos</span></a></li>
     <li><a href="#" class="nav-link" data-tab="tab-campograma"><span class="nav-icon">⚽</span><span class="nav-text">Campograma RBB</span></a></li>
+    <li><a href="#" class="nav-link" data-tab="tab-once-ideal"><span class="nav-icon">🌟</span><span class="nav-text">11 Ideal</span></a></li>
   </ul>
 </nav>
 
@@ -1020,6 +1021,91 @@
     </div><!-- .cg-layout / #campo-container -->
   </div><!-- #tab-campograma -->
 
+  <!-- ===================== TAB: 11 IDEAL ===================== -->
+  <div id="tab-once-ideal" class="tab-content">
+    <div class="section-header">
+      <h2 class="section-title">🌟 11 Ideal</h2>
+      <p class="section-subtitle">Los mejores jugadores por posición según el seguimiento del scouting de Betis</p>
+    </div>
+
+    <!-- Filters bar -->
+    <div class="oi-filters-bar">
+      <div class="oi-filter-group">
+        <label class="oi-filter-label">Contexto</label>
+        <select id="oi-contexto" class="select-styled">
+          <option value="">Todos</option>
+          <option value="Betis Deportivo" selected>Betis Deportivo</option>
+          <option value="Betis Juvenil DH">Betis Juvenil DH</option>
+          <option value="Real Betis C">Real Betis C</option>
+        </select>
+      </div>
+      <div class="oi-filter-group">
+        <label class="oi-filter-label">Formación</label>
+        <select id="oi-formacion" class="select-styled">
+          <option value="433">4-3-3</option>
+          <option value="4231">4-2-3-1</option>
+          <option value="442">4-4-2</option>
+          <option value="352">3-5-2</option>
+          <option value="4141">4-1-4-1</option>
+        </select>
+      </div>
+      <div class="oi-filter-group">
+        <label class="oi-filter-label">Rendimiento mín.</label>
+        <select id="oi-rendimiento" class="select-styled">
+          <option value="">Todos</option>
+          <option value="A" selected>A (Excelente)</option>
+          <option value="AB">A + B</option>
+        </select>
+      </div>
+      <div class="oi-filter-group">
+        <label class="oi-filter-label">Procedencia</label>
+        <select id="oi-procedencia" class="select-styled">
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <button id="oi-refresh-btn" class="btn-primary" onclick="renderOnceIdeal()">⚽ Actualizar 11</button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="oi-kpis" id="oi-kpis"></div>
+
+    <!-- Pitch container -->
+    <div class="oi-wrapper">
+      <!-- Pitch -->
+      <div class="oi-pitch-container">
+        <div class="oi-pitch" id="oi-pitch">
+          <!-- Pitch markings -->
+          <div class="oi-pitch-circle"></div>
+          <div class="oi-pitch-center-line"></div>
+          <div class="oi-pitch-box oi-pitch-box-top"></div>
+          <div class="oi-pitch-box oi-pitch-box-bottom"></div>
+          <div class="oi-pitch-goal oi-pitch-goal-top"></div>
+          <div class="oi-pitch-goal oi-pitch-goal-bottom"></div>
+          <!-- Players injected by JS -->
+          <div id="oi-players-layer" class="oi-players-layer"></div>
+        </div>
+      </div>
+
+      <!-- Sidebar: top players list -->
+      <div class="oi-sidebar">
+        <h3 class="oi-sidebar-title">📋 Ranking por posición</h3>
+        <div id="oi-position-ranking"></div>
+      </div>
+    </div>
+
+    <!-- Bench -->
+    <div class="oi-bench-section">
+      <h3 class="oi-bench-title">🪑 Suplentes recomendados</h3>
+      <div id="oi-bench" class="oi-bench-row"></div>
+    </div>
+
+    <!-- Full roster table -->
+    <div class="chart-card full-width" style="margin-top:24px">
+      <div class="chart-title">📊 Tabla completa — Jugadores seleccionados</div>
+      <div id="oi-table-container" style="overflow-x:auto"></div>
+    </div>
+  </div><!-- #tab-once-ideal -->
+
 </div><!-- end main-content -->
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -1029,7 +1115,7 @@
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="script.js?v=41"></script>
+<script src="script.js?v=43"></script>
 <script src="campograma.js?v=3"></script>
 </body>
 </html>

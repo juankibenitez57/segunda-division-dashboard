@@ -540,7 +540,7 @@ function switchTab(tabId) {
 }
 
 function renderCurrentTab() {
-  if (ALL_DATA.length === 0 && currentTab !== 'tab-inicio' && currentTab !== 'tab-campograma') return;
+  if (ALL_DATA.length === 0 && currentTab !== 'tab-inicio' && currentTab !== 'tab-campograma' && currentTab !== 'tab-once-ideal') return;
 
   switch (currentTab) {
     case 'tab-inicio':       renderInicioTab(); break;
@@ -559,6 +559,7 @@ function renderCurrentTab() {
     case 'tab-pos-dev':      renderPosDevTab(); break;
     case 'tab-bbdd':         if (!chartsRendered['tab-bbdd']) { renderBBDDTab(); chartsRendered['tab-bbdd'] = true; } break;
     case 'tab-campograma':   if (window.initCampograma) window.initCampograma(); break;
+    case 'tab-once-ideal':   renderOnceIdeal(); break;
   }
 }
 
@@ -5424,6 +5425,365 @@ function buildQueryContext(question) {
   return `Resumen dataset: ${ALL_DATA.length} operaciones, ${REV_DATA.length} revalorizaciones, 5 temporadas (2021-26)\n` +
     `Master: ${MASTER_DATA.length} registros, ${new Set(MASTER_DATA.map(d=>d.entrenador).filter(Boolean)).size} entrenadores\n` +
     'Top revalorizados:\n' + topRev.map(d=>`${d.jugador}|${d.club}|${d.posicion_es||''}|rev:${formatM(+d.revalorizacion_abs||0)}|ROI:${(+d.revalorizacion_pct||0).toFixed(0)}%`).join('\n');
+}
+
+/* ===================== 11 IDEAL ===================== */
+
+/* --- Helpers (scoped to avoid collisions) --- */
+function _oiCol(p, ...names) {
+  for (const n of names) {
+    const v = p[n];
+    if (v !== undefined && String(v).trim() !== '') return String(v).trim();
+  }
+  return '';
+}
+function _oiNum(val) { return parseFloat(String(val || '').replace(',', '.')) || 0; }
+function _oiSafe(text) {
+  if (!text) return 'unknown';
+  return text.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+}
+function _oiZone(pos) {
+  const p = ' ' + (pos || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '') + ' ';
+  const R = [
+    ['EI',  ['extremo izquierdo','extremo izq',' ei ',' xi ','ala izquierda','ala izq','carrilero izq']],
+    ['ED',  ['extremo derecho','extremo der','extremo dcho',' ed ',' xd ','ala derecha','ala der','carrilero der']],
+    ['EXT', [' extremo ']],
+    ['LI',  ['lateral izquierdo','lateral izq',' li ','carrilero izquierdo']],
+    ['LD',  ['lateral derecho','lateral der','lateral dcho',' ld ','carrilero derecho']],
+    ['LAT', [' lateral ']],
+    ['MP',  ['mediapunta','media punta',' mp ','segunda punta','enganche','trequartista']],
+    ['DC',  ['delantero centro','delantero',' dc ',' punta ','ariete',' 9 ']],
+    ['CC',  ['centrocampista','interior','volante',' cc ']],
+    ['MC',  ['mediocentro',' mc ','pivote',' mcd']],
+    ['CTI', ['central izquierdo','central izq']],
+    ['CTD', ['central derecho','central der','central dcho']],
+    ['CT',  [' central','defensa central']],
+    ['GK',  ['portero',' po ',' gk ']],
+  ];
+  for (const [z, kws] of R) { if (kws.some(k => p.includes(k))) return z; }
+  return null;
+}
+
+/* --- Formation slot definitions (x/y as % of pitch container) --- */
+const OI_FORMATIONS = {
+  '433': [
+    { id:'gk',  label:'PO', zones:['GK'],              x:50, y:87 },
+    { id:'li',  label:'LI', zones:['LI','LAT'],        x:12, y:70 },
+    { id:'cti', label:'CT', zones:['CTI','CT'],        x:33, y:73 },
+    { id:'ctd', label:'CT', zones:['CTD','CT'],        x:67, y:73 },
+    { id:'ld',  label:'LD', zones:['LD','LAT'],        x:88, y:70 },
+    { id:'mc1', label:'MC', zones:['MC','CC'],          x:28, y:50 },
+    { id:'mc2', label:'MC', zones:['MC','CC'],          x:50, y:47 },
+    { id:'mc3', label:'MC', zones:['MC','CC'],          x:72, y:50 },
+    { id:'ei',  label:'EI', zones:['EI','EXT','MP'],    x:14, y:20 },
+    { id:'dc',  label:'DC', zones:['DC'],               x:50, y:14 },
+    { id:'ed',  label:'ED', zones:['ED','EXT','MP'],    x:86, y:20 },
+  ],
+  '4231': [
+    { id:'gk',  label:'PO',    zones:['GK'],            x:50, y:87 },
+    { id:'li',  label:'LI',    zones:['LI','LAT'],      x:12, y:70 },
+    { id:'cti', label:'CT',    zones:['CTI','CT'],      x:33, y:73 },
+    { id:'ctd', label:'CT',    zones:['CTD','CT'],      x:67, y:73 },
+    { id:'ld',  label:'LD',    zones:['LD','LAT'],      x:88, y:70 },
+    { id:'mc1', label:'MC',    zones:['MC'],             x:33, y:57 },
+    { id:'mc2', label:'MC',    zones:['MC'],             x:67, y:57 },
+    { id:'ei',  label:'EI/MP', zones:['EI','EXT','MP'], x:15, y:34 },
+    { id:'mp',  label:'MP',    zones:['MP','CC'],        x:50, y:31 },
+    { id:'ed',  label:'ED/MP', zones:['ED','EXT','MP'], x:85, y:34 },
+    { id:'dc',  label:'DC',    zones:['DC'],             x:50, y:14 },
+  ],
+  '442': [
+    { id:'gk',  label:'PO', zones:['GK'],               x:50, y:87 },
+    { id:'li',  label:'LI', zones:['LI','LAT'],         x:12, y:70 },
+    { id:'cti', label:'CT', zones:['CTI','CT'],         x:33, y:73 },
+    { id:'ctd', label:'CT', zones:['CTD','CT'],         x:67, y:73 },
+    { id:'ld',  label:'LD', zones:['LD','LAT'],         x:88, y:70 },
+    { id:'ei',  label:'EI', zones:['EI','LAT'],         x:12, y:48 },
+    { id:'mc1', label:'MC', zones:['MC','CC'],           x:37, y:48 },
+    { id:'mc2', label:'MC', zones:['MC','CC'],           x:63, y:48 },
+    { id:'ed',  label:'ED', zones:['ED','LAT'],         x:88, y:48 },
+    { id:'dc1', label:'DC', zones:['DC','EI','MP'],      x:36, y:17 },
+    { id:'dc2', label:'DC', zones:['DC','ED','MP'],      x:64, y:17 },
+  ],
+  '352': [
+    { id:'gk',  label:'PO',  zones:['GK'],               x:50, y:87 },
+    { id:'cti', label:'CT',  zones:['CTI','CT'],         x:22, y:74 },
+    { id:'ct',  label:'CT',  zones:['CT','CTI','CTD'],   x:50, y:76 },
+    { id:'ctd', label:'CT',  zones:['CTD','CT'],         x:78, y:74 },
+    { id:'car1',label:'CAR', zones:['LI','EI','LAT'],    x:8,  y:52 },
+    { id:'mc1', label:'MC',  zones:['MC','CC'],           x:29, y:50 },
+    { id:'mc2', label:'MC',  zones:['MC','CC'],           x:50, y:48 },
+    { id:'mc3', label:'MC',  zones:['MC','CC'],           x:71, y:50 },
+    { id:'car2',label:'CAR', zones:['LD','ED','LAT'],    x:92, y:52 },
+    { id:'dc1', label:'DC',  zones:['DC','EI','MP'],      x:35, y:17 },
+    { id:'dc2', label:'DC',  zones:['DC','ED','MP'],      x:65, y:17 },
+  ],
+  '4141': [
+    { id:'gk',  label:'PO', zones:['GK'],               x:50, y:87 },
+    { id:'li',  label:'LI', zones:['LI','LAT'],         x:12, y:70 },
+    { id:'cti', label:'CT', zones:['CTI','CT'],         x:33, y:73 },
+    { id:'ctd', label:'CT', zones:['CTD','CT'],         x:67, y:73 },
+    { id:'ld',  label:'LD', zones:['LD','LAT'],         x:88, y:70 },
+    { id:'mc',  label:'MC', zones:['MC'],               x:50, y:58 },
+    { id:'ei',  label:'EI', zones:['EI','EXT'],         x:14, y:40 },
+    { id:'cc1', label:'CC', zones:['CC','MC'],           x:37, y:38 },
+    { id:'cc2', label:'CC', zones:['CC','MC'],           x:63, y:38 },
+    { id:'ed',  label:'ED', zones:['ED','EXT'],         x:86, y:40 },
+    { id:'dc',  label:'DC', zones:['DC','MP'],           x:50, y:14 },
+  ],
+};
+
+/* Zona → display label */
+const OI_ZONE_LABEL = {
+  GK:'Portero', LI:'Lat. Izq.', LD:'Lat. Der.', CTI:'Central', CTD:'Central', CT:'Central',
+  MC:'Mediocentro', CC:'Centrocampista', EI:'Extremo Izq.', ED:'Extremo Der.', EXT:'Extremo',
+  MP:'Mediapunta', DC:'Delantero', LAT:'Lateral',
+};
+
+/* Safe fallback for photo errors */
+window._oiPhotoError = function(el, name) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = playerAvatar(name, 52);
+  el.replaceWith(tmp.firstElementChild || tmp);
+};
+
+/* Build a single player card for the pitch */
+function _oiPlayerCard(player, slotLabel, clubMapping) {
+  if (!player) {
+    return `<div class="oi-player-card oi-empty-slot">
+      <div class="oi-player-photo oi-no-player">${slotLabel}</div>
+      <div class="oi-player-name" style="color:rgba(255,255,255,0.4)">—</div>
+    </div>`;
+  }
+  const safe = _oiSafe(player.apodo || player.nombre);
+  const nameEsc = (player.apodo || player.nombre).replace(/'/g, "\\'");
+  const shortName = (player.apodo || player.nombre.split(' ').slice(0, 2).join(' ')).substring(0, 18);
+  const score = player.mediaJaviG || player.media || 0;
+  const scoreFmt = score > 0 ? score.toFixed(1) : '—';
+  const shieldSrc = clubMapping[player.equipo] || '';
+  const shieldHtml = shieldSrc
+    ? `<img class="oi-card-shield" src="${shieldSrc}" alt="" onerror="this.style.display='none'">`
+    : '';
+  return `<div class="oi-player-card" title="${player.nombre} · ${player.posicion} · ${player.equipo}">
+    <div class="oi-card-score">${scoreFmt}</div>
+    <div class="oi-player-photo">
+      <img src="assets/players/${safe}.jpg" alt="${nameEsc}" width="52" height="52"
+           style="border-radius:50%;object-fit:cover;object-position:center top;border:2px solid rgba(255,255,255,0.35);background:#1a3928"
+           onerror="_oiPhotoError(this,'${nameEsc}')">
+      ${shieldHtml}
+    </div>
+    <div class="oi-player-name">${shortName}</div>
+  </div>`;
+}
+
+/* Greedy best-11 selection */
+function _oiSelectBest11(players, formation) {
+  const used = new Set();
+  const starters = {};
+  for (const slot of formation) {
+    const candidates = players
+      .filter(p => slot.zones.some(z => p.zona === z) && !used.has(p.nombre))
+      .sort((a, b) => (b.mediaJaviG || b.media || 0) - (a.mediaJaviG || a.media || 0));
+    if (candidates.length) {
+      starters[slot.id] = candidates[0];
+      used.add(candidates[0].nombre);
+    }
+  }
+  const bench = players
+    .filter(p => !used.has(p.nombre))
+    .sort((a, b) => (b.mediaJaviG || b.media || 0) - (a.mediaJaviG || a.media || 0))
+    .slice(0, 6);
+  return { starters, bench };
+}
+
+async function renderOnceIdeal() {
+  const playersLayer = document.getElementById('oi-players-layer');
+  const kpiEl = document.getElementById('oi-kpis');
+  const benchEl = document.getElementById('oi-bench');
+  const rankingEl = document.getElementById('oi-position-ranking');
+  const tableEl = document.getElementById('oi-table-container');
+  if (!playersLayer) return;
+
+  /* Show loading */
+  playersLayer.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.7);font-size:0.9rem">Cargando datos…</div>';
+
+  /* Load CSV */
+  const CSV_FILE = 'Base de Datos 25-26 RBB.csv';
+  const csvPath = typeof dataPath === 'function' ? dataPath(CSV_FILE) : `data/final/${CSV_FILE}`;
+  let rawPlayers = [];
+  try {
+    const resp = await fetch(csvPath);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const csv = await resp.text();
+    const parsed = Papa.parse(csv, {
+      header: true, delimiter: ';', skipEmptyLines: 'greedy',
+      transformHeader: h => String(h || '').trim(),
+    });
+    rawPlayers = parsed.data
+      .filter(p => _oiCol(p, 'Nombre'))
+      .map(p => ({
+        nombre: _oiCol(p, 'Nombre'),
+        apodo: _oiCol(p, 'Apodo'),
+        posicion: _oiCol(p, 'Posición', 'Posicion', 'Pos'),
+        equipo: _oiCol(p, 'Equipo'),
+        liga: _oiCol(p, 'Liga'),
+        procedencia: _oiCol(p, 'Procedencia'),
+        contexto: _oiCol(p, 'Contexto'),
+        rendimiento: _oiCol(p, 'Rendimiento'),
+        proyeccion: _oiCol(p, 'Proyección', 'Proyeccion'),
+        etapa: _oiCol(p, 'Etapa'),
+        mediaJaviG: _oiNum(_oiCol(p, 'Media Javi G')),
+        media: _oiNum(_oiCol(p, 'Media')),
+        total: _oiNum(_oiCol(p, 'Total')),
+        finContrato: _oiCol(p, 'Fin Contrato (TM)', 'CONTRATOS'),
+        zona: _oiZone(_oiCol(p, 'Posición', 'Posicion', 'Pos')),
+        safeName: _oiSafe(_oiCol(p, 'Apodo') || _oiCol(p, 'Nombre')),
+      }));
+  } catch (e) {
+    playersLayer.innerHTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#f87171;font-size:0.85rem;padding:16px;text-align:center">Error al cargar datos:<br>${e.message}</div>`;
+    return;
+  }
+
+  /* Read filter values */
+  const contexto    = document.getElementById('oi-contexto')?.value    || '';
+  const formKey     = document.getElementById('oi-formacion')?.value   || '433';
+  const rendFilter  = document.getElementById('oi-rendimiento')?.value || '';
+  const procFilter  = document.getElementById('oi-procedencia')?.value || '';
+
+  /* Populate procedencia dropdown once */
+  const procSelect = document.getElementById('oi-procedencia');
+  if (procSelect && procSelect.options.length <= 1) {
+    const procs = [...new Set(rawPlayers.map(p => p.procedencia).filter(Boolean))].sort();
+    procs.forEach(pr => {
+      const opt = document.createElement('option');
+      opt.value = pr; opt.textContent = pr;
+      procSelect.appendChild(opt);
+    });
+  }
+
+  /* Filter players */
+  let pool = rawPlayers;
+  if (contexto) pool = pool.filter(p => p.contexto === contexto);
+  if (rendFilter === 'A')  pool = pool.filter(p => p.rendimiento === 'A');
+  if (rendFilter === 'AB') pool = pool.filter(p => p.rendimiento === 'A' || p.rendimiento === 'B');
+  if (procFilter) pool = pool.filter(p => p.procedencia === procFilter);
+
+  /* KPIs */
+  if (kpiEl) {
+    const countA = pool.filter(p => p.rendimiento === 'A').length;
+    const countB = pool.filter(p => p.rendimiento === 'B').length;
+    const clubs  = new Set(pool.map(p => p.equipo).filter(Boolean)).size;
+    const avgScore = pool.length ? (pool.reduce((s,p) => s + (p.mediaJaviG || p.media || 0), 0) / pool.length).toFixed(2) : '—';
+    kpiEl.innerHTML = `
+      <div class="oi-kpi"><div class="oi-kpi-value">${pool.length}</div><div class="oi-kpi-label">Jugadores</div></div>
+      <div class="oi-kpi"><div class="oi-kpi-value" style="color:var(--success)">${countA}</div><div class="oi-kpi-label">Rating A</div></div>
+      <div class="oi-kpi"><div class="oi-kpi-value" style="color:var(--warning)">${countB}</div><div class="oi-kpi-label">Rating B</div></div>
+      <div class="oi-kpi"><div class="oi-kpi-value">${clubs}</div><div class="oi-kpi-label">Clubes</div></div>
+      <div class="oi-kpi"><div class="oi-kpi-value">${avgScore}</div><div class="oi-kpi-label">Media score</div></div>`;
+  }
+
+  /* Load club mapping */
+  let clubMapping = {};
+  try {
+    const r = await fetch('assets/config/club_mapping.json');
+    if (r.ok) clubMapping = await r.json();
+  } catch {}
+
+  /* Select best 11 */
+  const formation = OI_FORMATIONS[formKey] || OI_FORMATIONS['433'];
+  const { starters, bench } = _oiSelectBest11(pool, formation);
+
+  /* --- Render player cards on pitch --- */
+  const cards = formation.map(slot => {
+    const player = starters[slot.id];
+    const cardHtml = _oiPlayerCard(player, slot.label, clubMapping);
+    return `<div class="oi-slot" style="left:${slot.x}%;top:${slot.y}%">
+      <div class="oi-slot-label">${slot.label}</div>
+      ${cardHtml}
+    </div>`;
+  }).join('');
+  playersLayer.innerHTML = cards;
+
+  /* --- Bench --- */
+  if (benchEl) {
+    if (bench.length === 0) {
+      benchEl.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem">No hay suplentes disponibles con los filtros actuales.</p>';
+    } else {
+      benchEl.innerHTML = bench.map(p => {
+        const safe = _oiSafe(p.apodo || p.nombre);
+        const nameEsc = (p.apodo || p.nombre).replace(/'/g, "\\'");
+        const shortName = (p.apodo || p.nombre.split(' ').slice(0, 2).join(' ')).substring(0, 16);
+        const score = p.mediaJaviG || p.media || 0;
+        const shieldSrc = clubMapping[p.equipo] || '';
+        const rendBadge = p.rendimiento
+          ? `<span class="oi-badge rend-${p.rendimiento.toLowerCase()}">${p.rendimiento}</span>` : '';
+        return `<div class="oi-bench-card">
+          <div class="oi-bench-photo">
+            <img src="assets/players/${safe}.jpg" alt="${nameEsc}" width="46" height="46"
+                 style="border-radius:50%;object-fit:cover;object-position:center top;border:2px solid rgba(255,255,255,0.2);background:#1a3928"
+                 onerror="_oiPhotoError(this,'${nameEsc}')">
+            ${shieldSrc ? `<img class="oi-bench-shield" src="${shieldSrc}" alt="" onerror="this.style.display='none'">` : ''}
+          </div>
+          <div class="oi-bench-info">
+            <div class="oi-bench-name">${shortName}</div>
+            <div class="oi-bench-pos">${OI_ZONE_LABEL[p.zona] || p.posicion}</div>
+            <div class="oi-bench-score">${score > 0 ? score.toFixed(1) : '—'} ${rendBadge}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  /* --- Ranking sidebar by zone --- */
+  if (rankingEl) {
+    const byZone = {};
+    for (const p of pool) {
+      if (!p.zona) continue;
+      (byZone[p.zona] = byZone[p.zona] || []).push(p);
+    }
+    const zoneOrder = ['GK','LI','LD','CTI','CTD','CT','MC','CC','EI','ED','EXT','MP','DC','LAT'];
+    const html = zoneOrder
+      .filter(z => byZone[z]?.length)
+      .map(z => {
+        const top = [...byZone[z]].sort((a,b) => (b.mediaJaviG||b.media||0)-(a.mediaJaviG||a.media||0)).slice(0,3);
+        return `<div class="oi-rank-zone">
+          <div class="oi-rank-zone-title">${OI_ZONE_LABEL[z] || z}</div>
+          ${top.map((p,i) => `<div class="oi-rank-row">
+            <span class="oi-rank-pos">${i+1}</span>
+            <span class="oi-rank-name">${(p.apodo||p.nombre).substring(0,20)}</span>
+            <span class="oi-rank-score">${(p.mediaJaviG||p.media||0).toFixed(1)}</span>
+          </div>`).join('')}
+        </div>`;
+      }).join('');
+    rankingEl.innerHTML = html || '<p style="color:var(--text-muted);font-size:0.82rem;padding:8px">Sin datos</p>';
+  }
+
+  /* --- Full table --- */
+  if (tableEl) {
+    const starterSet = new Set(Object.values(starters).map(p => p?.nombre).filter(Boolean));
+    const tableData = [...pool].sort((a,b) => (b.mediaJaviG||b.media||0)-(a.mediaJaviG||a.media||0));
+    tableEl.innerHTML = `<table class="ppc-table" style="min-width:700px">
+      <thead><tr>
+        <th>#</th><th>Jugador</th><th>Posición</th><th>Equipo</th><th>Rend.</th>
+        <th>Score</th><th>Contrato</th><th>Contexto</th>
+      </tr></thead>
+      <tbody>${tableData.map((p, i) => {
+        const isStarter = starterSet.has(p.nombre);
+        return `<tr class="${isStarter ? 'oi-starter-row' : ''}">
+          <td style="color:var(--text-muted)">${i+1}</td>
+          <td><strong>${p.nombre}</strong>${p.apodo && p.apodo !== p.nombre ? `<br><span style="font-size:0.78rem;color:var(--text-muted)">${p.apodo}</span>` : ''}${isStarter ? ' <span class="oi-starter-badge">11</span>' : ''}</td>
+          <td>${p.posicion}</td>
+          <td>${p.equipo}</td>
+          <td><span class="badge-rend badge-rend-${(p.rendimiento||'').toLowerCase()}">${p.rendimiento||'—'}</span></td>
+          <td><strong>${(p.mediaJaviG||p.media||0).toFixed(2)}</strong></td>
+          <td style="font-size:0.8rem;color:var(--text-muted)">${p.finContrato||'—'}</td>
+          <td style="font-size:0.78rem;color:var(--text-muted)">${p.contexto}</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table>`;
+  }
 }
 
 /* ===================== INIT ===================== */
